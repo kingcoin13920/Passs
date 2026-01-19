@@ -85,8 +85,7 @@ const AirtableAPI = {
     return response.json();
   },
   
-  // ✅ FONCTION CORRIGÉE - Vérification réelle dans Airtable
-  verifyCode: async (code: string) => {
+verifyCode: async (code: string) => {
     if (IS_DEMO_MODE) {
       console.log('DEMO MODE - Verifying code:', code);
       return { 
@@ -101,12 +100,24 @@ const AirtableAPI = {
     }
     
     try {
-      // Appel à l'API pour vérifier le code dans Airtable
       const response = await fetch('/api/airtable/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
       });
+      
+      if (!response.ok) {
+        console.error('Verify code API failed:', response.status);
+        return { type: null, code, valid: false };
+      }
+      
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error verifying code:', error);
+      return { type: null, code, valid: false };
+    }
+  },
       
       if (!response.ok) {
         console.error('Verify code API failed:', response.status);
