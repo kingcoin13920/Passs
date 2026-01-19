@@ -1,8 +1,7 @@
 // lib/airtable.ts
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
-import { AirtableAPI, airtableClient } from '@/lib/airtable';
+
 
 const TABLES = {
   VOYAGES: 'Voyages',
