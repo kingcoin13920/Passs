@@ -1565,10 +1565,12 @@ const PassworldModule = () => {
           onComplete={async (groupData) => {
             setLoading(true);
             try {
-              const result = await createGroupTrip(groupData);
+              // Envoyer directement à Stripe avec les metadata
               await redirectToStripe('group', groupData.price, { 
-                tripId: result.tripId,
-                participants: result.participants 
+                type: 'group',
+                nbParticipants: groupData.participants.length,
+                participants: JSON.stringify(groupData.participants),
+                criteriaOrder: JSON.stringify(groupData.criteria.map(c => c.id))
               });
             } catch (error) {
               alert('Erreur : ' + error.message);
