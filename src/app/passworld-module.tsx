@@ -271,7 +271,7 @@ const PassworldModule = () => {
   const redirectToStripe = async (type: string, amount: number, metadata: any) => {
     try {
       // En mode démo, on simule
-      if (CONFIG.stripePublicKey === 'YOUR_STRIPE_PUBLIC_KEY') {
+      if (IS_DEMO_MODE) {
         console.log('Mode démo - Paiement simulé:', { type, amount, metadata });
         alert(`Mode démo:\nPaiement de ${amount}€ simulé avec succès!\n\nEn production, vous serez redirigé vers Stripe.`);
         return;
