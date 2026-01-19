@@ -118,19 +118,6 @@ verifyCode: async (code: string) => {
       return { type: null, code, valid: false };
     }
   },
-      
-      if (!response.ok) {
-        console.error('Verify code API failed:', response.status);
-        return { type: null, code, valid: false };
-      }
-      
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Error verifying code:', error);
-      return { type: null, code, valid: false };
-    }
-  },
   
   saveFormResponse: async (data: any) => {
     if (IS_DEMO_MODE) {
