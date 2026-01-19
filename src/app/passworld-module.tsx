@@ -7,8 +7,6 @@ import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, C
 const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
 // Config front (variables publiques Next.js)
-// NOTE: Les clés préfixées NEXT_PUBLIC_* sont exposées côté navigateur.
-// Garder les clés secrètes côté serveur uniquement (routes /api, server actions).
 const CONFIG = {
   stripePublicKey: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ?? 'YOUR_STRIPE_PUBLIC_KEY',
   airtableApiKey: process.env.NEXT_PUBLIC_AIRTABLE_API_KEY ?? 'YOUR_AIRTABLE_API_KEY',
@@ -18,7 +16,7 @@ const CONFIG = {
 const CRITERIA = [
   { id: 'budget', label: 'Budget', icon: '💰' },
   { id: 'dates', label: 'Dates / Durée', icon: '📅' },
-  { id: 'environment', label: "Type d'environnement", icon: '🏖️' },
+  { id: 'environment', label: "Type d'environnement", icon: '🖖' },
   { id: 'climate', label: 'Climat', icon: '☀️' },
   { id: 'activities', label: 'Activités souhaitées', icon: '🎯' },
   { id: 'rhythm', label: 'Rythme du voyage', icon: '⚡' },
@@ -50,7 +48,6 @@ const AirtableAPI = {
       return { success: true, id: 'demo-trip-' + Date.now() };
     }
     
-    // Mode production - appel API réel
     const response = await fetch('/api/airtable/create-trip', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -168,8 +165,13 @@ const PassworldModule = () => {
   const [currentView, setCurrentView] = useState('router');
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
-  const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
-
+  const [showDebug, setShowDebug] = useState(IS_DEMO_MODE);
+  const [giftFormData, setGiftFormData] = useState({
+    recipientName: '',
+    buyerName: '',
+    buyerEmail: ''
+  });
+  const [soloEmail, setSoloEmail] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -215,7 +217,6 @@ const PassworldModule = () => {
     try {
       const tripId = `TRIP-${Date.now()}`;
       
-      // Créer le voyage
       await AirtableAPI.createTrip({
         tripId,
         type: data.type,
@@ -224,7 +225,6 @@ const PassworldModule = () => {
         paymentStatus: 'pending'
       });
 
-      // Créer le participant
       await AirtableAPI.createParticipant({
         tripId,
         code: data.code,
@@ -245,7 +245,6 @@ const PassworldModule = () => {
     try {
       const tripId = `TRIP-${Date.now()}`;
       
-      // Créer le voyage
       await AirtableAPI.createTrip({
         tripId,
         type: 'group',
@@ -255,7 +254,6 @@ const PassworldModule = () => {
         paymentStatus: 'pending'
       });
 
-      // Créer tous les participants avec leurs codes
       const participantCodes = [];
       for (const participant of data.participants) {
         const code = generateCode();
@@ -279,14 +277,6 @@ const PassworldModule = () => {
 
   const redirectToStripe = async (type: string, amount: number, metadata: any) => {
     try {
-      // En mode démo, on simule
-      if (CONFIG.stripePublicKey === 'YOUR_STRIPE_PUBLIC_KEY') {
-        console.log('Mode démo - Paiement simulé:', { type, amount, metadata });
-        alert(`Mode démo:\nPaiement de ${amount}€ simulé avec succès!\n\nEn production, vous serez redirigé vers Stripe.`);
-        return;
-      }
-
-      // En production, rediriger vers Stripe
       await StripeAPI.createCheckoutSession({
         amount,
         type,
@@ -298,15 +288,67 @@ const PassworldModule = () => {
     }
   };
 
+  const handleGiftCardPayment = async () => {
+    if (!giftFormData.recipientName || !giftFormData.buyerName || !giftFormData.buyerEmail) {
+      alert('Veuillez remplir tous les champs');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const giftCode = generateCode();
+      
+      await createGiftCard(giftFormData, giftCode);
+      
+      await redirectToStripe('gift', 29, { 
+        type: 'gift',
+        code: giftCode,
+        recipientName: giftFormData.recipientName,
+        buyerName: giftFormData.buyerName,
+        buyerEmail: giftFormData.buyerEmail
+      });
+    } catch (error) {
+      alert('Erreur: ' + (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSoloPayment = async () => {
+    if (!soloEmail) {
+      alert('Veuillez entrer votre email');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const soloCode = generateCode();
+      
+      await createTrip({
+        type: 'solo',
+        code: soloCode,
+        email: soloEmail
+      });
+      
+      await redirectToStripe('solo', 29, { 
+        type: 'solo',
+        code: soloCode,
+        email: soloEmail
+      });
+    } catch (error) {
+      alert('Erreur: ' + (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const verifyCode = async (code: string) => {
     try {
-      // En mode démo
       if (CONFIG.airtableApiKey === 'YOUR_AIRTABLE_API_KEY') {
         console.log('Mode démo - Code vérifié:', code);
         return { type: 'gift', code };
       }
 
-      // En production
       return await AirtableAPI.verifyCode(code);
     } catch (error) {
       console.error('Erreur vérification code:', error);
@@ -317,16 +359,15 @@ const PassworldModule = () => {
   const GroupSetupView = ({ travelers, onBack, onComplete }: { travelers: number; onBack: () => void; onComplete: (data: any) => void }) => {
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
-    const [draggedItem, setDraggedItem] = useState(null);
+    const [draggedItem, setDraggedItem] = useState<number | null>(null);
     const [participants, setParticipants] = useState([{ prenom: '', nom: '', email: '' }]);
 
-    // Calculer le prix en fonction du nombre réel de participants
-    const calculatePrice = (nbParticipants) => {
+    const calculatePrice = (nbParticipants: number) => {
       if (nbParticipants === 1) return PRICES[1];
       if (nbParticipants === 2) return PRICES[2];
       if (nbParticipants >= 3 && nbParticipants <= 4) return PRICES[3];
       if (nbParticipants >= 5 && nbParticipants <= 8) return PRICES[4];
-      return PRICES[4]; // Max 8 personnes
+      return PRICES[4];
     };
 
     const currentPrice = calculatePrice(participants.length);
@@ -373,18 +414,28 @@ const PassworldModule = () => {
       setParticipants(newParticipants);
     };
 
-    const handlePayment = () => {
+    const handlePayment = async () => {
       const invalid = participants.some(p => !p.prenom || !p.nom || !p.email);
       if (invalid) {
         alert('Veuillez remplir toutes les informations des participants');
         return;
       }
-      console.log('Group setup complete:', { 
-        criteria: criteria.map(c => c.id), 
-        participants, 
-        price: currentPrice 
-      });
-      onComplete({ criteria, participants, price: currentPrice });
+      
+      setLoading(true);
+      try {
+        const result = await createGroupTrip({ criteria, participants, price: currentPrice });
+        
+        await redirectToStripe('group', currentPrice, { 
+          type: 'group',
+          tripId: result.tripId,
+          participants: result.participants,
+          nbParticipants: participants.length
+        });
+      } catch (error) {
+        alert('Erreur: ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (step === 1) {
@@ -501,202 +552,6 @@ const PassworldModule = () => {
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
-                      <input
-                        type="text"
-                        value={participant.prenom}
-                        onChange={(e) => updateParticipant(index, 'prenom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="Marie"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
-                      <input
-                        type="text"
-                        value={participant.nom}
-                        onChange={(e) => updateParticipant(index, 'nom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="Dupont"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                      <input
-                        type="email"
-                        value={participant.email}
-                        onChange={(e) => updateParticipant(index, 'email', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        placeholder="marie@example.com"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <button
-                onClick={addParticipant}
-                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
-              >
-                + Ajouter un participant {participants.length >= maxParticipants && `(max ${maxParticipants})`}
-              </button>
-            </div>
-
-            <div className="bg-indigo-50 p-6 rounded-lg mb-6">
-              <div className="flex justify-between items-center mb-3">
-                <div>
-                  <span className="text-gray-700 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
-                  <span className="text-sm text-gray-600">
-                    {participants.length === 1 && 'Solo'}
-                    {participants.length === 2 && 'Duo'}
-                    {participants.length >= 3 && participants.length <= 4 && 'Groupe 3-4'}
-                    {participants.length >= 5 && participants.length <= 8 && 'Groupe 5-8'}
-                  </span>
-                </div>
-                <span className="font-bold text-3xl text-gray-900">{currentPrice}€</span>
-              </div>
-              <p className="text-sm text-gray-600">
-                Chaque participant recevra un code unique par email après le paiement
-              </p>
-              {participants.length > 1 && (
-                <p className="text-sm text-indigo-600 mt-2">
-                  💡 Soit {(currentPrice / participants.length).toFixed(2)}€ par personne
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={handlePayment}
-              disabled={loading}
-              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 flex items-center justify-center"
-            >
-              {loading ? 'Chargement...' : (
-                <>
-                  Payer {currentPrice}€
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const FormView = ({ onBack }: { onBack: () => void }) => {
-    const [currentStep, setCurrentStep] = useState(1);
-    const [formData, setFormData] = useState({
-      prenom: '',
-      nom: '',
-      dateNaissance: '',
-      email: '',
-      nbVoyageurs: '',
-      enfants: '',
-      villeDepart: '',
-      dateDepart: '',
-      duree: '',
-      budget: '',
-      distance: '',
-      motivations: [],
-      motivationsDetail: '',
-      voyageType: '',
-      planningStyle: '',
-      environnements: [],
-      climat: '',
-      paysVisites: '',
-      activites: [],
-      rythme: '',
-      problemeSante: '',
-      phobies: '',
-      interdits: '',
-      formatRevelation: ''
-    });
-
-    const totalSteps = 10;
-
-    const updateField = (field: string, value: any) => {
-      setFormData({ ...formData, [field]: value });
-    };
-
-    const toggleMultiSelect = (field: string, value: string) => {
-      const current = formData[field];
-      if (current.includes(value)) {
-        updateField(field, current.filter(v => v !== value));
-      } else {
-        updateField(field, [...current, value]);
-      }
-    };
-
-    const nextStep = () => {
-      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
-    };
-
-    const prevStep = () => {
-      if (currentStep > 1) setCurrentStep(currentStep - 1);
-    };
-
-    const submitForm = async () => {
-      try {
-        setLoading(true);
-        
-        // En mode démo
-        if (CONFIG.airtableApiKey === 'YOUR_AIRTABLE_API_KEY') {
-          console.log('Mode démo - Formulaire soumis:', formData);
-          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
-          setLoading(false);
-          return;
-        }
-
-        // En production, sauvegarder dans Airtable
-        await AirtableAPI.saveFormResponse({
-          participantId: tripData.participantId || 'DEMO',
-          ...formData
-        });
-
-        // Mettre à jour le statut du participant
-        if (tripData.participantRecordId) {
-          await AirtableAPI.updateParticipantStatus(tripData.participantRecordId, 'completed');
-        }
-
-        alert('Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.');
-        onBack();
-      } catch (error) {
-        console.error('Erreur soumission formulaire:', error);
-        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Progress bar */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Étape {currentStep} sur {totalSteps}</span>
-              <span className="text-sm font-medium text-emerald-600">{Math.round((currentStep / totalSteps) * 100)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* Step 1: Infos personnelles */}
-            {currentStep === 1 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
                     <input
                       type="text"
                       value={formData.prenom}
@@ -746,425 +601,6 @@ const PassworldModule = () => {
               </div>
             )}
 
-            {/* Step 2: Plan de vol */}
-            {currentStep === 2 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🛫 Le plan de vol commence ici</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Combien êtes-vous à voyager ?</label>
-                    <select
-                      value={formData.nbVoyageurs}
-                      onChange={(e) => updateField('nbVoyageurs', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">-</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3-4">3-4</option>
-                      <option value="5-6">5-6</option>
-                      <option value="7+">7+</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Y a-t-il des enfants ?</label>
-                    <select
-                      value={formData.enfants}
-                      onChange={(e) => updateField('enfants', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">-</option>
-                      <option value="oui">Oui</option>
-                      <option value="non">Non</option>
-                    </select>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Votre ville de départ</label>
-                      <input
-                        type="text"
-                        value={formData.villeDepart}
-                        onChange={(e) => updateField('villeDepart', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                        placeholder="Lyon"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Date de départ</label>
-                      <input
-                        type="date"
-                        value={formData.dateDepart}
-                        onChange={(e) => updateField('dateDepart', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Durée</label>
-                      <select
-                        value={formData.duree}
-                        onChange={(e) => updateField('duree', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">-</option>
-                        <option value="weekend">Weekend</option>
-                        <option value="3-5j">3-5 jours</option>
-                        <option value="1sem">1 semaine</option>
-                        <option value="2sem">2 semaines</option>
-                        <option value="3sem+">3 semaines+</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Quel est votre budget par personne ? (vols inclus)</label>
-                      <select
-                        value={formData.budget}
-                        onChange={(e) => updateField('budget', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">-</option>
-                        <option value="<500">{"< 500€"}</option>
-                        <option value="500-1000">500-1000€</option>
-                        <option value="1000-2000">1000-2000€</option>
-                        <option value="2000-3000">2000-3000€</option>
-                        <option value="3000+">3000€+</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Préférence de distance</label>
-                      <select
-                        value={formData.distance}
-                        onChange={(e) => updateField('distance', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">-</option>
-                        <option value="proche">Proche (Europe)</option>
-                        <option value="moyen">Moyen (Afrique, Moyen-Orient)</option>
-                        <option value="loin">Loin (Amériques, Asie, Océanie)</option>
-                        <option value="peu-importe">Peu importe</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Motivations */}
-            {currentStep === 3 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">✨ Vos motivations, notre boussole</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Que recherchez-vous ?</label>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      {[
-                        'Besoin de déconnexion',
-                        'Envie de changement',
-                        'Célébration (anniversaire, lune de miel, etc.)',
-                        "Retrouver l'inspiration",
-                        'Recharger les batteries',
-                        'Travailler à distance',
-                        'Autre (Précisez)'
-                      ].map((option) => (
-                        <label key={option} className="flex items-center p-3 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.motivations.includes(option)}
-                            onChange={() => toggleMultiSelect('motivations', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded"
-                          />
-                          <span className="ml-3 text-sm text-gray-700">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Précisez</label>
-                    <textarea
-                      value={formData.motivationsDetail}
-                      onChange={(e) => updateField('motivationsDetail', e.target.value)}
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Type de voyage */}
-            {currentStep === 4 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🧭 Quel voyage vous ressemble le plus ?</h2>
-                </div>
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Vous préférez :</label>
-                    <div className="space-y-3">
-                      {['Un seul lieu', 'Plusieurs étapes'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="voyageType"
-                            checked={formData.voyageType === option}
-                            onChange={() => updateField('voyageType', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300"
-                          />
-                          <span className="ml-3 text-gray-700">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Vous aimez plutôt :</label>
-                    <div className="space-y-3">
-                      {['Être libre / improviser', 'Être encadré·e / guidé·e'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="planningStyle"
-                            checked={formData.planningStyle === option}
-                            onChange={() => updateField('planningStyle', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300"
-                          />
-                          <span className="ml-3 text-gray-700">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Environnements */}
-            {currentStep === 5 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quels types d'environnements vous attirent ?</h2>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'mer', label: '🌊 Mer', img: 'beach' },
-                    { value: 'montagne', label: '⛰️ Montagne', img: 'mountain' },
-                    { value: 'ville', label: '🏙️ Ville', img: 'city' },
-                    { value: 'campagne', label: '🌾 Campagne', img: 'countryside' },
-                    { value: 'desert', label: '🏜️ Désert', img: 'desert' },
-                    { value: 'jungle', label: '🌴 Jungle', img: 'jungle' }
-                  ].map((env) => (
-                    <button
-                      key={env.value}
-                      onClick={() => toggleMultiSelect('environnements', env.value)}
-                      className={`p-6 rounded-xl border-2 transition-all ${
-                        formData.environnements.includes(env.value)
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="text-4xl mb-2">{env.label.split(' ')[0]}</div>
-                      <div className="font-medium text-gray-900">{env.label.split(' ')[1]}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Step 6: Climat */}
-            {currentStep === 6 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quel climat recherchez-vous ?</h2>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'chaud', label: '☀️ Chaud', icon: '☀️' },
-                    { value: 'froid', label: '❄️ Froid', icon: '❄️' },
-                    { value: 'peu-importe', label: '🌤️ Peu importe', icon: '🌤️' }
-                  ].map((climat) => (
-                    <button
-                      key={climat.value}
-                      onClick={() => updateField('climat', climat.value)}
-                      className={`p-8 rounded-xl border-2 transition-all ${
-                        formData.climat === climat.value
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="text-5xl mb-3">{climat.icon}</div>
-                      <div className="font-semibold text-gray-900">{climat.label.split(' ')[1]}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Step 7: Pays visités */}
-            {currentStep === 7 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Pays ou régions déjà visités</h2>
-                  <p className="text-gray-600">(où vous ne souhaitez pas retourner)</p>
-                </div>
-
-                <textarea
-                  value={formData.paysVisites}
-                  onChange={(e) => updateField('paysVisites', e.target.value)}
-                  rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="Bali, Espagne, Italie..."
-                />
-              </div>
-            )}
-
-            {/* Step 8: Activités */}
-            {currentStep === 8 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Activités souhaitées</h2>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'baignade', label: '🏊 Baignade / Farniente' },
-                    { value: 'rando', label: '🥾 Randonnée / Marche' },
-                    { value: 'surf', label: '🏄 Plongée / Surf / Sports nautiques' },
-                    { value: 'culture', label: '🏛️ Visites culturelles (monuments, sites, musées...)' },
-                    { value: 'nature', label: '🌋 Nature (parcs, lacs, volcans...)' },
-                    { value: 'roadtrip', label: '🚗 Road trip / Escapades en voiture' },
-                    { value: 'gastro', label: '🍷 Gastronomie / spécialités locales' },
-                    { value: 'zen', label: '🧘 Bien-être (yoga, spa...)' },
-                    { value: 'fete', label: '🎉 Fêtes / Bars / Concerts' }
-                  ].map((act) => (
-                    <button
-                      key={act.value}
-                      onClick={() => toggleMultiSelect('activites', act.value)}
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
-                        formData.activites.includes(act.value)
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="text-2xl mb-2">{act.label.split(' ')[0]}</div>
-                      <div className="text-sm text-gray-700">{act.label.substring(act.label.indexOf(' ') + 1)}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Step 9: Rythme + Contraintes */}
-            {currentStep === 9 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quel rythme vous convient le mieux ?</h2>
-                </div>
-
-                <div className="mb-8">
-                  <select
-                    value={formData.rythme}
-                    onChange={(e) => updateField('rythme', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  >
-                    <option value="">-</option>
-                    <option value="repos">🛌 Repos total</option>
-                    <option value="tranquille">😌 Tranquille</option>
-                    <option value="equilibre">⚖️ Équilibré</option>
-                    <option value="actif">⚡ Actif</option>
-                    <option value="intense">🔥 Intense</option>
-                  </select>
-                </div>
-
-                <div className="border-t pt-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6">🌪️ Vos zones de turbulences à prendre en compte</h3>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Problèmes de santé ou de mobilité à prendre...</label>
-                      <textarea
-                        value={formData.problemeSante}
-                        onChange={(e) => updateField('problemeSante', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phobies ou peurs à éviter</label>
-                      <textarea
-                        value={formData.phobies}
-                        onChange={(e) => updateField('phobies', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Lieux, ambiances ou choses que vous souhaitez éviter absolument</label>
-                      <textarea
-                        value={formData.interdits}
-                        onChange={(e) => updateField('interdits', e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 10: Format révélation */}
-            {currentStep === 10 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🎁 Formule</h2>
-                  <p className="text-gray-600">Comment souhaitez-vous découvrir votre destination ?</p>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'lettre', label: 'Lettre', desc: 'Révélation physique par courrier' },
-                    { value: 'email', label: 'E-mail (PDF)', desc: 'Révélation numérique instantanée' },
-                    { value: 'lettre-email', label: 'Lettre + Email (PDF)', desc: 'Les deux formats' }
-                  ].map((format) => (
-                    <button
-                      key={format.value}
-                      onClick={() => updateField('formatRevelation', format.value)}
-                      className={`p-6 rounded-xl border-2 transition-all text-left ${
-                        formData.formatRevelation === format.value
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="font-bold text-lg text-gray-900 mb-2">{format.label}</div>
-                      <div className="text-sm text-gray-600">{format.desc}</div>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-6 text-center">
-                  <p className="text-emerald-800 font-semibold mb-2">✨ Prêt à découvrir votre destination ?</p>
-                  <p className="text-sm text-emerald-700">Votre expérience unique sera préparée dans les 48-72h</p>
-                </div>
-              </div>
-            )}
-
-            {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
               <button
                 onClick={currentStep === 1 ? onBack : prevStep}
@@ -1185,10 +621,15 @@ const PassworldModule = () => {
               ) : (
                 <button
                   onClick={submitForm}
-                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center"
+                  disabled={loading}
+                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center disabled:bg-gray-400"
                 >
-                  Envoyer
-                  <Check className="w-5 h-5 ml-2" />
+                  {loading ? 'Envoi...' : (
+                    <>
+                      Envoyer
+                      <Check className="w-5 h-5 ml-2" />
+                    </>
+                  )}
                 </button>
               )}
             </div>
@@ -1300,6 +741,8 @@ const PassworldModule = () => {
                 </label>
                 <input
                   type="text"
+                  value={giftFormData.recipientName}
+                  onChange={(e) => setGiftFormData({...giftFormData, recipientName: e.target.value})}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   placeholder="Marie Dupont"
                 />
@@ -1315,6 +758,8 @@ const PassworldModule = () => {
                     </label>
                     <input
                       type="text"
+                      value={giftFormData.buyerName}
+                      onChange={(e) => setGiftFormData({...giftFormData, buyerName: e.target.value})}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                       placeholder="Jean Martin"
                     />
@@ -1326,6 +771,8 @@ const PassworldModule = () => {
                     </label>
                     <input
                       type="email"
+                      value={giftFormData.buyerEmail}
+                      onChange={(e) => setGiftFormData({...giftFormData, buyerEmail: e.target.value})}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                       placeholder="jean@example.com"
                     />
@@ -1337,11 +784,16 @@ const PassworldModule = () => {
               </div>
 
               <button
-                onClick={() => alert('Paiement Stripe 29€')}
-                className="w-full bg-pink-600 text-white py-4 rounded-lg font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center"
+                onClick={handleGiftCardPayment}
+                disabled={loading}
+                className="w-full bg-pink-600 text-white py-4 rounded-lg font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center disabled:bg-gray-400"
               >
-                Payer 29€
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {loading ? 'Chargement...' : (
+                  <>
+                    Payer 29€
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1508,6 +960,8 @@ const PassworldModule = () => {
                 </label>
                 <input
                   type="email"
+                  value={soloEmail}
+                  onChange={(e) => setSoloEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="votre@email.com"
                 />
@@ -1524,11 +978,16 @@ const PassworldModule = () => {
               </div>
 
               <button
-                onClick={() => alert('Paiement Stripe 29€')}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                onClick={handleSoloPayment}
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center disabled:bg-gray-400"
               >
-                Payer 29€
-                <ArrowRight className="w-5 h-5 ml-2" />
+                {loading ? 'Chargement...' : (
+                  <>
+                    Payer 29€
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1537,20 +996,10 @@ const PassworldModule = () => {
 
       {currentView === 'group-setup' && (
         <GroupSetupView 
-          travelers={tripData.travelers} 
+          travelers={tripData.travelers || 3} 
           onBack={() => setCurrentView('no-code')}
           onComplete={async (groupData) => {
-            setLoading(true);
-            try {
-              const result = await createGroupTrip(groupData);
-              await redirectToStripe('group', groupData.price, { 
-                tripId: result.tripId,
-                participants: result.participants 
-              });
-            } catch (error) {
-              alert('Erreur : ' + error.message);
-              setLoading(false);
-            }
+            // La gestion du paiement est maintenant dans handlePayment du GroupSetupView
           }}
         />
       )}
@@ -1665,4 +1114,196 @@ const PassworldModule = () => {
   );
 };
 
-export default PassworldModule;
+export default PassworldModule;>
+                      <input
+                        type="text"
+                        value={participant.prenom}
+                        onChange={(e) => updateParticipant(index, 'prenom', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="Marie"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                      <input
+                        type="text"
+                        value={participant.nom}
+                        onChange={(e) => updateParticipant(index, 'nom', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="Dupont"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                      <input
+                        type="email"
+                        value={participant.email}
+                        onChange={(e) => updateParticipant(index, 'email', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="marie@example.com"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={addParticipant}
+                disabled={participants.length >= maxParticipants}
+                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                + Ajouter un participant {participants.length >= maxParticipants && `(max ${maxParticipants})`}
+              </button>
+            </div>
+
+            <div className="bg-indigo-50 p-6 rounded-lg mb-6">
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <span className="text-gray-700 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
+                  <span className="text-sm text-gray-600">
+                    {participants.length === 1 && 'Solo'}
+                    {participants.length === 2 && 'Duo'}
+                    {participants.length >= 3 && participants.length <= 4 && 'Groupe 3-4'}
+                    {participants.length >= 5 && participants.length <= 8 && 'Groupe 5-8'}
+                  </span>
+                </div>
+                <span className="font-bold text-3xl text-gray-900">{currentPrice}€</span>
+              </div>
+              <p className="text-sm text-gray-600">
+                Chaque participant recevra un code unique par email après le paiement
+              </p>
+              {participants.length > 1 && (
+                <p className="text-sm text-indigo-600 mt-2">
+                  💡 Soit {(currentPrice / participants.length).toFixed(2)}€ par personne
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={handlePayment}
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 flex items-center justify-center"
+            >
+              {loading ? 'Chargement...' : (
+                <>
+                  Payer {currentPrice}€
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const FormView = ({ onBack }: { onBack: () => void }) => {
+    const [currentStep, setCurrentStep] = useState(1);
+    const [formData, setFormData] = useState({
+      prenom: '',
+      nom: '',
+      dateNaissance: '',
+      email: '',
+      nbVoyageurs: '',
+      enfants: '',
+      villeDepart: '',
+      dateDepart: '',
+      duree: '',
+      budget: '',
+      distance: '',
+      motivations: [] as string[],
+      motivationsDetail: '',
+      voyageType: '',
+      planningStyle: '',
+      environnements: [] as string[],
+      climat: '',
+      paysVisites: '',
+      activites: [] as string[],
+      rythme: '',
+      problemeSante: '',
+      phobies: '',
+      interdits: '',
+      formatRevelation: ''
+    });
+
+    const totalSteps = 10;
+
+    const updateField = (field: string, value: any) => {
+      setFormData({ ...formData, [field]: value });
+    };
+
+    const toggleMultiSelect = (field: string, value: string) => {
+      const current = formData[field] as string[];
+      if (current.includes(value)) {
+        updateField(field, current.filter(v => v !== value));
+      } else {
+        updateField(field, [...current, value]);
+      }
+    };
+
+    const nextStep = () => {
+      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
+    };
+
+    const prevStep = () => {
+      if (currentStep > 1) setCurrentStep(currentStep - 1);
+    };
+
+    const submitForm = async () => {
+      try {
+        setLoading(true);
+        
+        if (CONFIG.airtableApiKey === 'YOUR_AIRTABLE_API_KEY') {
+          console.log('Mode démo - Formulaire soumis:', formData);
+          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
+          setLoading(false);
+          return;
+        }
+
+        await AirtableAPI.saveFormResponse({
+          participantId: tripData.participantId || 'DEMO',
+          ...formData
+        });
+
+        if (tripData.participantRecordId) {
+          await AirtableAPI.updateParticipantStatus(tripData.participantRecordId, 'completed');
+        }
+
+        alert('Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.');
+        onBack();
+      } catch (error) {
+        console.error('Erreur soumission formulaire:', error);
+        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">Étape {currentStep} sur {totalSteps}</span>
+              <span className="text-sm font-medium text-emerald-600">{Math.round((currentStep / totalSteps) * 100)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            {currentStep === 1 && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label
