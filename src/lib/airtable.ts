@@ -108,6 +108,7 @@ class AirtableClient {
         'Recipient Name': data.recipientName,
         'Status': 'unused',
         'Created At': new Date().toISOString(),
+        'Amount': 29, 
       },
     };
 
