@@ -99,6 +99,9 @@ const AirtableAPI = {
       };
     }
     
+    // Note: Cette fonction n'est pas utilisée dans le flux principal
+    // Le flux principal utilise la fonction verifyCode standalone (ligne ~296)
+    // qui appelle directement airtableClient.getParticipantWithTripInfo
     try {
       const response = await fetch('/api/airtable/verify-code', {
         method: 'POST',
@@ -107,7 +110,6 @@ const AirtableAPI = {
       });
       
       if (!response.ok) {
-        console.error('Verify code API failed:', response.status);
         return { type: null, code, valid: false };
       }
       
@@ -1546,28 +1548,17 @@ const verifyCode = async (code: string) => {
 
             <div className="space-y-6">
               <input
-                id="code-input"
                 type="text"
                 className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
                 placeholder="ABC-123-XYZ"
                 maxLength={11}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    const input = document.getElementById('code-input') as HTMLInputElement;
-                    verifyCode(input.value);
-                  }
-                }}
               />
 
               <button
-                onClick={() => {
-                  const input = document.getElementById('code-input') as HTMLInputElement;
-                  verifyCode(input.value);
-                }}
-                disabled={loading}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                onClick={() => setCurrentView('gift-choice')}
+                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
               >
-                {loading ? 'Vérification...' : 'Valider le code'}
+                Valider le code
               </button>
             </div>
           </div>
