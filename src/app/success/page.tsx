@@ -68,8 +68,8 @@ function SuccessContent() {
         
         const tripId = `TRIP-${Date.now()}`;
         
-    // Créer le voyage dans Airtable
-await fetch('/api/airtable/create-trip', {
+ // Créer le voyage dans Airtable
+const tripResponse = await fetch('/api/airtable/create-trip', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -82,7 +82,10 @@ await fetch('/api/airtable/create-trip', {
   }),
 });
 
-console.log('✅ Trip created:', tripId);
+const tripData = await tripResponse.json();
+const airtableTripRecordId = tripData.id;  // ← Récupérer le record ID d'Airtable
+
+console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripRecordId);
         
         // Récupérer les participants depuis les metadata
         let participantsData = [];
