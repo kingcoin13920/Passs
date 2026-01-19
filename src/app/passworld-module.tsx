@@ -161,38 +161,7 @@ const PassworldModule = () => {
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
 
-  // === AUTO-HEIGHT IFRAME (pour Elementor) ===
-  useEffect(() => {
-    function sendHeight() {
-      const h = Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight
-      );
 
-      window.parent.postMessage(
-        { type: "IFRAME_HEIGHT", height: h },
-        "*" // À sécuriser plus tard avec ton domaine WordPress
-      );
-    }
-
-    // Envoi initial
-    sendHeight();
-
-    // Envoi si la fenêtre change
-    window.addEventListener("resize", sendHeight);
-
-    // Observe les changements de contenu (clé pour ton app)
-    const observer = new ResizeObserver(sendHeight);
-    observer.observe(document.documentElement);
-
-    return () => {
-      window.removeEventListener("resize", sendHeight);
-      observer.disconnect();
-    };
-  }, []);
-  // === FIN AUTO-HEIGHT ===
-
-  
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const action = params.get('action');
