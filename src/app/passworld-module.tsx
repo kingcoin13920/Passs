@@ -292,7 +292,7 @@ const PassworldModule = () => {
   const verifyCode = async (code: string) => {
     try {
       // En mode démo
-      if (CONFIG.airtableApiKey === 'YOUR_AIRTABLE_API_KEY') {
+      if (IS_DEMO_MODE) {
         console.log('Mode démo - Code vérifié:', code);
         return { type: 'gift', code };
       }
@@ -632,7 +632,7 @@ const PassworldModule = () => {
         setLoading(true);
         
         // En mode démo
-        if (CONFIG.airtableApiKey === 'YOUR_AIRTABLE_API_KEY') {
+        if (IS_DEMO_MODE) {
           console.log('Mode démo - Formulaire soumis:', formData);
           alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
           setLoading(false);
