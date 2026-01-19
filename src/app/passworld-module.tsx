@@ -339,6 +339,17 @@ const verifyCode = async (code: string) => {
   }
 };
     
+    // Afficher la page d'accueil personnalisée
+    setCurrentView('personalized-welcome');
+    setLoading(false);
+    
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    alert('Erreur lors de la vérification du code');
+    setLoading(false);
+  }
+};
+    
 const result = await airtableClient.getParticipantWithTripInfo(code);
     
     console.log('📋 Résultat:', result);
