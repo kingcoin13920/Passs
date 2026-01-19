@@ -160,6 +160,7 @@ const PassworldModule = () => {
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
+
   // === AUTO-HEIGHT IFRAME (pour Elementor) ===
   useEffect(() => {
     function sendHeight() {
@@ -191,7 +192,7 @@ const PassworldModule = () => {
   }, []);
   // === FIN AUTO-HEIGHT ===
 
-
+  
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const action = params.get('action');
