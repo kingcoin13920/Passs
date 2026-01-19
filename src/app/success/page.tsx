@@ -32,19 +32,26 @@ function SuccessContent() {
         
         const data = await response.json();
         
+        console.log('✅ Session data:', data);
+        
         // Enregistrer dans Airtable selon le type
-        if (data.metadata.type === 'gift') {
+        // Si pas de type dans metadata, deviner selon l'URL ou enregistrer par défaut
+        const type = data.metadata?.type || 'solo'; // Par défaut: solo
+        
+        if (type === 'gift' || data.metadata?.recipientName) {
+          console.log('📦 Creating gift card...');
           await fetch('/api/airtable/create-gift-card', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               code: `GIFT-${Date.now()}`,
-              buyerName: data.metadata.buyerName || '',
+              buyerName: data.metadata?.buyerName || '',
               buyerEmail: data.customer_email,
-              recipientName: data.metadata.recipientName || '',
+              recipientName: data.metadata?.recipientName || '',
             }),
           });
-        } else if (data.metadata.type === 'solo') {
+        } else {
+          console.log('✈️ Creating trip...');
           const tripId = `TRIP-${Date.now()}`;
           const code = `CODE-${Date.now()}`;
           
