@@ -317,15 +317,19 @@ async createParticipant(data: {
   }
 }
 
+export const airtableClient = new AirtableClient();
+
 export const AirtableAPI = {
   createTrip: (data: any) => airtableClient.createTrip(data),
   createParticipant: (data: any) => airtableClient.createParticipant(data),
   createGiftCard: (data: any) => airtableClient.createGiftCard(data),
   verifyCode: (code: string) => airtableClient.verifyCode(code),
-  getParticipantWithTripInfo: (code: string) => airtableClient.getParticipantWithTripInfo(code),
+  getParticipantWithTripInfo: (code: string) => airtableClient.getParticipantWithTripInfo(code),  // ← AJOUTER CETTE LIGNE
   saveFormResponse: (data: any) => airtableClient.saveFormResponse(data),
-  updateParticipantStatus: (recordId: string, status: string) => airtableClient.updateParticipantStatus(recordId, status),
-  updateGiftCardStatus: (code: string, status: string) => airtableClient.updateGiftCardStatus(code, status),
-  getParticipantsByTrip: (tripId: string) => airtableClient.getParticipantsByTrip(tripId),
+  updateParticipantStatus: (recordId: string, status: string) => 
+    airtableClient.updateParticipantStatus(recordId, status),
+  updateGiftCardStatus: (code: string, status: string) =>
+    airtableClient.updateGiftCardStatus(code, status),
+  getParticipantsByTrip: (tripId: string) => 
+    airtableClient.getParticipantsByTrip(tripId),
 };
-export const airtableClient = new AirtableClient();
