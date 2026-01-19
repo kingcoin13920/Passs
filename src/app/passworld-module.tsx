@@ -86,16 +86,11 @@ const AirtableAPI = {
   },
   
   verifyCode: async (code: string) => {
-    if (IS_DEMO_MODE) {
-      console.log('DEMO MODE - Verifying code:', code);
-      return { type: 'gift', code, valid: true };
-    }
-    
-    const response = await fetch(`/api/airtable/verify-code?code=${encodeURIComponent(code)}`);
-    
-    if (!response.ok) throw new Error('Failed to verify code');
-    return response.json();
-  },
+  // Cette fonction est maintenant définie plus bas dans le composant (ligne ~301)
+  // Elle est gardée ici pour compatibilité mais ne fait rien
+  console.warn('⚠️ Ancienne verifyCode appelée - utilisez la nouvelle!');
+  return { type: null, code, valid: false };
+},
   
   saveFormResponse: async (data: any) => {
     if (IS_DEMO_MODE) {
