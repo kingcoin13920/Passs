@@ -3,17 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
 
-// Vérifier si on est en mode démo
-const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-
-// Config front (variables publiques Next.js)
-// NOTE: Les clés préfixées NEXT_PUBLIC_* sont exposées côté navigateur.
-// Garder les clés secrètes côté serveur uniquement (routes /api, server actions).
-const CONFIG = {
-  stripePublicKey: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY ?? 'YOUR_STRIPE_PUBLIC_KEY',
-  airtableApiKey: process.env.NEXT_PUBLIC_AIRTABLE_API_KEY ?? 'YOUR_AIRTABLE_API_KEY',
-  demoMode: IS_DEMO_MODE,
-};
+// Vérifier si on est en mode démo - désactivé par défaut en production
+const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
 
 const CRITERIA = [
   { id: 'budget', label: 'Budget', icon: '💰' },
