@@ -20,19 +20,119 @@ function SuccessContent() {
 
     // Enregistrer les données dans Airtable
     const saveToAirtable = async () => {
-      try {
-        // Récupérer les détails de la session Stripe
-        const response = await fetch('/api/stripe/verify-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
-        });
+  try {
+    console.log('📞 Verifying Stripe session...');
+    
+    // Récupérer les détails de la session Stripe
+    const response = await fetch('/api/stripe/verify-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    });
 
-        if (!response.ok) throw new Error('Failed to verify session');
-        
-        const data = await response.json();
-        
-        console.log('✅ Session data:', data);
+    if (!response.ok) throw new Error('Failed to verify session');
+    
+    const data = await response.json();
+    console.log('✅ Session data:', data);
+    
+    // Récupérer les metadata
+    const metadata = data.metadata || {};
+    const type = metadata.type || 'solo';
+    const nbParticipants = parseInt(metadata.nbParticipants) || 1;
+    const amount = data.amount_total / 100; // Convertir centimes en euros
+    
+    console.log('📊 Processing:', { type, nbParticipants, amount });
+    
+    // CAS 1: Carte cadeau
+    if (type === 'gift' || metadata.recipientName) {
+      console.log('🎁 Creating gift card...');
+      
+      await fetch('/api/airtable/create-gift-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: `GIFT-${Date.now()}`,
+          buyerName: metadata.buyerName || '',
+          buyerEmail: data.customer_email,
+          recipientName: metadata.recipientName || '',
+        }),
+      });
+      
+      setStatus('success');
+      setMessage('Carte cadeau créée! Le destinataire recevra un email avec son code.');
+      return;
+    }
+    
+    // CAS 2: Voyage (solo ou groupe)
+    console.log('✈️ Creating trip with', nbParticipants, 'participant(s)...');
+    
+    const tripId = `TRIP-${Date.now()}`;
+    
+    // Créer le voyage dans Airtable
+    await fetch('/api/airtable/create-trip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tripId,
+        type: type,
+        nbParticipants: nbParticipants,
+        amount: amount,
+        paymentStatus: 'paid',
+        criteriaOrder: metadata.criteriaOrder || ''
+      }),
+    });
+    
+    console.log('✅ Trip created:', tripId);
+    
+    // Récupérer les participants depuis les metadata
+    let participantsData = [];
+    try {
+      participantsData = metadata.participants ? JSON.parse(metadata.participants) : [];
+    } catch (e) {
+      console.error('Error parsing participants:', e);
+    }
+    
+    // Si pas de participants dans metadata, créer un participant avec l'email du paiement
+    if (participantsData.length === 0) {
+      participantsData = [{
+        prenom: '',
+        nom: '',
+        email: data.customer_email
+      }];
+    }
+    
+    // Créer chaque participant dans Airtable
+    console.log('👥 Creating', participantsData.length, 'participant(s)...');
+    
+    for (let i = 0; i < participantsData.length; i++) {
+      const participant = participantsData[i];
+      const code = `CODE-${Date.now()}-${i + 1}`;
+      
+      await fetch('/api/airtable/create-participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tripId,
+          code,
+          prenom: participant.prenom || '',
+          nom: participant.nom || '',
+          email: participant.email || data.customer_email,
+          paymentStatus: 'paid',
+        }),
+      });
+      
+      console.log(`✅ Participant ${i + 1} created:`, code);
+    }
+
+    setStatus('success');
+    setMessage(`Voyage créé! ${participantsData.length} participant(s) recevront un email avec leur code unique.`);
+    
+  } catch (error) {
+    console.error('❌ Error:', error);
+    setStatus('error');
+    setMessage('Erreur lors de l\'enregistrement. Veuillez contacter le support.');
+  }
+};
         
         // Enregistrer dans Airtable selon le type
         // Si pas de type dans metadata, deviner selon l'URL ou enregistrer par défaut
