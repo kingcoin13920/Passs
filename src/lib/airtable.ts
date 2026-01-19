@@ -134,6 +134,67 @@ async createParticipant(data: {
       };
     }
 
+    // Récupérer les informations complètes d'un participant et de son voyage
+async getParticipantWithTripInfo(code: string) {
+  try {
+    // 1. Trouver le participant
+    const formula = encodeURIComponent(`{Code} = '${code}'`);
+    const participantResult = await this.request(
+      'GET', 
+      `/${TABLES.PARTICIPANTS}?filterByFormula=${formula}`
+    );
+    
+    if (!participantResult.records || participantResult.records.length === 0) {
+      return { valid: false, message: 'Code invalide' };
+    }
+    
+    const participant = participantResult.records[0];
+    const tripIdArray = participant.fields['Trip ID'];
+    
+    // Trip ID est un tableau de record IDs (relation Airtable)
+    const tripRecordId = Array.isArray(tripIdArray) ? tripIdArray[0] : tripIdArray;
+    
+    if (!tripRecordId) {
+      return { valid: false, message: 'Voyage non trouvé' };
+    }
+    
+    // 2. Récupérer tous les participants du même voyage
+    const tripFormula = encodeURIComponent(`SEARCH('${tripRecordId}', ARRAYJOIN({Trip ID}))`);
+    const allParticipantsResult = await this.request(
+      'GET',
+      `/${TABLES.PARTICIPANTS}?filterByFormula=${tripFormula}`
+    );
+    
+    // 3. Filtrer les autres participants (pas celui qui se connecte)
+    const currentParticipant = {
+      id: participant.id,
+      code: code,
+      prenom: participant.fields['Prenom'] || '',
+      nom: participant.fields['Nom'] || '',
+      email: participant.fields['Email'] || '',
+      formStatus: participant.fields['Form Status'] || 'pending'
+    };
+    
+    const otherParticipants = (allParticipantsResult.records || [])
+      .filter(p => p.id !== participant.id)
+      .map(p => ({
+        prenom: p.fields['Prenom'] || '',
+        nom: p.fields['Nom'] || ''
+      }));
+    
+    return {
+      valid: true,
+      participant: currentParticipant,
+      otherParticipants: otherParticipants,
+      tripRecordId: tripRecordId
+    };
+    
+  } catch (error) {
+    console.error('Error getting participant info:', error);
+    return { valid: false, message: 'Erreur lors de la vérification du code' };
+  }
+}
+
     // Chercher dans les gift cards
     formula = encodeURIComponent(`{Code} = '${code}'`);
     result = await this.request('GET', `/${TABLES.GIFT_CARDS}?filterByFormula=${formula}`);
@@ -258,12 +319,12 @@ async createParticipant(data: {
 
 export const airtableClient = new AirtableClient();
 
-// Export des fonctions pour compatibilité avec le code existant
 export const AirtableAPI = {
   createTrip: (data: any) => airtableClient.createTrip(data),
   createParticipant: (data: any) => airtableClient.createParticipant(data),
   createGiftCard: (data: any) => airtableClient.createGiftCard(data),
   verifyCode: (code: string) => airtableClient.verifyCode(code),
+  getParticipantWithTripInfo: (code: string) => airtableClient.getParticipantWithTripInfo(code),  // ← AJOUTER CETTE LIGNE
   saveFormResponse: (data: any) => airtableClient.saveFormResponse(data),
   updateParticipantStatus: (recordId: string, status: string) => 
     airtableClient.updateParticipantStatus(recordId, status),
