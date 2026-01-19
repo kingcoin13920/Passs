@@ -3,11 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
 
-const CONFIG = {
-  airtableApiKey: 'YOUR_AIRTABLE_API_KEY',
-  airtableBaseId: 'YOUR_BASE_ID',
-  stripePublicKey: 'YOUR_STRIPE_PUBLIC_KEY'
-};
+// Vérifier si on est en mode démo
+const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
 const CRITERIA = [
   { id: 'budget', label: 'Budget', icon: '💰' },
@@ -36,39 +33,125 @@ interface TripData {
   [key: string]: any;
 }
 
-// Mock API helpers for demo mode
+// API helpers - Mode démo ou production
 const AirtableAPI = {
   createTrip: async (data: any) => {
-    console.log('Creating trip:', data);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Creating trip:', data);
+      return { success: true, id: 'demo-trip-' + Date.now() };
+    }
+    
+    // Mode production - appel API réel
+    const response = await fetch('/api/airtable/create-trip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) throw new Error('Failed to create trip');
+    return response.json();
   },
+  
   createParticipant: async (data: any) => {
-    console.log('Creating participant:', data);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Creating participant:', data);
+      return { success: true, id: 'demo-participant-' + Date.now() };
+    }
+    
+    const response = await fetch('/api/airtable/create-participant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) throw new Error('Failed to create participant');
+    return response.json();
   },
+  
   createGiftCard: async (data: any) => {
-    console.log('Creating gift card:', data);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Creating gift card:', data);
+      return { success: true, id: 'demo-gift-' + Date.now() };
+    }
+    
+    const response = await fetch('/api/airtable/create-gift-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) throw new Error('Failed to create gift card');
+    return response.json();
   },
+  
   verifyCode: async (code: string) => {
-    console.log('Verifying code:', code);
-    return { type: 'gift', code, valid: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Verifying code:', code);
+      return { type: 'gift', code, valid: true };
+    }
+    
+    const response = await fetch(`/api/airtable/verify-code?code=${encodeURIComponent(code)}`);
+    
+    if (!response.ok) throw new Error('Failed to verify code');
+    return response.json();
   },
+  
   saveFormResponse: async (data: any) => {
-    console.log('Saving form response:', data);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Saving form response:', data);
+      return { success: true };
+    }
+    
+    const response = await fetch('/api/airtable/save-form', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) throw new Error('Failed to save form');
+    return response.json();
   },
+  
   updateParticipantStatus: async (recordId: string, status: string) => {
-    console.log('Updating participant status:', recordId, status);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Updating participant status:', recordId, status);
+      return { success: true };
+    }
+    
+    const response = await fetch('/api/airtable/update-participant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, status }),
+    });
+    
+    if (!response.ok) throw new Error('Failed to update participant');
+    return response.json();
   }
 };
 
 const StripeAPI = {
   createCheckoutSession: async (data: any) => {
-    console.log('Creating Stripe session:', data);
-    alert(`Mode démo - Paiement de ${data.amount}€ simulé avec succès!`);
-    return { success: true };
+    if (IS_DEMO_MODE) {
+      console.log('DEMO MODE - Creating Stripe session:', data);
+      alert(`Mode démo - Paiement de ${data.amount}€ simulé avec succès!`);
+      return { success: true, url: null };
+    }
+    
+    const response = await fetch('/api/stripe/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) throw new Error('Failed to create checkout session');
+    const result = await response.json();
+    
+    // Rediriger vers Stripe
+    if (result.url) {
+      window.location.href = result.url;
+    }
+    
+    return result;
   }
 };
 
@@ -76,7 +159,38 @@ const PassworldModule = () => {
   const [currentView, setCurrentView] = useState('router');
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
-  const [showDebug, setShowDebug] = useState(true);
+  const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
+  // === AUTO-HEIGHT IFRAME (pour Elementor) ===
+  useEffect(() => {
+    function sendHeight() {
+      const h = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+
+      window.parent.postMessage(
+        { type: "IFRAME_HEIGHT", height: h },
+        "*" // À sécuriser plus tard avec ton domaine WordPress
+      );
+    }
+
+    // Envoi initial
+    sendHeight();
+
+    // Envoi si la fenêtre change
+    window.addEventListener("resize", sendHeight);
+
+    // Observe les changements de contenu (clé pour ton app)
+    const observer = new ResizeObserver(sendHeight);
+    observer.observe(document.documentElement);
+
+    return () => {
+      window.removeEventListener("resize", sendHeight);
+      observer.disconnect();
+    };
+  }, []);
+  // === FIN AUTO-HEIGHT ===
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
