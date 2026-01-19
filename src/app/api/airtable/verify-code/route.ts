@@ -1,3 +1,4 @@
+// app/api/airtable/verify-code/route.ts
 import { NextResponse } from 'next/server';
 import { AirtableAPI } from '@/lib/airtable';
 
@@ -13,7 +14,10 @@ export async function POST(request: Request) {
     }
 
     console.log('🔍 API: Verifying code:', code);
+
+    // Vérifier le code dans Airtable
     const result = await AirtableAPI.verifyCode(code);
+
     console.log('📋 API: Verification result:', result);
 
     return NextResponse.json(result);
