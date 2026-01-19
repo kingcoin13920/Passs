@@ -69,7 +69,7 @@ class AirtableClient {
 
 // Créer un participant
 async createParticipant(data: {
-  tripId: string;
+  tripId: string | string[];  // ← Accepter aussi un tableau
   code: string;
   prenom: string;
   nom: string;
@@ -78,9 +78,9 @@ async createParticipant(data: {
 }) {
   const record = {
     fields: {
-      'Trip ID': data.tripId,
+      'Trip ID': Array.isArray(data.tripId) ? data.tripId : [data.tripId],  // ← Convertir en tableau si nécessaire
       'Code': data.code,
-      'Prenom': data.prenom,  // ← SANS ACCENT
+      'Prenom': data.prenom,
       'Nom': data.nom,
       'Email': data.email,
       'Payment Status': data.paymentStatus,
