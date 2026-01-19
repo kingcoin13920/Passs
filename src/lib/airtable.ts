@@ -134,8 +134,26 @@ async createParticipant(data: {
       };
     }
 
-    // Récupérer les informations complètes d'un participant et de son voyage
-async getParticipantWithTripInfo(code: string) {
+    // Chercher dans les gift cards
+    formula = encodeURIComponent(`{Code} = '${code}'`);
+    result = await this.request('GET', `/${TABLES.GIFT_CARDS}?filterByFormula=${formula}`);
+    
+    if (result.records && result.records.length > 0) {
+      const giftCard = result.records[0];
+      return {
+        type: 'gift',
+        code,
+        valid: true,
+        status: giftCard.fields.Status,
+        recipientName: giftCard.fields['Recipient Name'],
+      };
+    }
+
+    return { type: null, code, valid: false };
+  }
+
+  // Récupérer les informations complètes d'un participant et de son voyage
+  async getParticipantWithTripInfo(code: string) {
   try {
     // 1. Trouver le participant
     const formula = encodeURIComponent(`{Code} = '${code}'`);
@@ -194,24 +212,6 @@ async getParticipantWithTripInfo(code: string) {
     return { valid: false, message: 'Erreur lors de la vérification du code' };
   }
 }
-
-    // Chercher dans les gift cards
-    formula = encodeURIComponent(`{Code} = '${code}'`);
-    result = await this.request('GET', `/${TABLES.GIFT_CARDS}?filterByFormula=${formula}`);
-    
-    if (result.records && result.records.length > 0) {
-      const giftCard = result.records[0];
-      return {
-        type: 'gift',
-        code,
-        valid: true,
-        status: giftCard.fields.Status,
-        recipientName: giftCard.fields['Recipient Name'],
-      };
-    }
-
-    return { type: null, code, valid: false };
-  }
 
   // Sauvegarder une réponse de formulaire
   async saveFormResponse(data: {
