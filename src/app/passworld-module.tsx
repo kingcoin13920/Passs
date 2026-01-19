@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Gift, Users, User, Plane } from 'lucide-react';
 
 // Vérifier si on est en mode démo - désactivé par défaut en production
 const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
@@ -156,6 +157,7 @@ const StripeAPI = {
 };
 
 const PassworldModule = () => {
+  const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
@@ -296,21 +298,46 @@ const PassworldModule = () => {
     }
   };
 
-  const verifyCode = async (code: string) => {
-    try {
-      // En mode démo
-      if (IS_DEMO_MODE) {
-        console.log('Mode démo - Code vérifié:', code);
-        return { type: 'gift', code };
-      }
+const verifyCode = async (code: string) => {
+  if (!code.trim()) {
+    alert('Veuillez entrer un code');
+    return;
+  }
 
-      // En production
-      return await AirtableAPI.verifyCode(code);
-    } catch (error) {
-      console.error('Erreur vérification code:', error);
-      throw error;
+  setLoading(true);
+  try {
+    console.log('🔍 Vérification du code:', code);
+    
+    const result = await AirtableAPI.getParticipantWithTripInfo(code);
+    
+    console.log('📋 Résultat:', result);
+    
+    if (!result.valid) {
+      alert(result.message || 'Code invalide');
+      setLoading(false);
+      return;
     }
-  };
+    
+    // Stocker les infos du participant
+    setParticipantInfo(result);
+    
+    // Si le formulaire est déjà complété, afficher un message
+    if (result.participant.formStatus === 'completed') {
+      alert('Vous avez déjà complété votre formulaire!');
+      setLoading(false);
+      return;
+    }
+    
+    // Afficher la page d'accueil personnalisée
+    setCurrentView('personalized-welcome');
+    setLoading(false);
+    
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    alert('Erreur lors de la vérification du code');
+    setLoading(false);
+  }
+};
 
   const GroupSetupView = ({ travelers, onBack, onComplete }: { travelers: number; onBack: () => void; onComplete: (data: any) => void }) => {
     const [step, setStep] = useState(1);
@@ -1238,6 +1265,75 @@ const PassworldModule = () => {
       </div>
     </div>
   );
+
+  {currentView === 'personalized-welcome' && participantInfo && (
+  <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+      <div className="text-center mb-8">
+        <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+          <Plane className="w-10 h-10 text-indigo-600" />
+        </div>
+        
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+          Bienvenue {participantInfo.participant.prenom}! 👋
+        </h2>
+        
+        {participantInfo.otherParticipants && participantInfo.otherParticipants.length > 0 ? (
+          <p className="text-xl text-gray-600 mb-6">
+            Préparez votre voyage avec{' '}
+            {participantInfo.otherParticipants.map((p, i) => (
+              <span key={i}>
+                <strong>{p.prenom}</strong>
+                {i < participantInfo.otherParticipants.length - 1 ? (
+                  i === participantInfo.otherParticipants.length - 2 ? ' et ' : ', '
+                ) : ''}
+              </span>
+            ))}
+          </p>
+        ) : (
+          <p className="text-xl text-gray-600 mb-6">
+            Préparez votre voyage surprise! 🌍
+          </p>
+        )}
+        
+        <div className="bg-blue-50 rounded-lg p-6 mb-6">
+          <p className="text-gray-700 text-lg leading-relaxed">
+            Vous allez définir vos préférences de voyage en classant différents critères par ordre d'importance. 
+            Cela nous permettra de trouver la destination parfaite pour vous!
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <button
+          onClick={() => {
+            // Stocker les infos du participant pour le formulaire
+            setTripData({
+              participantRecordId: participantInfo.participant.id,
+              participantCode: participantInfo.participant.code,
+              prenom: participantInfo.participant.prenom,
+              nom: participantInfo.participant.nom,
+              email: participantInfo.participant.email
+            });
+            setCurrentView('group-criteria');
+          }}
+          className="w-full bg-indigo-600 text-white py-4 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-lg font-semibold"
+        >
+          Commencer le formulaire
+          <ArrowRight className="w-6 h-6 ml-2" />
+        </button>
+
+        <button
+          onClick={() => setCurrentView('home')}
+          className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Retour à l'accueil
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
   return (
     <div className="relative">
