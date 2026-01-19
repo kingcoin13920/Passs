@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
-import { AirtableAPI, airtableClient } from '@/lib/airtable';
+import { airtableClient } from '@/lib/airtable';
 
 // Vérifier si on est en mode démo - désactivé par défaut en production
 const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
@@ -308,7 +308,7 @@ const verifyCode = async (code: string) => {
   try {
     console.log('🔍 Vérification du code:', code);
     
-const result = await RealAirtableAPI.getParticipantWithTripInfo(code);
+const result = await airtableClient.getParticipantWithTripInfo(code);
     
     console.log('📋 Résultat:', result);
     
