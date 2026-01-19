@@ -269,22 +269,29 @@ const PassworldModule = () => {
   };
 
   const redirectToStripe = async (type: string, amount: number, metadata: any) => {
+    console.log('🚀 redirectToStripe appelé:', { type, amount, IS_DEMO_MODE });
+    
     try {
       // En mode démo, on simule
       if (IS_DEMO_MODE) {
-        console.log('Mode démo - Paiement simulé:', { type, amount, metadata });
+        console.log('⚠️ MODE DEMO ACTIF');
         alert(`Mode démo:\nPaiement de ${amount}€ simulé avec succès!\n\nEn production, vous serez redirigé vers Stripe.`);
         return;
       }
 
+      console.log('✅ MODE PRODUCTION - Appel API Stripe...');
+      
       // En production, rediriger vers Stripe
       await StripeAPI.createCheckoutSession({
         amount,
         type,
         metadata
       });
+      
+      console.log('✅ API Stripe appelée avec succès');
     } catch (error) {
-      console.error('Erreur Stripe:', error);
+      console.error('❌ Erreur Stripe:', error);
+      alert('Erreur lors de la création de la session de paiement. Vérifiez la console.');
       throw error;
     }
   };
