@@ -325,7 +325,7 @@ export const AirtableAPI = {
   createParticipant: (data: any) => airtableClient.createParticipant(data),
   createGiftCard: (data: any) => airtableClient.createGiftCard(data),
   verifyCode: (code: string) => airtableClient.verifyCode(code),
-  getParticipantWithTripInfo: (code: string) => airtableClient.getParticipantWithTripInfo(code),  // ← AJOUTER CETTE LIGNE
+  getParticipantWithTripInfo: (code: string) => airtableClient.getParticipantWithTripInfo(code),
   saveFormResponse: (data: any) => airtableClient.saveFormResponse(data),
   updateParticipantStatus: (recordId: string, status: string) => 
     airtableClient.updateParticipantStatus(recordId, status),
