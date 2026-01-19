@@ -317,6 +317,7 @@ const PassworldModule = () => {
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
     const [participants, setParticipants] = useState([{ prenom: '', nom: '', email: '' }]);
+    const [selectedGroupSize, setSelectedGroupSize] = useState(1);
 
     // Calculer le prix en fonction du nombre réel de participants
     const calculatePrice = (nbParticipants) => {
