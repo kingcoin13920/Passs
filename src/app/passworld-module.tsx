@@ -1335,7 +1335,15 @@ const PassworldModule = () => {
               </div>
 
               <button
-                onClick={() => alert('Paiement Stripe 29€')}
+                onClick={() => {
+                  // Récupérer les données du formulaire
+                  const inputs = document.querySelectorAll('input');
+                  redirectToStripe('gift', 29, {
+                    recipientName: (inputs[0] as HTMLInputElement)?.value || '',
+                    buyerName: (inputs[1] as HTMLInputElement)?.value || '',
+                    buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
+                  });
+                }}
                 className="w-full bg-pink-600 text-white py-4 rounded-lg font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center"
               >
                 Payer 29€
@@ -1522,7 +1530,13 @@ const PassworldModule = () => {
               </div>
 
               <button
-                onClick={() => alert('Paiement Stripe 29€')}
+                onClick={() => {
+                  // Récupérer l'email du formulaire
+                  const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+                  redirectToStripe('solo', 29, {
+                    email: emailInput?.value || ''
+                  });
+                }}
                 className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center"
               >
                 Payer 29€
