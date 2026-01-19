@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
-import { ArrowLeft, ArrowRight, Gift, Users, User, Plane } from 'lucide-react';
 
 // Vérifier si on est en mode démo - désactivé par défaut en production
 const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
