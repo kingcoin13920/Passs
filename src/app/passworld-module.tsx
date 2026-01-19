@@ -1469,15 +1469,25 @@ const PassworldModule = () => {
                 { value: 4, label: '5-8 personnes', price: 129 }
               ].map((option) => (
                 <button
-                  key={option.value}
-                  onClick={() => {
-                    setTripData({ travelers: option.value });
-                    if (option.value === 1) {
-                      setCurrentView('solo-payment');
-                    } else {
-                      setCurrentView('group-setup');
-                    }
-                  }}
+  key={option.value}
+  onClick={() => {
+    // Déterminer le nombre exact de participants
+    let nbParticipants = 1;
+    if (option.value === 2) nbParticipants = 2;
+    if (option.value === 3) nbParticipants = 4;  // 3-4 personnes = 4 champs
+    if (option.value === 4) nbParticipants = 8;  // 5-8 personnes = 8 champs
+    
+    setTripData({ 
+      travelers: option.value,
+      nbParticipants: nbParticipants 
+    });
+    
+    if (option.value === 1) {
+      setCurrentView('solo-payment');
+    } else {
+      setCurrentView('group-setup');
+    }
+  }}
                   className="p-6 rounded-xl border-2 border-gray-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all"
                 >
                   <div className="text-xl font-bold text-gray-900 mb-1">{option.label}</div>
