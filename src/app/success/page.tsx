@@ -68,21 +68,21 @@ function SuccessContent() {
         
         const tripId = `TRIP-${Date.now()}`;
         
-        // Créer le voyage dans Airtable
-        await fetch('/api/airtable/create-trip', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tripId,
-            type: type,
-            nbParticipants: nbParticipants,
-            amount: amount,
-            paymentStatus: 'paid',
-            criteriaOrder: metadata.criteriaOrder || ''
-          }),
-        });
-        
-        console.log('✅ Trip created:', tripId);
+    // Créer le voyage dans Airtable
+await fetch('/api/airtable/create-trip', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    tripId,
+    type: type,
+    nbParticipants: nbParticipants,
+    amount: amount,
+    paymentStatus: 'paid',
+    criteriaOrder: metadata.criteriaOrder || ''
+  }),
+});
+
+console.log('✅ Trip created:', tripId);
         
         // Récupérer les participants depuis les metadata
         let participantsData = [];
