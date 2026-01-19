@@ -112,17 +112,17 @@ console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripReco
           const code = `CODE-${Date.now()}-${i + 1}`;
           
           await fetch('/api/airtable/create-participant', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tripId,
-              code,
-              prenom: participant.prenom || '',
-              nom: participant.nom || '',
-              email: participant.email || data.customer_email,
-              paymentStatus: 'paid',
-            }),
-          });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    tripId: [airtableTripRecordId],  // ← Passer le record ID dans un tableau
+    code,
+    prenom: participant.prenom || '',
+    nom: participant.nom || '',
+    email: participant.email || data.customer_email,
+    paymentStatus: 'paid',
+  }),
+});
           
           console.log(`✅ Participant ${i + 1} created:`, code);
         }
