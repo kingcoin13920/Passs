@@ -308,6 +308,37 @@ const verifyCode = async (code: string) => {
   try {
     console.log('🔍 Vérification du code:', code);
     
+    const result = await airtableClient.getParticipantWithTripInfo(code);
+    
+    console.log('📋 Résultat:', result);
+    
+    if (!result.valid) {
+      alert(result.message || 'Code invalide');
+      setLoading(false);
+      return;
+    }
+    
+    // Stocker les infos du participant
+    setParticipantInfo(result);
+    
+    // Si le formulaire est déjà complété, afficher un message
+    if (result.participant.formStatus === 'completed') {
+      alert('Vous avez déjà complété votre formulaire!');
+      setLoading(false);
+      return;
+    }
+    
+    // Afficher la page d'accueil personnalisée
+    setCurrentView('personalized-welcome');
+    setLoading(false);
+    
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    alert('Erreur lors de la vérification du code');
+    setLoading(false);
+  }
+};
+    
 const result = await airtableClient.getParticipantWithTripInfo(code);
     
     console.log('📋 Résultat:', result);
