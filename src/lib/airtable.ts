@@ -43,55 +43,54 @@ class AirtableClient {
     return response.json();
   }
 
-  // Créer un voyage
-  async createTrip(data: {
-    tripId: string;
-    type: string;
-    nbParticipants: number;
-    amount: number;
-    paymentStatus: string;
-    criteriaOrder?: string[];
-  }) {
-    const record = {
-      fields: {
-        'Trip ID': data.tripId,
-        'Type': data.type,
-        'Nb Participants': data.nbParticipants,
-        'Amount': data.amount,
-        'Payment Status': data.paymentStatus,
-        'Criteria Order': data.criteriaOrder ? JSON.stringify(data.criteriaOrder) : '',
-        'Created At': new Date().toISOString(),
-      },
-    };
+ async createTrip(data: {
+  tripId: string;
+  type: string;
+  nbParticipants: number;
+  amount: number;
+  paymentStatus: string;
+  criteriaOrder?: string[];
+}) {
+  const record = {
+    fields: {
+      'Trip ID': data.tripId,
+      'Type': data.type,
+      'Nb Participants': data.nbParticipants,
+      'Amount': data.amount,
+      'Status': 'pending',  // ← AJOUTER CETTE LIGNE
+      'Payment Status': data.paymentStatus,
+      'Criteria Order': data.criteriaOrder ? JSON.stringify(data.criteriaOrder) : '',
+    },
+  };
 
-    const result = await this.request('POST', `/${TABLES.VOYAGES}`, { records: [record] });
-    return result.records[0];
-  }
+  const result = await this.request('POST', `/${TABLES.VOYAGES}`, { records: [record] });
+  return result.records[0];
+}
 
-  // Créer un participant
-  async createParticipant(data: {
-    tripId: string;
-    code: string;
-    prenom: string;
-    nom: string;
-    email: string;
-    paymentStatus: string;
-  }) {
-    const record = {
-      fields: {
-        'Trip ID': data.tripId,
-        'Code': data.code,
-        'Prénom': data.prenom,
-        'Nom': data.nom,
-        'Email': data.email,
-        'Payment Status': data.paymentStatus,
-        'Form Status': 'pending',
-      },
-    };
+// Créer un participant
+async createParticipant(data: {
+  tripId: string;
+  code: string;
+  prenom: string;
+  nom: string;
+  email: string;
+  paymentStatus: string;
+}) {
+  const record = {
+    fields: {
+      'Trip ID': data.tripId,
+      'Code': data.code,
+      'Prenom': data.prenom,  // ← SANS ACCENT
+      'Nom': data.nom,
+      'Email': data.email,
+      'Payment Status': data.paymentStatus,
+      'Form Status': 'pending',
+    },
+  };
 
-    const result = await this.request('POST', `/${TABLES.PARTICIPANTS}`, { records: [record] });
-    return result.records[0];
-  }
+  const result = await this.request('POST', `/${TABLES.PARTICIPANTS}`, { records: [record] });
+  return result.records[0];
+}
 
   // Créer une carte cadeau
   async createGiftCard(data: {
