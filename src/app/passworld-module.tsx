@@ -1810,7 +1810,7 @@ setTimeout(() => {
                     nom: participantInfo.participant.nom,
                     email: participantInfo.participant.email
                   });
-                  setCurrentView('group-criteria');
+                  setCurrentView('form');
                 }}
                 className="w-full bg-indigo-600 text-white py-4 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-lg font-semibold"
               >
