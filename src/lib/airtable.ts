@@ -157,7 +157,7 @@ async createParticipant(data: {
   async getParticipantWithTripInfo(code: string) {
     try {
       // 1. Trouver le participant
-      const formula = encodeURIComponent(`{Code} = '${code}'`);
+      const formula = encodeURIComponent(`{code} = '${code}'`);
       const participantResult = await this.request(
         'GET', 
         `/${TABLES.PARTICIPANTS}?filterByFormula=${formula}`
