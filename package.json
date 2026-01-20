@@ -15,7 +15,8 @@
     "lucide-react": "^0.263.1",
     "stripe": "^14.11.0",
     "@stripe/stripe-js": "^2.4.0",
-    "airtable": "^0.12.2"
+    "airtable": "^0.12.2",
+     "resend": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
