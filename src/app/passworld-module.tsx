@@ -342,21 +342,25 @@ const verifyCode = async (code: string) => {
       return;
     }
     
-    // Stocker les infos du participant
-    setParticipantInfo(result);
-    console.log('👤 ParticipantInfo stocké:', result);  // ← AJOUTER CETTE LIGNE
-    console.log('👤 Participant prenom:', result.participant?.prenom);  // ← ET CELLE-CI AUSSI
-    
-    // Si le formulaire est déjà complété, afficher un message
-    if (result.participant.formStatus === 'completed') {
-      alert('Vous avez déjà complété votre formulaire!');
-      setLoading(false);
-      return;
-    }
-    
-    // Afficher la page d'accueil personnalisée
-    setCurrentView('personalized-welcome');
-    setLoading(false);
+// Stocker les infos du participant
+setParticipantInfo(result);
+console.log('👤 ParticipantInfo stocké:', result);
+console.log('👤 Participant prenom:', result.participant?.prenom);
+
+// Si le formulaire est déjà complété, afficher un message
+if (result.participant.formStatus === 'completed') {
+  alert('Vous avez déjà complété votre formulaire!');
+  setLoading(false);
+  return;
+}
+
+// Afficher la page d'accueil personnalisée
+setCurrentView('personalized-welcome');
+
+// Délai pour laisser React mettre à jour
+setTimeout(() => {
+  setLoading(false);
+}, 100);
     
   } catch (error) {
     console.error('❌ Erreur:', error);
