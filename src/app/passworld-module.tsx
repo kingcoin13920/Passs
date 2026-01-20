@@ -344,6 +344,8 @@ const verifyCode = async (code: string) => {
     
     // Stocker les infos du participant
     setParticipantInfo(result);
+    console.log('👤 ParticipantInfo stocké:', result);  // ← AJOUTER CETTE LIGNE
+    console.log('👤 Participant prenom:', result.participant?.prenom);  // ← ET CELLE-CI AUSSI
     
     // Si le formulaire est déjà complété, afficher un message
     if (result.participant.formStatus === 'completed') {
