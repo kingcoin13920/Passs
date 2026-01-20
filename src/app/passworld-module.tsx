@@ -451,8 +451,15 @@ const handleModifyForm = async () => {
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
-    const [participants, setParticipants] = useState([{ prenom: '', nom: '', email: '' }]);
-    const [selectedGroupSize, setSelectedGroupSize] = useState(1);
+    
+    // Initialiser avec le bon nombre de participants selon travelers
+    const initialParticipants = Array.from({ length: travelers || 1 }, () => ({ 
+      prenom: '', 
+      nom: '', 
+      email: '' 
+    }));
+    const [participants, setParticipants] = useState(initialParticipants);
+    const [selectedGroupSize, setSelectedGroupSize] = useState(travelers || 1);
 
     // Calculer le prix en fonction du nombre réel de participants
     const calculatePrice = (nbParticipants) => {
@@ -1616,7 +1623,7 @@ const handleModifyForm = async () => {
                 id="code-input-field"
                 type="text"
                 className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
-                placeholder="XXXXX"
+                placeholder="ABC-123-XYZ"
                 maxLength={11}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
