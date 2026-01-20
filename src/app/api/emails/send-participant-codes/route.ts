@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       success: true,
       sent: successCount,
       failed: failureCount,
-      results,
+     result.data?.id,
     });
 
   } catch (error) {
