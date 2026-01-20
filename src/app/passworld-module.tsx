@@ -190,6 +190,21 @@ const PassworldModule = () => {
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
 
+  // Bouton retour en haut à gauche (sauf pour router)
+  const BackButton = () => {
+    if (currentView === 'router') return null;
+    
+    return (
+      <button
+        onClick={() => setCurrentView('router')}
+        className="fixed top-4 left-4 bg-white text-gray-700 p-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:bg-gray-50 z-50 flex items-center gap-2"
+        title="Retour à l'accueil"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </button>
+    );
+  };
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1356,7 +1371,7 @@ const handleModifyForm = async () => {
           <p className="text-gray-600">Votre prochaine aventure commence ici</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           <button
             onClick={() => setCurrentView('gift')}
             className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-left group"
@@ -1385,12 +1400,32 @@ const handleModifyForm = async () => {
             <p className="text-gray-600">Découvrez votre destination mystère maintenant</p>
           </button>
         </div>
+
+        <button
+          onClick={() => setCurrentView('with-code')}
+          className="w-full bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-left group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-emerald-100 rounded-full p-3">
+                <Code className="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Accéder à mon dashboard</h3>
+                <p className="text-gray-600 text-sm">J'ai déjà un code participant</p>
+              </div>
+            </div>
+            <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+          </div>
+        </button>
       </div>
     </div>
   );
 
   return (
     <div className="relative">
+      <BackButton />
+      
       {showDebug && (
         <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50 max-w-xs">
           <div className="flex justify-between items-center mb-3">
@@ -1581,7 +1616,7 @@ const handleModifyForm = async () => {
                 id="code-input-field"
                 type="text"
                 className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
-                placeholder="VOTRE CODE"
+                placeholder="XXXXX"
                 maxLength={11}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -1866,15 +1901,33 @@ const handleModifyForm = async () => {
                 )}
               </>
             ) : (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center mb-6">
-                <p className="text-blue-800">
-                  ℹ️ Vous n'êtes pas encore assigné à un groupe
-                </p>
-              </div>
+              <>
+                {/* Joueur solo - Afficher le statut simple */}
+                {groupStatus.participant.formStatus === 'completed' ? (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center mb-6">
+                    <div className="flex items-center justify-center gap-3 mb-2">
+                      <Check className="w-6 h-6 text-green-600" />
+                      <p className="text-green-800 font-semibold text-lg">
+                        Formulaire complété !
+                      </p>
+                    </div>
+                    <p className="text-green-700 text-sm">
+                      Votre destination est en cours de préparation. Vous recevrez les détails dans les 48-72h.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center mb-6">
+                    <p className="text-blue-800">
+                      ℹ️ Complétez votre formulaire pour découvrir votre destination surprise
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="space-y-3">
-              {groupStatus.participant.formStatus === 'completed' && groupStatus.canModifyForm && (
+              {/* Bouton "Modifier" uniquement pour les groupes ET si autorisé */}
+              {groupStatus.hasGroup && groupStatus.participant.formStatus === 'completed' && groupStatus.canModifyForm && (
                 <button
                   onClick={handleModifyForm}
                   disabled={isModifying}
@@ -1911,7 +1964,7 @@ const handleModifyForm = async () => {
               )}
 
               <button
-                onClick={() => setCurrentView('home')}
+                onClick={() => setCurrentView('router')}
                 className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
