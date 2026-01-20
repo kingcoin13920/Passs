@@ -1,6 +1,10 @@
-// lib/airtable.ts
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
+
+// AJOUTER CES LIGNES DE DEBUG
+console.log('🔑 AIRTABLE_API_KEY:', AIRTABLE_API_KEY ? 'Définie' : '❌ UNDEFINED');
+console.log('🗂️ AIRTABLE_BASE_ID:', AIRTABLE_BASE_ID ? AIRTABLE_BASE_ID : '❌ UNDEFINED');
+
 
 
 const TABLES = {
