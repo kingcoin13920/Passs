@@ -1548,17 +1548,34 @@ const verifyCode = async (code: string) => {
 
             <div className="space-y-6">
               <input
+                id="code-input-field"
                 type="text"
                 className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
                 placeholder="ABC-123-XYZ"
                 maxLength={11}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    const input = document.getElementById('code-input-field') as HTMLInputElement;
+                    if (input.value.trim()) {
+                      verifyCode(input.value.trim());
+                    }
+                  }
+                }}
               />
 
               <button
-                onClick={() => setCurrentView('gift-choice')}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                onClick={() => {
+                  const input = document.getElementById('code-input-field') as HTMLInputElement;
+                  if (input.value.trim()) {
+                    verifyCode(input.value.trim());
+                  } else {
+                    alert('Veuillez entrer un code');
+                  }
+                }}
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Valider le code
+                {loading ? 'Vérification...' : 'Valider le code'}
               </button>
             </div>
           </div>
