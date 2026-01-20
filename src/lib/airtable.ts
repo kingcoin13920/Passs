@@ -58,7 +58,7 @@ class AirtableClient {
       'Type': data.type,
       'Nb Participants': data.nbParticipants,
       'Amount': data.amount,
-      'Status': 'pending',  // ← AJOUTER CETTE LIGNE
+      'Status': 'pending',
       'Payment Status': data.paymentStatus,
       'Criteria Order': data.criteriaOrder ? JSON.stringify(data.criteriaOrder) : '',
     },
@@ -70,7 +70,7 @@ class AirtableClient {
 
 // Créer un participant
 async createParticipant(data: {
-  tripId: string | string[];  // ← Accepter aussi un tableau
+  tripId: string | string[];
   code: string;
   prenom: string;
   nom: string;
@@ -79,7 +79,7 @@ async createParticipant(data: {
 }) {
   const record = {
     fields: {
-      'Trip ID': Array.isArray(data.tripId) ? data.tripId : [data.tripId],  // ← Convertir en tableau si nécessaire
+      'Trip ID': Array.isArray(data.tripId) ? data.tripId : [data.tripId],
       'Code': data.code,
       'Prenom': data.prenom,
       'Nom': data.nom,
@@ -158,13 +158,8 @@ async createParticipant(data: {
     try {
       // 1. Trouver le participant
       const formula = encodeURIComponent(`{code} = '${code}'`);
-      async getParticipantWithTripInfo(code: string) {
-  try {
-    // 1. Trouver le participant
-    const formula = encodeURIComponent(`{code} = '${code}'`);
-    console.log('🔍🔍🔍 FORMULE:', formula); // ← AJOUTER CETTE LIGNE
-    console.log('🔍🔍🔍 CODE RECHERCHÉ:', code); // ← AJOUTER CETTE LIGNE
-    const participantResult = await this.request(
+      console.log('🔍🔍🔍 FORMULE:', formula);
+      console.log('🔍🔍🔍 CODE RECHERCHÉ:', code);
       const participantResult = await this.request(
         'GET', 
         `/${TABLES.PARTICIPANTS}?filterByFormula=${formula}`
