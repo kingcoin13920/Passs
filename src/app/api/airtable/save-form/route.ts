@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         'duree': data.duree || '',
         'budget': data.budget || '',
         'distance': data.distance || '',
-        'Main Motivations': data.motivations || [],
+'Main Motivations': Array.isArray(data.motivations) ? data.motivations.join(', ') : (data.motivations || ''),
         'Motivation Details': data.motivationsDetail || '',
         'Type of Trip': data.voyageType || '',
         'Planning Style': data.planningStyle || '',
