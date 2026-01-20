@@ -17,10 +17,17 @@ export async function POST(request: Request) {
       );
     }
 
+    // Helper pour convertir les tableaux en texte
+    const arrayToText = (value: any) => {
+      if (!value) return '';
+      if (Array.isArray(value)) return value.join(', ');
+      return String(value);
+    };
+
     // Créer l'enregistrement dans Form_Responses avec les VRAIS noms de colonnes
     const record = {
       fields: {
-        'Participant': [data.participantRecordId], // Lien vers le participant (doit être un tableau)
+        'Participant': data.participantRecordId ? [data.participantRecordId] : [], // Lien vers le participant
         'Number of Travelers': data.nbVoyageurs || '',
         'Children': data.enfants || '',
         'Departure City': data.villeDepart || '',
@@ -28,14 +35,14 @@ export async function POST(request: Request) {
         'duree': data.duree || '',
         'budget': data.budget || '',
         'distance': data.distance || '',
-'Main Motivations': Array.isArray(data.motivations) ? data.motivations.join(', ') : (data.motivations || ''),
+        'Main Motivations': arrayToText(data.motivations), // Converti en texte
         'Motivation Details': data.motivationsDetail || '',
         'Type of Trip': data.voyageType || '',
         'Planning Style': data.planningStyle || '',
-        'Preferred Environments': data.environnements || [],
+        'Preferred Environments': arrayToText(data.environnements), // Converti en texte
         'climat': data.climat || '',
         'Countries Visited': data.paysVisites || '',
-        'activites': data.activites || [],
+        'activites': arrayToText(data.activites), // Converti en texte
         'Pace': data.rythme || '',
         'Health Issues': data.problemeSante || '',
         'Phobias': data.phobies || '',
@@ -45,11 +52,8 @@ export async function POST(request: Request) {
       },
     };
 
-    console.log('📋 Record à envoyer:', record);
-console.log('📋 Record à envoyer:', record);
-console.log('🔍 participantRecordId:', data.participantRecordId);
-console.log('🔍 Type:', typeof data.participantRecordId);
-    
+    console.log('📋 Record à envoyer:', JSON.stringify(record, null, 2));
+
     // Sauvegarder dans Airtable
     const response = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Form_Responses`,
@@ -65,7 +69,7 @@ console.log('🔍 Type:', typeof data.participantRecordId);
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('❌ Erreur Airtable:', error);
+      console.error('❌ Erreur Airtable:', JSON.stringify(error, null, 2));
       console.error('❌ Status:', response.status);
       return NextResponse.json(
         { error: 'Erreur lors de la sauvegarde', details: error },
@@ -96,7 +100,8 @@ console.log('🔍 Type:', typeof data.participantRecordId);
       );
 
       if (!updateResponse.ok) {
-        console.error('❌ Erreur mise à jour participant');
+        const updateError = await updateResponse.json();
+        console.error('❌ Erreur mise à jour participant:', updateError);
       } else {
         console.log('✅ Statut participant mis à jour');
       }
