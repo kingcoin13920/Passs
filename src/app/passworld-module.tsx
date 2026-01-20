@@ -185,25 +185,9 @@ const PassworldModule = () => {
   const [currentView, setCurrentView] = useState('router');
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
-  const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
   const [groupStatus, setGroupStatus] = useState(null);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
-
-  // Bouton retour en haut à gauche (sauf pour router)
-  const BackButton = () => {
-    if (currentView === 'router') return null;
-    
-    return (
-      <button
-        onClick={() => setCurrentView('router')}
-        className="fixed top-4 left-4 bg-white text-gray-700 p-3 rounded-full shadow-lg hover:shadow-xl transition-all hover:bg-gray-50 z-50 flex items-center gap-2"
-        title="Retour à l'accueil"
-      >
-        <ArrowLeft className="w-5 h-5" />
-      </button>
-    );
-  };
 
 
   useEffect(() => {
@@ -676,12 +660,14 @@ const handleModifyForm = async () => {
                 </div>
               ))}
 
-              <button
-                onClick={addParticipant}
-                className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
-              >
-                + Ajouter un participant {participants.length >= maxParticipants && `(max ${maxParticipants})`}
-              </button>
+              {participants.length < maxParticipants && (
+                <button
+                  onClick={addParticipant}
+                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
+                >
+                  + Ajouter un participant (max {maxParticipants})
+                </button>
+              )}
             </div>
 
             <div className="bg-indigo-50 p-6 rounded-lg mb-6">
@@ -1431,37 +1417,6 @@ const handleModifyForm = async () => {
 
   return (
     <div className="relative">
-      <BackButton />
-      
-      {showDebug && (
-        <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-50 max-w-xs">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-sm">🔧 Debug Menu</h3>
-            <button onClick={() => setShowDebug(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-          </div>
-          <div className="space-y-1 text-xs">
-            <button onClick={() => setCurrentView('router')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Router</button>
-            <button onClick={() => setCurrentView('gift')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Offrir cadeau</button>
-            <button onClick={() => setCurrentView('start')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Commencer</button>
-            <button onClick={() => setCurrentView('with-code')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Avec code</button>
-            <button onClick={() => setCurrentView('no-code')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Sans code</button>
-            <button onClick={() => { setTripData({ travelers: 1 }); setCurrentView('solo-payment'); }} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Solo</button>
-            <button onClick={() => { setTripData({ travelers: 3 }); setCurrentView('group-setup'); }} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Groupe</button>
-            <button onClick={() => setCurrentView('gift-choice')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Choix cadeau</button>
-            <button onClick={() => setCurrentView('dashboard')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Dashboard</button>
-            <button onClick={() => setCurrentView('form')} className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded">Formulaire</button>
-          </div>
-        </div>
-      )}
-
-      {!showDebug && (
-        <button
-          onClick={() => setShowDebug(true)}
-          className="fixed top-4 right-4 bg-gray-800 text-white px-3 py-2 rounded-lg shadow-lg z-50 text-sm"
-        >
-          🔧
-        </button>
-      )}
 
       {currentView === 'router' && <Router />}
       
@@ -1990,7 +1945,10 @@ const handleModifyForm = async () => {
             nom: tripData?.nom || '',
             email: tripData?.email || '',
             participantId: tripData?.participantRecordId || '',
-            participantRecordId: tripData?.participantRecordId || ''
+            participantRecordId: tripData?.participantRecordId || '',
+            existingFormData: tripData?.existingFormData,
+            responseId: tripData?.responseId,
+            isModifying: tripData?.isModifying || false,
           }}
           skipFormatStep={!!tripData?.participantRecordId}
         />
