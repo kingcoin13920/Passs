@@ -158,6 +158,13 @@ async createParticipant(data: {
     try {
       // 1. Trouver le participant
       const formula = encodeURIComponent(`{code} = '${code}'`);
+      async getParticipantWithTripInfo(code: string) {
+  try {
+    // 1. Trouver le participant
+    const formula = encodeURIComponent(`{code} = '${code}'`);
+    console.log('🔍🔍🔍 FORMULE:', formula); // ← AJOUTER CETTE LIGNE
+    console.log('🔍🔍🔍 CODE RECHERCHÉ:', code); // ← AJOUTER CETTE LIGNE
+    const participantResult = await this.request(
       const participantResult = await this.request(
         'GET', 
         `/${TABLES.PARTICIPANTS}?filterByFormula=${formula}`
