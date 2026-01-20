@@ -66,11 +66,10 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Récupérer tous les participants du même voyage
-    const tripRecordId = tripId[0];
-    const groupFormula = encodeURIComponent(`FIND('${tripRecordId}', ARRAYJOIN({Trip ID}))`);
-    const groupResponse = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Participants?filterByFormula=${groupFormula}`,
+    // 3. Récupérer TOUS les participants (pas de filtre) puis filtrer en JS
+    console.log('🔍 Récupération de tous les participants...');
+    const allParticipantsResponse = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Participants`,
       {
         headers: {
           'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -78,25 +77,39 @@ export async function POST(request: Request) {
       }
     );
 
-    if (!groupResponse.ok) {
+    if (!allParticipantsResponse.ok) {
       return NextResponse.json(
         { error: 'Erreur lors de la recherche du groupe' },
-        { status: groupResponse.status }
+        { status: allParticipantsResponse.status }
       );
     }
 
-    const groupData = await groupResponse.json();
+    const allParticipantsData = await allParticipantsResponse.json();
     
-    // 4. Formater les participants
-    const groupParticipants = groupData.records.map(p => ({
-      id: p.id,
-      prenom: p.fields['Prenom'] || '',
-      nom: p.fields['Nom'] || '',
-      email: p.fields['Email'] || '',
-      code: p.fields['code'] || '',
-      formStatus: p.fields['Form Status'] || 'not_started',
-      isCurrentUser: p.id === participant.id,
-    }));
+    // 4. Filtrer en JavaScript pour trouver ceux qui ont le même Trip ID
+    const tripRecordId = tripId[0];
+    console.log('🔍 Recherche des participants avec Trip ID:', tripRecordId);
+    
+    const groupParticipants = allParticipantsData.records
+      .filter(p => {
+        const pTripId = p.fields['Trip ID'];
+        const hasSameTripId = pTripId && Array.isArray(pTripId) && pTripId.includes(tripRecordId);
+        if (hasSameTripId) {
+          console.log('✅ Participant trouvé dans le groupe:', p.fields['Prenom']);
+        }
+        return hasSameTripId;
+      })
+      .map(p => ({
+        id: p.id,
+        prenom: p.fields['Prenom'] || '',
+        nom: p.fields['Nom'] || '',
+        email: p.fields['Email'] || '',
+        code: p.fields['code'] || '',
+        formStatus: p.fields['Form Status'] || 'not_started',
+        isCurrentUser: p.id === participant.id,
+      }));
+
+    console.log('📋 Participants du groupe:', groupParticipants.length);
 
     // 5. Vérifier si le participant peut modifier son formulaire
     // Règle: Peut modifier SI tous les autres n'ont pas encore soumis
