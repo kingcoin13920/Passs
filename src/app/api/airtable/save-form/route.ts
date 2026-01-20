@@ -17,37 +17,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Créer l'enregistrement dans Form_Responses
+    // Créer l'enregistrement dans Form_Responses avec les VRAIS noms de colonnes
     const record = {
       fields: {
-        'Participant ID': data.participantId,
-        'Prénom': data.prenom,
-        'Nom': data.nom,
-        'Email': data.email,
-        'Date Naissance': data.dateNaissance || '',
-        'Nb Voyageurs': data.nbVoyageurs || '',
-        'Enfants': data.enfants || '',
-        'Ville Départ': data.villeDepart || '',
-        'Date Départ': data.dateDepart || '',
-        'Durée': data.duree || '',
-        'Budget': data.budget || '',
-        'Distance': data.distance || '',
-        'Motivations': data.motivations || [],
-        'Motivations Detail': data.motivationsDetail || '',
-        'Voyage Type': data.voyageType || '',
+        'Participant': [data.participantRecordId], // Lien vers le participant (doit être un tableau)
+        'Number of Travelers': data.nbVoyageurs || '',
+        'Children': data.enfants || '',
+        'Departure City': data.villeDepart || '',
+        'dateDepart': data.dateDepart || '',
+        'duree': data.duree || '',
+        'budget': data.budget || '',
+        'distance': data.distance || '',
+        'Main Motivations': data.motivations || [],
+        'Motivation Details': data.motivationsDetail || '',
+        'Type of Trip': data.voyageType || '',
         'Planning Style': data.planningStyle || '',
-        'Environnements': data.environnements || [],
-        'Climat': data.climat || '',
-        'Pays Visités': data.paysVisites || '',
-        'Activités': data.activites || [],
-        'Rythme': data.rythme || '',
-        'Problème Santé': data.problemeSante || '',
-        'Phobies': data.phobies || '',
-        'Interdits': data.interdits || '',
-        'Format Révélation': data.formatRevelation || '',
-        'Created At': new Date().toISOString(),
+        'Preferred Environments': data.environnements || [],
+        'climat': data.climat || '',
+        'Countries Visited': data.paysVisites || '',
+        'activites': data.activites || [],
+        'Pace': data.rythme || '',
+        'Health Issues': data.problemeSante || '',
+        'Phobias': data.phobies || '',
+        'Restrictions': data.interdits || '',
+        'Reveal Format': data.formatRevelation || '',
+        'Completed At': new Date().toISOString(),
       },
     };
+
+    console.log('📋 Record à envoyer:', record);
 
     // Sauvegarder dans Airtable
     const response = await fetch(
@@ -65,6 +63,7 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const error = await response.json();
       console.error('❌ Erreur Airtable:', error);
+      console.error('❌ Status:', response.status);
       return NextResponse.json(
         { error: 'Erreur lors de la sauvegarde', details: error },
         { status: response.status }
