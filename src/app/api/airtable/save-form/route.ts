@@ -46,7 +46,10 @@ export async function POST(request: Request) {
     };
 
     console.log('📋 Record à envoyer:', record);
-
+console.log('📋 Record à envoyer:', record);
+console.log('🔍 participantRecordId:', data.participantRecordId);
+console.log('🔍 Type:', typeof data.participantRecordId);
+    
     // Sauvegarder dans Airtable
     const response = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Form_Responses`,
