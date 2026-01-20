@@ -1,271 +1,150 @@
-// app/api/stripe/webhook/route.ts
+// app/api/emails/send-participant-codes/route.ts
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { Resend } from 'resend';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-
-// Générer un code unique de 6 caractères
-function generateCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
-    const body = await request.text();
-    const signature = request.headers.get('stripe-signature');
+    const { participants, tripId } = await request.json();
+    
+    console.log('📧 Envoi des emails pour', participants.length, 'participants');
 
-    if (!signature) {
-      return NextResponse.json({ error: 'No signature' }, { status: 400 });
-    }
-
-    // Vérifier la signature du webhook
-    let event: Stripe.Event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET!
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { error: 'RESEND_API_KEY manquant' },
+        { status: 500 }
       );
-    } catch (err) {
-      console.error('❌ Erreur signature webhook:', err.message);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    console.log('🔔 Webhook Stripe reçu:', event.type);
-
-    // Gérer l'événement de paiement réussi
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+    // Envoyer un email à chaque participant
+    const emailPromises = participants.map(async (participant: any) => {
+      const { prenom, nom, email, code } = participant;
       
-      console.log('💰 Paiement réussi:', session.id);
-      console.log('📋 Metadata:', session.metadata);
+      console.log(`📨 Envoi email à ${prenom} ${nom} (${email}) - Code: ${code}`);
 
-      // Récupérer les métadonnées
-      const metadata = session.metadata;
-      
-      if (!metadata || !metadata.type) {
-        console.log('⚠️ Pas de metadata, ignorer');
-        return NextResponse.json({ received: true });
-      }
+      const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votre voyage surprise vous attend !</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f0f4f8;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0f4f8; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
+                ✈️ Votre voyage surprise vous attend !
+              </h1>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <h2 style="color: #2d3748; margin: 0 0 20px 0; font-size: 22px;">
+                Bonjour ${prenom} ! 👋
+              </h2>
+              
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                Vous avez été invité(e) à participer à un <strong>voyage surprise</strong> ! 🌍
+              </p>
+              
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+                Pour que nous puissions trouver la destination parfaite pour vous, merci de compléter le questionnaire ci-dessous avec votre code d'accès.
+              </p>
+              
+              <!-- Code Box -->
+              <div style="background-color: #edf2f7; border-left: 4px solid #667eea; padding: 20px; margin: 0 0 30px 0; border-radius: 8px;">
+                <p style="color: #2d3748; font-size: 14px; margin: 0 0 8px 0; font-weight: bold;">
+                  Votre code d'accès :
+                </p>
+                <p style="color: #667eea; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">
+                  ${code}
+                </p>
+              </div>
+              
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="https://passs-two.vercel.app?action=code&c=${code}" 
+                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);">
+                      🚀 Accéder à mon questionnaire
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="color: #718096; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                💡 <strong>Astuce :</strong> Complétez le questionnaire en toute honnêteté pour que votre destination soit vraiment adaptée à vos envies !
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #a0aec0; font-size: 14px; margin: 0 0 10px 0;">
+                Passworld - Voyages Surprise
+              </p>
+              <p style="color: #cbd5e0; font-size: 12px; margin: 0;">
+                Si vous avez des questions, répondez simplement à cet email.
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `;
 
-      // Gérer les paiements de groupe
-      if (metadata.type === 'group') {
-        await handleGroupPayment(session, metadata);
-      }
-      
-      // Gérer les paiements solo
-      if (metadata.type === 'solo') {
-        await handleSoloPayment(session, metadata);
-      }
-    }
+      try {
+        const result = await resend.emails.send({
+          from: 'Passworld <contact@hihaaa.fr>',
+          to: [email],
+          subject: '🌍 Votre voyage surprise vous attend !',
+          html: emailHtml,
+        });
 
-    return NextResponse.json({ received: true });
+        console.log(`✅ Email envoyé à ${email}:`, result);
+        return { success: true, email, messageId: result.data?.id };
+      } catch (error) {
+        console.error(`❌ Erreur envoi email à ${email}:`, error);
+        return { success: false, email, error: error.message };
+      }
+    });
+
+    // Attendre que tous les emails soient envoyés
+    const results = await Promise.all(emailPromises);
+    
+    const successCount = results.filter(r => r.success).length;
+    const failureCount = results.filter(r => !r.success).length;
+
+    console.log(`📊 Résultats: ${successCount} envoyés, ${failureCount} échoués`);
+
+    return NextResponse.json({
+      success: true,
+      sent: successCount,
+      failed: failureCount,
+      results,
+    });
 
   } catch (error) {
-    console.error('❌ Erreur webhook:', error);
+    console.error('❌ Erreur serveur:', error);
     return NextResponse.json(
-      { error: 'Webhook error', details: error.message },
+      { error: 'Erreur serveur', details: error.message },
       { status: 500 }
     );
-  }
-}
-
-async function handleGroupPayment(session: Stripe.Checkout.Session, metadata: any) {
-  try {
-    console.log('👥 Traitement paiement groupe');
-    
-    const participants = JSON.parse(metadata.participants);
-    const nbParticipants = parseInt(metadata.nbParticipants);
-    
-    console.log(`📊 ${nbParticipants} participants à créer`);
-
-    // 1. Créer le voyage dans Airtable
-    const tripId = `TRIP-${Date.now()}`;
-    const tripResponse = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Voyages`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          records: [{
-            fields: {
-              'Trip ID': tripId,
-              'Payment Status': 'paid',
-              'Payment Amount': session.amount_total ? session.amount_total / 100 : 0,
-              'Created At': new Date().toISOString(),
-            }
-          }]
-        }),
-      }
-    );
-
-    if (!tripResponse.ok) {
-      throw new Error('Failed to create trip');
-    }
-
-    const tripData = await tripResponse.json();
-    const tripRecordId = tripData.records[0].id;
-    console.log('✅ Voyage créé:', tripRecordId);
-
-    // 2. Créer les participants avec leurs codes
-    const participantRecords = participants.map((p: any) => ({
-      fields: {
-        'Prenom': p.prenom,
-        'Nom': p.nom,
-        'Email': p.email,
-        'code': generateCode(),
-        'Trip ID': [tripRecordId],
-        'Form Status': 'pending',
-      }
-    }));
-
-    const participantsResponse = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Participants`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ records: participantRecords }),
-      }
-    );
-
-    if (!participantsResponse.ok) {
-      throw new Error('Failed to create participants');
-    }
-
-    const participantsData = await participantsResponse.json();
-    console.log('✅ Participants créés:', participantsData.records.length);
-
-    // 3. Envoyer les emails
-    const participantsWithCodes = participantsData.records.map((record: any) => ({
-      prenom: record.fields.Prenom,
-      nom: record.fields.Nom,
-      email: record.fields.Email,
-      code: record.fields.code,
-    }));
-
-    const emailResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL || 'https://passs-two.vercel.app'}/api/emails/send-participant-codes`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participants: participantsWithCodes,
-          tripId: tripRecordId,
-        }),
-      }
-    );
-
-    if (emailResponse.ok) {
-      console.log('✅ Emails envoyés avec succès');
-    } else {
-      console.error('❌ Erreur envoi emails');
-    }
-
-  } catch (error) {
-    console.error('❌ Erreur handleGroupPayment:', error);
-  }
-}
-
-async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any) {
-  try {
-    console.log('👤 Traitement paiement solo');
-    
-    // Récupérer les infos du client depuis Stripe
-    const customerEmail = session.customer_details?.email;
-    const customerName = session.customer_details?.name || '';
-    const [prenom, ...nomParts] = customerName.split(' ');
-    const nom = nomParts.join(' ');
-
-    // Créer le voyage
-    const tripId = `TRIP-${Date.now()}`;
-    const tripResponse = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Voyages`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          records: [{
-            fields: {
-              'Trip ID': tripId,
-              'Payment Status': 'paid',
-              'Payment Amount': session.amount_total ? session.amount_total / 100 : 0,
-              'Created At': new Date().toISOString(),
-            }
-          }]
-        }),
-      }
-    );
-
-    const tripData = await tripResponse.json();
-    const tripRecordId = tripData.records[0].id;
-
-    // Créer le participant
-    const code = generateCode();
-    const participantResponse = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Participants`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          records: [{
-            fields: {
-              'Prenom': prenom || 'Voyageur',
-              'Nom': nom || '',
-              'Email': customerEmail,
-              'code': code,
-              'Trip ID': [tripRecordId],
-              'Form Status': 'pending',
-            }
-          }]
-        }),
-      }
-    );
-
-    console.log('✅ Participant solo créé');
-
-    // Envoyer l'email
-    await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL || 'https://passs-two.vercel.app'}/api/emails/send-participant-codes`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participants: [{
-            prenom: prenom || 'Voyageur',
-            nom: nom || '',
-            email: customerEmail,
-            code: code,
-          }],
-          tripId: tripRecordId,
-        }),
-      }
-    );
-
-    console.log('✅ Email solo envoyé');
-
-  } catch (error) {
-    console.error('❌ Erreur handleSoloPayment:', error);
   }
 }
