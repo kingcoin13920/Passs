@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User } from 'lucide-react';
+import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User, Edit } from 'lucide-react';
 import { airtableClient } from '@/lib/airtable';
 
 // Vérifier si on est en mode démo - désactivé par défaut en production
@@ -186,6 +186,9 @@ const PassworldModule = () => {
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(IS_DEMO_MODE); // Debug visible seulement en mode démo
+  const [groupStatus, setGroupStatus] = useState(null);
+  const [isLoadingGroup, setIsLoadingGroup] = useState(false);
+  const [isModifying, setIsModifying] = useState(false);
 
 
   useEffect(() => {
@@ -342,30 +345,90 @@ const verifyCode = async (code: string) => {
       return;
     }
     
-// Stocker les infos du participant
-setParticipantInfo(result);
-console.log('👤 ParticipantInfo stocké:', result);
-console.log('👤 Participant prenom:', result.participant?.prenom);
+    // Stocker les infos du participant
+    setParticipantInfo(result);
+    console.log('👤 ParticipantInfo stocké:', result);
+    console.log('👤 Participant prenom:', result.participant?.prenom);
 
-// Si le formulaire est déjà complété, afficher un message
-if (result.participant.formStatus === 'completed') {
-  alert('Vous avez déjà complété votre formulaire!');
-  setLoading(false);
-  return;
-}
+    // Charger le statut du groupe
+    await loadGroupStatus(code);
 
-// Afficher la page d'accueil personnalisée
-setCurrentView('personalized-welcome');
+    // Rediriger vers le dashboard
+    setCurrentView('dashboard');
 
-// Délai pour laisser React mettre à jour
-setTimeout(() => {
-  setLoading(false);
-}, 100);
+    // Délai pour laisser React mettre à jour
+    setTimeout(() => {
+      setLoading(false);
+    }, 100);
     
   } catch (error) {
     console.error('❌ Erreur:', error);
     alert('Erreur lors de la vérification du code');
     setLoading(false);
+  }
+};
+
+// Charger le statut du groupe après vérification du code
+const loadGroupStatus = async (code: string) => {
+  setIsLoadingGroup(true);
+  try {
+    const response = await fetch('/api/airtable/get-group-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load group status');
+    }
+
+    const data = await response.json();
+    setGroupStatus(data);
+    console.log('👥 Statut du groupe chargé:', data);
+  } catch (error) {
+    console.error('Erreur chargement groupe:', error);
+  } finally {
+    setIsLoadingGroup(false);
+  }
+};
+
+// Modifier le formulaire existant
+const handleModifyForm = async () => {
+  setIsModifying(true);
+  try {
+    // Récupérer les réponses existantes
+    const response = await fetch('/api/airtable/get-form-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        participantRecordId: groupStatus.participant.id 
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load form');
+    }
+
+    const data = await response.json();
+    
+    // Pré-remplir le formulaire avec les données existantes
+    setTripData({
+      ...tripData,
+      prenom: groupStatus.participant.prenom,
+      nom: groupStatus.participant.nom,
+      email: groupStatus.participant.email,
+      participantRecordId: groupStatus.participant.id,
+      existingFormData: data.formData,
+      responseId: data.formData.responseId,
+      isModifying: true,
+    });
+    
+    setCurrentView('form');
+  } catch (error) {
+    console.error('Erreur chargement formulaire:', error);
+    alert('Erreur lors du chargement du formulaire');
+  } finally {
+    setIsModifying(false);
   }
 };
 
@@ -642,35 +705,44 @@ setTimeout(() => {
 
   const FormView = ({ onBack, initialData, skipFormatStep }: { 
     onBack: () => void;
-    initialData?: { prenom?: string; nom?: string; email?: string; participantId?: string; participantRecordId?: string };
+    initialData?: { 
+      prenom?: string; 
+      nom?: string; 
+      email?: string; 
+      participantId?: string; 
+      participantRecordId?: string;
+      existingFormData?: any;
+      responseId?: string;
+      isModifying?: boolean;
+    };
     skipFormatStep?: boolean;
   }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
       prenom: initialData?.prenom || '',
       nom: initialData?.nom || '',
-      dateNaissance: '',
+      dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      nbVoyageurs: '',
-      enfants: '',
-      villeDepart: '',
-      dateDepart: '',
-      duree: '',
-      budget: '',
-      distance: '',
-      motivations: [],
-      motivationsDetail: '',
-      voyageType: '',
-      planningStyle: '',
-      environnements: [],
-      climat: '',
-      paysVisites: '',
-      activites: [],
-      rythme: '',
-      problemeSante: '',
-      phobies: '',
-      interdits: '',
-      formatRevelation: ''
+      nbVoyageurs: initialData?.existingFormData?.nbVoyageurs || '',
+      enfants: initialData?.existingFormData?.enfants || '',
+      villeDepart: initialData?.existingFormData?.villeDepart || '',
+      dateDepart: initialData?.existingFormData?.dateDepart || '',
+      duree: initialData?.existingFormData?.duree || '',
+      budget: initialData?.existingFormData?.budget || '',
+      distance: initialData?.existingFormData?.distance || '',
+      motivations: initialData?.existingFormData?.motivations || [],
+      motivationsDetail: initialData?.existingFormData?.motivationsDetail || '',
+      voyageType: initialData?.existingFormData?.voyageType || '',
+      planningStyle: initialData?.existingFormData?.planningStyle || '',
+      environnements: initialData?.existingFormData?.environnements || [],
+      climat: initialData?.existingFormData?.climat || '',
+      paysVisites: initialData?.existingFormData?.paysVisites || '',
+      activites: initialData?.existingFormData?.activites || [],
+      rythme: initialData?.existingFormData?.rythme || '',
+      problemeSante: initialData?.existingFormData?.problemeSante || '',
+      phobies: initialData?.existingFormData?.phobies || '',
+      interdits: initialData?.existingFormData?.interdits || '',
+      formatRevelation: initialData?.existingFormData?.formatRevelation || ''
     });
 
     const totalSteps = skipFormatStep ? 9 : 10;
@@ -708,11 +780,16 @@ setTimeout(() => {
           return;
         }
 
-        // En production, sauvegarder via l'API route
-        const response = await fetch('/api/airtable/save-form', {
+        // Si c'est une modification, utiliser l'API update
+        const endpoint = initialData?.isModifying 
+          ? '/api/airtable/update-form'
+          : '/api/airtable/save-form';
+
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            ...(initialData?.isModifying && { responseId: initialData.responseId }),
             participantId: initialData?.participantId || 'UNKNOWN',
             participantRecordId: initialData?.participantRecordId,
             ...formData
@@ -724,8 +801,12 @@ setTimeout(() => {
           throw new Error(error.error || 'Failed to save form');
         }
 
-        alert('Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.');
-        onBack();
+        alert(initialData?.isModifying 
+          ? 'Formulaire modifié ! 🎉'
+          : 'Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.'
+        );
+        
+        setCurrentView('dashboard');
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
@@ -1710,60 +1791,132 @@ setTimeout(() => {
         </div>
       )}
 
-      {currentView === 'dashboard' && (
+      {currentView === 'dashboard' && groupStatus && (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Clock className="w-8 h-8 text-indigo-600" />
+                <Users className="w-8 h-8 text-indigo-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Statut du groupe</h2>
-              <p className="text-gray-600">Code: ABC-123-XYZ</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Bonjour {groupStatus.participant.prenom} !
+              </h2>
+              {groupStatus.hasGroup && (
+                <p className="text-gray-600">Statut de votre groupe</p>
+              )}
             </div>
 
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium text-gray-700">Progression</span>
-                <span className="text-sm font-medium text-indigo-600">2/4</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div className="bg-indigo-600 h-3 rounded-full" style={{ width: '50%' }} />
-              </div>
-            </div>
-
-            <div className="space-y-3 mb-8">
-              {[
-                { name: 'Marie', completed: true },
-                { name: 'Jean', completed: true },
-                { name: 'Pierre', completed: false },
-                { name: 'Sophie', completed: false }
-              ].map((p, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      p.completed ? 'bg-green-100' : 'bg-gray-200'
-                    }`}>
-                      {p.completed ? (
-                        <Check className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <Clock className="w-5 h-5 text-gray-400" />
-                      )}
-                    </div>
-                    <span className="font-medium text-gray-900">{p.name}</span>
+            {groupStatus.hasGroup ? (
+              <>
+                <div className="mb-8">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Progression du groupe</span>
+                    <span className="text-sm font-medium text-indigo-600">
+                      {groupStatus.groupParticipants.filter(p => p.formStatus === 'completed').length}/
+                      {groupStatus.groupParticipants.length}
+                    </span>
                   </div>
-                  <span className={`text-sm font-medium ${
-                    p.completed ? 'text-green-600' : 'text-gray-500'
-                  }`}>
-                    {p.completed ? 'Complété' : 'En attente'}
-                  </span>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div 
+                      className="bg-indigo-600 h-3 rounded-full transition-all" 
+                      style={{ 
+                        width: `${(groupStatus.groupParticipants.filter(p => p.formStatus === 'completed').length / groupStatus.groupParticipants.length) * 100}%` 
+                      }} 
+                    />
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-              <p className="text-yellow-800">
-                ⏳ En attente que tous les participants complètent leur formulaire
-              </p>
+                <div className="space-y-3 mb-8">
+                  {groupStatus.groupParticipants.map((p, i) => (
+                    <div key={i} className={`flex items-center justify-between p-4 rounded-lg border-2 ${
+                      p.isCurrentUser ? 'border-indigo-200 bg-indigo-50' : 'bg-gray-50 border-transparent'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          p.formStatus === 'completed' ? 'bg-green-100' : 'bg-gray-200'
+                        }`}>
+                          {p.formStatus === 'completed' ? (
+                            <Check className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <Clock className="w-5 h-5 text-gray-400" />
+                          )}
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-900">
+                            {p.prenom} {p.nom}
+                            {p.isCurrentUser && <span className="text-indigo-600 ml-2">(Vous)</span>}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`text-sm font-medium ${
+                        p.formStatus === 'completed' ? 'text-green-600' : 'text-gray-500'
+                      }`}>
+                        {p.formStatus === 'completed' ? 'Complété' : 'En attente'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {groupStatus.groupParticipants.filter(p => p.formStatus !== 'completed').length > 0 && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6">
+                    <p className="text-yellow-800">
+                      ⏳ En attente que tous les participants complètent leur formulaire
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center mb-6">
+                <p className="text-blue-800">
+                  ℹ️ Vous n'êtes pas encore assigné à un groupe
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {groupStatus.participant.formStatus === 'completed' && groupStatus.canModifyForm && (
+                <button
+                  onClick={handleModifyForm}
+                  disabled={isModifying}
+                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <Edit className="w-5 h-5" />
+                  {isModifying ? 'Chargement...' : 'Modifier mon formulaire'}
+                </button>
+              )}
+              
+              {groupStatus.participant.formStatus !== 'completed' && (
+                <button
+                  onClick={() => {
+                    setTripData({
+                      prenom: groupStatus.participant.prenom,
+                      nom: groupStatus.participant.nom,
+                      email: groupStatus.participant.email,
+                      participantRecordId: groupStatus.participant.id,
+                    });
+                    setCurrentView('form');
+                  }}
+                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  Compléter mon formulaire
+                </button>
+              )}
+
+              {groupStatus.participant.formStatus === 'completed' && !groupStatus.canModifyForm && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                  <p className="text-red-800 text-sm">
+                    🔒 Vous ne pouvez plus modifier votre formulaire car d'autres participants ont déjà soumis le leur
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={() => setCurrentView('home')}
+                className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Retour à l'accueil
+              </button>
             </div>
           </div>
         </div>
@@ -1815,7 +1968,7 @@ setTimeout(() => {
               
               <div className="bg-blue-50 rounded-lg p-6 mb-6">
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  Vous allez définir vos préférences de voyage en classant différents critères par ordre d'importance. 
+                  Vous allez remplir un questionnaire sur vos préférences de voyage. 
                   Cela nous permettra de trouver la destination parfaite pour vous!
                 </p>
               </div>
