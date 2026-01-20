@@ -1304,12 +1304,7 @@ setTimeout(() => {
     {console.log('🎯 Vue personalized-welcome affichée!', participantInfo)}  {/* ← AJOUTER */}
     <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
       
-  <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-    <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
-      <div className="text-center mb-8">
-        <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-          <Plane className="w-10 h-10 text-indigo-600" />
-        </div>
+
         
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
           Bienvenue {participantInfo.participant.prenom}! 👋
