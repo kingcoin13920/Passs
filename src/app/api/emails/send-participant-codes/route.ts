@@ -118,7 +118,7 @@ export async function POST(request: Request) {
         });
 
         console.log(`✅ Email envoyé à ${email}:`, result);
-        return { success: true, email, messageId: result.id };
+        return { success: true, email, messageId: result.data?.id };
       } catch (error) {
         console.error(`❌ Erreur envoi email à ${email}:`, error);
         return { success: false, email, error: error.message };
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       success: true,
       sent: successCount,
       failed: failureCount,
-     result.data?.id,
+      results,
     });
 
   } catch (error) {
