@@ -640,13 +640,17 @@ setTimeout(() => {
     );
   };
 
-  const FormView = ({ onBack }: { onBack: () => void }) => {
+  const FormView = ({ onBack, initialData, skipFormatStep }: { 
+    onBack: () => void;
+    initialData?: { prenom?: string; nom?: string; email?: string; participantId?: string; participantRecordId?: string };
+    skipFormatStep?: boolean;
+  }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
-      prenom: '',
-      nom: '',
+      prenom: initialData?.prenom || '',
+      nom: initialData?.nom || '',
       dateNaissance: '',
-      email: '',
+      email: initialData?.email || '',
       nbVoyageurs: '',
       enfants: '',
       villeDepart: '',
@@ -669,7 +673,7 @@ setTimeout(() => {
       formatRevelation: ''
     });
 
-    const totalSteps = 10;
+    const totalSteps = skipFormatStep ? 9 : 10;
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -704,15 +708,20 @@ setTimeout(() => {
           return;
         }
 
-        // En production, sauvegarder dans Airtable
-        await AirtableAPI.saveFormResponse({
-          participantId: tripData.participantId || 'DEMO',
-          ...formData
+        // En production, sauvegarder via l'API route
+        const response = await fetch('/api/airtable/save-form', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            participantId: initialData?.participantId || 'UNKNOWN',
+            participantRecordId: initialData?.participantRecordId,
+            ...formData
+          }),
         });
 
-        // Mettre à jour le statut du participant
-        if (tripData.participantRecordId) {
-          await AirtableAPI.updateParticipantStatus(tripData.participantRecordId, 'completed');
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to save form');
         }
 
         alert('Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.');
@@ -757,7 +766,8 @@ setTimeout(() => {
                       type="text"
                       value={formData.prenom}
                       onChange={(e) => updateField('prenom', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      readOnly={!!initialData?.prenom}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.prenom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
 
@@ -767,7 +777,8 @@ setTimeout(() => {
                       type="text"
                       value={formData.nom}
                       onChange={(e) => updateField('nom', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      readOnly={!!initialData?.nom}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.nom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
 
@@ -787,7 +798,8 @@ setTimeout(() => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      readOnly={!!initialData?.email}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.email ? 'bg-gray-50' : ''}`}
                       placeholder="john.martin@gmail.com"
                     />
                   </div>
@@ -1185,7 +1197,7 @@ setTimeout(() => {
             )}
 
             {/* Step 10: Format révélation */}
-            {currentStep === 10 && (
+            {!skipFormatStep && currentStep === 10 && (
               <div>
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">🎁 Formule</h2>
@@ -1758,7 +1770,17 @@ setTimeout(() => {
       )}
 
       {currentView === 'form' && (
-        <FormView onBack={() => setCurrentView('router')} />
+        <FormView 
+          onBack={() => setCurrentView('router')} 
+          initialData={{
+            prenom: tripData?.prenom || '',
+            nom: tripData?.nom || '',
+            email: tripData?.email || '',
+            participantId: tripData?.participantRecordId || '',
+            participantRecordId: tripData?.participantRecordId || ''
+          }}
+          skipFormatStep={!!tripData?.participantRecordId}
+        />
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
