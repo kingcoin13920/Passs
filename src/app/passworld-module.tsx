@@ -1687,7 +1687,7 @@ const handleModifyForm = async () => {
     if (option.value === 4) nbParticipants = 8;  // 5-8 personnes = 8 champs
     
     setTripData({ 
-      travelers: option.value,
+      travelers: nbParticipants,  // Passer le nombre réel de participants
       nbParticipants: nbParticipants 
     });
     
