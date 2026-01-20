@@ -726,6 +726,12 @@ const handleModifyForm = async () => {
     skipFormatStep?: boolean;
   }) => {
     const [currentStep, setCurrentStep] = useState(1);
+    
+    // LOG pour debug
+    console.log('🎨 FormView - initialData:', initialData);
+    console.log('🎨 FormView - existingFormData:', initialData?.existingFormData);
+    console.log('🎨 FormView - isModifying:', initialData?.isModifying);
+    
     const [formData, setFormData] = useState({
       prenom: initialData?.prenom || '',
       nom: initialData?.nom || '',
@@ -752,6 +758,9 @@ const handleModifyForm = async () => {
       interdits: initialData?.existingFormData?.interdits || '',
       formatRevelation: initialData?.existingFormData?.formatRevelation || ''
     });
+
+    // LOG pour voir le formData initialisé
+    console.log('📝 FormData initialisé:', formData);
 
     const totalSteps = skipFormatStep ? 9 : 10;
 
