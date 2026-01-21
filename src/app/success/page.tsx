@@ -107,6 +107,8 @@ console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripReco
         // Créer chaque participant dans Airtable
         console.log('👥 Creating', participantsData.length, 'participant(s)...');
         
+        const createdParticipants = [];
+        
         for (let i = 0; i < participantsData.length; i++) {
           const participant = participantsData[i];
           const code = `CODE-${Date.now()}-${i + 1}`;
@@ -125,6 +127,38 @@ console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripReco
 });
           
           console.log(`✅ Participant ${i + 1} created:`, code);
+          
+          // Stocker le participant avec son code pour l'envoi d'emails
+          createdParticipants.push({
+            prenom: participant.prenom || '',
+            nom: participant.nom || '',
+            email: participant.email || data.customer_email,
+            code: code,
+          });
+        }
+
+        // Envoyer les emails aux participants
+        console.log('📧 Envoi des emails à', createdParticipants.length, 'participant(s)...');
+        
+        try {
+          const emailResponse = await fetch('/api/emails/send-participant-codes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              participants: createdParticipants,
+              tripId: airtableTripRecordId,
+            }),
+          });
+
+          if (emailResponse.ok) {
+            const emailData = await emailResponse.json();
+            console.log('✅ Emails envoyés:', emailData);
+          } else {
+            const errorText = await emailResponse.text();
+            console.error('❌ Erreur envoi emails:', errorText);
+          }
+        } catch (emailError) {
+          console.error('❌ Exception lors de l\'envoi des emails:', emailError);
         }
 
         setStatus('success');
