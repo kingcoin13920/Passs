@@ -341,6 +341,41 @@ const verifyCode = async (code: string) => {
   try {
     console.log('🔍 Vérification du code:', code);
     
+    // Vérifier d'abord si c'est un code cadeau
+    if (code.startsWith('GIFT-')) {
+      console.log('🎁 Détection d\'un code cadeau');
+      
+      const response = await fetch('/api/airtable/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      
+      const giftResult = await response.json();
+      console.log('🎁 Résultat carte cadeau:', giftResult);
+      
+      if (!giftResult.valid) {
+        alert('Code cadeau invalide');
+        setLoading(false);
+        return;
+      }
+      
+      // Afficher message personnalisé et rediriger vers le formulaire
+      alert(`Bienvenue ${giftResult.recipientName || 'voyageur'} ! 🎁\n\nJe vois que ${giftResult.buyerName || 'quelqu\'un'} vous a offert ce beau cadeau !\n\nCommençons votre questionnaire pour découvrir votre destination.`);
+      
+      // Stocker les infos et rediriger vers le formulaire
+      setTripData({ 
+        inputCode: code, 
+        isGiftCard: true,
+        buyerName: giftResult.buyerName,
+        recipientName: giftResult.recipientName
+      });
+      setCurrentView('no-code'); // Commencer le questionnaire
+      setLoading(false);
+      return;
+    }
+    
+    // Code participant normal
     const result = await airtableClient.getParticipantWithTripInfo(code);
     
     console.log('📋 Résultat:', result);
