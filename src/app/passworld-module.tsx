@@ -185,6 +185,7 @@ const PassworldModule = () => {
   const [currentView, setCurrentView] = useState('router');
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
+  const [isRedirectingToStripe, setIsRedirectingToStripe] = useState(false);
   const [groupStatus, setGroupStatus] = useState(null);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
@@ -300,10 +301,14 @@ const PassworldModule = () => {
     console.log('🚀 redirectToStripe appelé:', { type, amount, IS_DEMO_MODE });
     
     try {
+      // Activer le spinner de redirection
+      setIsRedirectingToStripe(true);
+      
       // En mode démo, on simule
       if (IS_DEMO_MODE) {
         console.log('⚠️ MODE DEMO ACTIF');
         alert(`Mode démo:\nPaiement de ${amount}€ simulé avec succès!\n\nEn production, vous serez redirigé vers Stripe.`);
+        setIsRedirectingToStripe(false);
         return;
       }
 
@@ -316,9 +321,11 @@ const PassworldModule = () => {
         metadata
       });
       
+      // Note: setIsRedirectingToStripe(false) n'est pas appelé car la page est redirigée
       console.log('✅ API Stripe appelée avec succès');
     } catch (error) {
       console.error('❌ Erreur Stripe:', error);
+      setIsRedirectingToStripe(false);
       alert('Erreur lors de la création de la session de paiement. Vérifiez la console.');
       throw error;
     }
@@ -1426,6 +1433,16 @@ const handleModifyForm = async () => {
 
   return (
     <div className="relative">
+      {/* Overlay de chargement pendant la redirection vers Stripe */}
+      {isRedirectingToStripe && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Redirection vers le paiement...</h3>
+            <p className="text-gray-600">Veuillez patienter, vous allez être redirigé vers Stripe</p>
+          </div>
+        </div>
+      )}
 
       {currentView === 'router' && <Router />}
       
