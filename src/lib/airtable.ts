@@ -146,7 +146,10 @@ async createParticipant(data: {
         code,
         valid: true,
         status: giftCard.fields.Status,
+        buyerName: giftCard.fields['Buyer Name'],
+        buyerEmail: giftCard.fields['Buyer Email'],
         recipientName: giftCard.fields['Recipient Name'],
+        giftCardId: giftCard.id,
       };
     }
 
