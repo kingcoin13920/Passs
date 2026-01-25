@@ -20,6 +20,16 @@ function SuccessContent() {
 
     // Enregistrer les données dans Airtable
     const saveToAirtable = async () => {
+      // Générer un code GIFT unique
+      const generateGiftCode = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = 'GIFT-';
+        for (let i = 0; i < 8; i++) {
+          code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+      };
+      
       try {
         console.log('📞 Verifying Stripe session...');
         
@@ -46,16 +56,6 @@ function SuccessContent() {
         // CAS 1: Carte cadeau
         if (type === 'gift' || metadata.recipientName) {
           console.log('🎁 Creating gift card...');
-          
-          // Générer un code GIFT unique
-          function generateGiftCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = 'GIFT-';
-            for (let i = 0; i < 8; i++) {
-              code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-          }
           
           const giftCode = generateGiftCode();
           console.log('🎟️ Code généré:', giftCode);
