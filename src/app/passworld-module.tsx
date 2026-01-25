@@ -852,13 +852,89 @@ const handleModifyForm = async () => {
           ? '/api/airtable/update-form'
           : '/api/airtable/save-form';
 
+        // Vérifier si c'est un code cadeau solo (pas encore de participant créé)
+        let finalParticipantId = initialData?.participantId;
+        let finalParticipantRecordId = initialData?.participantRecordId;
+        
+        if (tripData.isGiftCard && !finalParticipantId) {
+          console.log('🎁 Code cadeau solo - Création du participant...');
+          
+          // Générer un code pour le participant
+          const participantCode = tripData.inputCode; // Utiliser le code cadeau comme code participant
+          
+          // Créer le voyage dans Airtable
+          const tripId = `TRIP-${Date.now()}`;
+          const tripResponse = await fetch('/api/airtable/create-trip', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId,
+              type: 'solo',
+              nbParticipants: 1,
+              amount: 29,
+              paymentStatus: 'paid-gift',
+              criteriaOrder: ''
+            }),
+          });
+          
+          const tripDataResponse = await tripResponse.json();
+          const airtableTripRecordId = tripDataResponse.id;
+          console.log('✅ Voyage créé:', airtableTripRecordId);
+          
+          // Créer le participant
+          const participantResponse = await fetch('/api/airtable/create-participant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId: [airtableTripRecordId],
+              code: participantCode,
+              prenom: formData.prenom,
+              nom: formData.nom,
+              email: formData.email,
+              paymentStatus: 'paid-gift',
+            }),
+          });
+          
+          const participantData = await participantResponse.json();
+          finalParticipantId = participantData.participant.id;
+          finalParticipantRecordId = participantData.participant.id;
+          console.log('✅ Participant créé:', finalParticipantId);
+          
+          // Marquer la carte cadeau comme utilisée
+          await fetch('/api/airtable/update-gift-card-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              giftCardId: tripData.giftCardId,
+              status: 'used'
+            }),
+          });
+          console.log('✅ Carte cadeau marquée comme utilisée');
+          
+          // Envoyer l'email avec le code
+          await fetch('/api/emails/send-participant-codes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              participants: [{
+                prenom: formData.prenom,
+                nom: formData.nom,
+                email: formData.email,
+                code: participantCode,
+              }],
+              tripId: airtableTripRecordId,
+            }),
+          });
+          console.log('✅ Email envoyé');
+        }
+
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...(initialData?.isModifying && { responseId: initialData.responseId }),
-            participantId: initialData?.participantId || 'UNKNOWN',
-            participantRecordId: initialData?.participantRecordId,
+            participantId: finalParticipantId || 'UNKNOWN',
+            participantRecordId: finalParticipantRecordId,
             ...formData
           }),
         });
