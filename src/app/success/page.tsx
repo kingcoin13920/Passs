@@ -47,19 +47,60 @@ function SuccessContent() {
         if (type === 'gift' || metadata.recipientName) {
           console.log('🎁 Creating gift card...');
           
+          // Générer un code GIFT unique
+          function generateGiftCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'GIFT-';
+            for (let i = 0; i < 8; i++) {
+              code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+          }
+          
+          const giftCode = generateGiftCode();
+          console.log('🎟️ Code généré:', giftCode);
+          
           await fetch('/api/airtable/create-gift-card', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              code: `GIFT-${Date.now()}`,
+              code: giftCode,
               buyerName: metadata.buyerName || '',
               buyerEmail: data.customer_email,
               recipientName: metadata.recipientName || '',
             }),
           });
           
+          console.log('✅ Gift card created');
+          
+          // Envoyer l'email à l'acheteur
+          console.log('📧 Envoi de l\'email à l\'acheteur:', data.customer_email);
+          
+          try {
+            const emailResponse = await fetch('/api/emails/send-gift-card', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                buyerEmail: data.customer_email,
+                buyerName: metadata.buyerName || 'Voyageur',
+                recipientName: metadata.recipientName || 'votre proche',
+                giftCode: giftCode,
+              }),
+            });
+
+            if (emailResponse.ok) {
+              const emailData = await emailResponse.json();
+              console.log('✅ Email carte cadeau envoyé:', emailData);
+            } else {
+              const errorText = await emailResponse.text();
+              console.error('❌ Erreur envoi email carte cadeau:', errorText);
+            }
+          } catch (emailError) {
+            console.error('❌ Exception lors de l\'envoi de l\'email:', emailError);
+          }
+          
           setStatus('success');
-          setMessage('Carte cadeau créée! Le destinataire recevra un email avec son code.');
+          setMessage('Carte cadeau créée! Vous allez recevoir un email avec le code à transmettre au destinataire.');
           return;
         }
         
