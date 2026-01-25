@@ -1587,8 +1587,8 @@ const handleModifyForm = async () => {
                 id="code-input-field"
                 type="text"
                 className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
-                placeholder="ABC-123-XYZ"
-                maxLength={11}
+                placeholder="CODE-1234567891011-X"
+                maxLength={21}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     const input = document.getElementById('code-input-field') as HTMLInputElement;
