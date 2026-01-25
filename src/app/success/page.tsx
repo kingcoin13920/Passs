@@ -109,6 +109,29 @@ function SuccessContent() {
         
         const tripId = `TRIP-${Date.now()}`;
         
+        // Vérifier si c'est une extension de carte cadeau
+        const isGiftExtension = metadata.isGiftExtension === 'true' || metadata.isGiftExtension === true;
+        const giftCardId = metadata.giftCardId;
+        
+        if (isGiftExtension && giftCardId) {
+          console.log('🎁 Extension de carte cadeau détectée:', giftCardId);
+          
+          // Marquer la carte cadeau comme utilisée
+          try {
+            await fetch('/api/airtable/update-gift-card-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                giftCardId: giftCardId,
+                status: 'used'
+              }),
+            });
+            console.log('✅ Carte cadeau marquée comme utilisée');
+          } catch (error) {
+            console.error('❌ Erreur mise à jour carte cadeau:', error);
+          }
+        }
+        
  // Créer le voyage dans Airtable
 const tripResponse = await fetch('/api/airtable/create-trip', {
   method: 'POST',
