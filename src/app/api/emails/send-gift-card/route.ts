@@ -119,7 +119,7 @@ export async function POST(request: Request) {
 
     try {
       const result = await resend.emails.send({
-        from: 'Passworld <contact@hihaaa.fr>',
+        from: 'Passworld <contact@hihaaa.com>',
         to: [buyerEmail],
         subject: '🎁 Votre carte cadeau Passworld',
         html: emailHtml,
