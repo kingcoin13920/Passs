@@ -700,7 +700,8 @@ const handleModifyForm = async () => {
                 <div key={index} className="border-2 border-gray-200 rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-gray-900">Participant {index + 1}</h3>
-                    {participants.length > 1 && (
+                    {/* Bouton Retirer - Désactivé pour les codes cadeaux */}
+                    {!isGiftCard && participants.length > 1 && (
                       <button
                         onClick={() => removeParticipant(index)}
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
@@ -747,7 +748,8 @@ const handleModifyForm = async () => {
                 </div>
               ))}
 
-              {participants.length < maxParticipants && (
+              {/* Bouton Ajouter - Désactivé pour les codes cadeaux */}
+              {!isGiftCard && participants.length < maxParticipants && (
                 <button
                   onClick={addParticipant}
                   className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
