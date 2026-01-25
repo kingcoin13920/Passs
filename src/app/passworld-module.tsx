@@ -719,7 +719,8 @@ const handleModifyForm = async () => {
                 <div key={index} className="border-2 border-gray-200 rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-gray-900">Participant {index + 1}</h3>
-                    {participants.length > 1 && (
+                    {/* Pour les codes cadeaux: minimum 2 participants, sinon minimum 1 */}
+                    {((isGiftCard && participants.length > 2) || (!isGiftCard && participants.length > 1)) && (
                       <button
                         onClick={() => removeParticipant(index)}
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
