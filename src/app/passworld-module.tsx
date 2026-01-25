@@ -481,7 +481,19 @@ const handleModifyForm = async () => {
   }
 };
 
-  const GroupSetupView = ({ travelers, onBack, onComplete }: { travelers: number; onBack: () => void; onComplete: (data: any) => void }) => {
+  const GroupSetupView = ({ 
+    travelers, 
+    onBack, 
+    onComplete,
+    isGiftCard = false,
+    giftExtensionPrice = null 
+  }: { 
+    travelers: number; 
+    onBack: () => void; 
+    onComplete: (data: any) => void;
+    isGiftCard?: boolean;
+    giftExtensionPrice?: number | null;
+  }) => {
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
@@ -497,6 +509,11 @@ const handleModifyForm = async () => {
 
     // Calculer le prix en fonction du nombre réel de participants
     const calculatePrice = (nbParticipants) => {
+      // Si c'est une extension de carte cadeau, utiliser le prix de supplément
+      if (isGiftCard && giftExtensionPrice) {
+        return giftExtensionPrice;
+      }
+      // Sinon, calculer le prix normal
       if (nbParticipants === 1) return PRICES[1];
       if (nbParticipants === 2) return PRICES[2];
       if (nbParticipants >= 3 && nbParticipants <= 4) return PRICES[3];
@@ -618,7 +635,18 @@ const handleModifyForm = async () => {
 
               <div className="space-y-4">
                 <button
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    // Si c'est un code cadeau solo (1 participant), terminer directement
+                    if (isGiftCard && participants.length === 1 && !giftExtensionPrice) {
+                      onComplete({
+                        criteria,
+                        participants,
+                        price: 0 // Pas de prix pour un cadeau solo
+                      });
+                    } else {
+                      setStep(2);
+                    }
+                  }}
                   className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-5 rounded-2xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center group"
                 >
                   Continuer
@@ -628,7 +656,16 @@ const handleModifyForm = async () => {
                 <button
                   onClick={() => {
                     setCriteria([...CRITERIA]);
-                    setStep(2);
+                    // Si c'est un code cadeau solo, terminer directement
+                    if (isGiftCard && participants.length === 1 && !giftExtensionPrice) {
+                      onComplete({
+                        criteria: [...CRITERIA],
+                        participants,
+                        price: 0
+                      });
+                    } else {
+                      setStep(2);
+                    }
                   }}
                   className="w-full text-gray-600 hover:text-gray-900 py-2 text-sm"
                 >
@@ -2064,7 +2101,9 @@ const handleModifyForm = async () => {
 
       {currentView === 'group-setup' && (
         <GroupSetupView 
-          travelers={tripData.travelers} 
+          travelers={tripData.travelers}
+          isGiftCard={tripData.isGiftCard || false}
+          giftExtensionPrice={tripData.giftExtensionPrice || null}
           onBack={() => {
             // Retourner au bon endroit selon le contexte
             if (tripData.isGiftCard && tripData.giftExtensionPrice) {
