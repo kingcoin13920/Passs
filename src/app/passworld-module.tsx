@@ -360,17 +360,25 @@ const verifyCode = async (code: string) => {
         return;
       }
       
-      // Afficher message personnalisé et rediriger vers le formulaire
-      alert(`Bienvenue ${giftResult.recipientName || 'voyageur'} ! 🎁\n\nJe vois que ${giftResult.buyerName || 'quelqu\'un'} vous a offert ce beau cadeau !\n\nCommençons votre questionnaire pour découvrir votre destination.`);
+      // Vérifier si la carte cadeau a déjà été utilisée
+      if (giftResult.status === 'used') {
+        alert(`Ce code cadeau a déjà été utilisé.\n\nVous avez dû recevoir un nouveau code par email pour votre voyage.`);
+        setLoading(false);
+        return;
+      }
       
-      // Stocker les infos et rediriger vers le formulaire
+      // Stocker les infos de la carte cadeau
       setTripData({ 
         inputCode: code, 
         isGiftCard: true,
+        giftCardId: giftResult.giftCardId,
         buyerName: giftResult.buyerName,
-        recipientName: giftResult.recipientName
+        recipientName: giftResult.recipientName,
+        buyerEmail: giftResult.buyerEmail
       });
-      setCurrentView('no-code'); // Commencer le questionnaire
+      
+      // Rediriger vers la page d'accueil cadeau
+      setCurrentView('gift-welcome');
       setLoading(false);
       return;
     }
@@ -1481,6 +1489,200 @@ const handleModifyForm = async () => {
 
       {currentView === 'router' && <Router />}
       
+      {/* Vue d'accueil pour les codes cadeaux */}
+      {currentView === 'gift-welcome' && (
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center p-4">
+          <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <button
+              onClick={() => setCurrentView('router')}
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Retour
+            </button>
+
+            {/* Message de bienvenue */}
+            <div className="text-center mb-12">
+              <div className="bg-gradient-to-br from-pink-100 to-purple-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <Gift className="w-10 h-10 text-pink-600" />
+              </div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Bienvenue {tripData.recipientName} ! 🎁
+              </h1>
+              <p className="text-xl text-gray-700 mb-2">
+                <strong>{tripData.buyerName}</strong> vous a offert une carte cadeau Passworld !
+              </p>
+              <p className="text-gray-600">
+                Découvrez votre destination surprise personnalisée
+              </p>
+            </div>
+
+            {/* Options */}
+            <div className="space-y-4 mb-8">
+              {/* Option 1: Solo */}
+              <div className="border-2 border-indigo-200 rounded-2xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-indigo-50 to-purple-50">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      🚀 Utiliser pour moi seul
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Profitez de votre voyage surprise en solo
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl font-bold text-indigo-600">Gratuit</span>
+                      <span className="text-sm text-gray-500">(déjà payé)</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    // Utilisation solo - aller directement au questionnaire
+                    setCurrentView('no-code');
+                  }}
+                  className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-colors shadow-lg"
+                >
+                  Commencer mon questionnaire
+                </button>
+              </div>
+
+              {/* Option 2: Groupe */}
+              <div className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-400 transition-colors cursor-pointer bg-gradient-to-r from-purple-50 to-pink-50">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      👥 Étendre à plusieurs personnes
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Transformez ce cadeau en voyage de groupe
+                    </p>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>• Duo (2 personnes)</span>
+                        <span className="font-semibold">+20€</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>• Trio/Quatuor (3-4 personnes)</span>
+                        <span className="font-semibold">+50€</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>• Groupe (5-8 personnes)</span>
+                        <span className="font-semibold">+100€</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    // Extension groupe - choix du nombre
+                    setCurrentView('gift-extend');
+                  }}
+                  className="w-full bg-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-colors shadow-lg"
+                >
+                  Choisir le nombre de personnes
+                </button>
+              </div>
+            </div>
+
+            <div className="text-center text-sm text-gray-500">
+              <p>💡 Vous pouvez choisir l'option qui vous convient le mieux</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Vue extension de carte cadeau - Choix du nombre */}
+      {currentView === 'gift-extend' && (
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+          <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <button
+              onClick={() => setCurrentView('gift-welcome')}
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-8"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Retour
+            </button>
+
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                Combien serez-vous ?
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Choisissez le nombre de voyageurs et payez le supplément
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Duo */}
+              <div 
+                onClick={() => {
+                  setTripData({ ...tripData, travelers: 2, giftExtensionPrice: 20 });
+                  setCurrentView('criteria-order');
+                }}
+                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">👥</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Duo</h3>
+                  <p className="text-gray-600 mb-4">2 personnes</p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-500 line-through">Prix normal: 49€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <div className="text-3xl font-bold text-purple-600 mt-2">
+                      +20€
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3-4 personnes */}
+              <div 
+                onClick={() => {
+                  setTripData({ ...tripData, travelers: 3, giftExtensionPrice: 50 });
+                  setCurrentView('criteria-order');
+                }}
+                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">👨‍👩‍👦</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Trio/Quatuor</h3>
+                  <p className="text-gray-600 mb-4">3-4 personnes</p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-500 line-through">Prix normal: 79€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <div className="text-3xl font-bold text-purple-600 mt-2">
+                      +50€
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5-8 personnes */}
+              <div 
+                onClick={() => {
+                  setTripData({ ...tripData, travelers: 5, giftExtensionPrice: 100 });
+                  setCurrentView('criteria-order');
+                }}
+                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50 md:col-span-2"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">👨‍👩‍👧‍👦</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Groupe</h3>
+                  <p className="text-gray-600 mb-4">5-8 personnes</p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-500 line-through">Prix normal: 129€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <div className="text-3xl font-bold text-purple-600 mt-2">
+                      +100€
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {currentView === 'gift' && (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
@@ -1790,12 +1992,21 @@ const handleModifyForm = async () => {
           onComplete={async (groupData) => {
             setLoading(true);
             try {
+              // Vérifier si c'est une extension de carte cadeau
+              const isGiftExtension = tripData.isGiftCard && tripData.giftExtensionPrice;
+              const finalPrice = isGiftExtension ? tripData.giftExtensionPrice : groupData.price;
+              
+              console.log('🎁 Extension carte cadeau:', isGiftExtension, 'Prix:', finalPrice);
+              
               // Envoyer directement à Stripe avec les metadata
-              await redirectToStripe('group', groupData.price, { 
+              await redirectToStripe('group', finalPrice, { 
                 type: 'group',
                 nbParticipants: groupData.participants.length,
                 participants: JSON.stringify(groupData.participants),
-                criteriaOrder: JSON.stringify(groupData.criteria.map(c => c.id))
+                criteriaOrder: JSON.stringify(groupData.criteria.map(c => c.id)),
+                isGiftExtension: isGiftExtension,
+                giftCode: tripData.inputCode || null,
+                giftCardId: tripData.giftCardId || null
               });
             } catch (error) {
               alert('Erreur : ' + error.message);
