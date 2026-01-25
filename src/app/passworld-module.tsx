@@ -486,39 +486,58 @@ const handleModifyForm = async () => {
     onBack, 
     onComplete,
     isGiftCard = false,
-    giftExtensionPrice = null 
+    giftExtensionPrice = null,
+    recipientName = null
   }: { 
     travelers: number; 
     onBack: () => void; 
     onComplete: (data: any) => void;
     isGiftCard?: boolean;
     giftExtensionPrice?: number | null;
+    recipientName?: string | null;
   }) => {
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
     
     // Initialiser avec le bon nombre de participants selon travelers
-    const initialParticipants = Array.from({ length: travelers || 1 }, () => ({ 
-      prenom: '', 
-      nom: '', 
-      email: '' 
-    }));
-    const [participants, setParticipants] = useState(initialParticipants);
+    // Si c'est un code cadeau, pré-remplir le premier participant avec recipientName
+    const getInitialParticipants = () => {
+      const parts = Array.from({ length: travelers || 1 }, (_, index) => {
+        if (index === 0 && isGiftCard && recipientName) {
+          // Premier participant = destinataire du cadeau
+          const names = recipientName.split(' ');
+          return {
+            prenom: names[0] || '',
+            nom: names.slice(1).join(' ') || '',
+            email: ''
+          };
+        }
+        return { prenom: '', nom: '', email: '' };
+      });
+      return parts;
+    };
+    
+    const [participants, setParticipants] = useState(getInitialParticipants());
     const [selectedGroupSize, setSelectedGroupSize] = useState(travelers || 1);
 
     // Calculer le prix en fonction du nombre réel de participants
     const calculatePrice = (nbParticipants) => {
-      // Si c'est une extension de carte cadeau, utiliser le prix de supplément
-      if (isGiftCard && giftExtensionPrice) {
-        return giftExtensionPrice;
+      // Calculer d'abord le prix normal
+      let normalPrice;
+      if (nbParticipants === 1) normalPrice = PRICES[1];
+      else if (nbParticipants === 2) normalPrice = PRICES[2];
+      else if (nbParticipants >= 3 && nbParticipants <= 4) normalPrice = PRICES[3];
+      else if (nbParticipants >= 5 && nbParticipants <= 8) normalPrice = PRICES[4];
+      else normalPrice = PRICES[4]; // Max 8 personnes
+      
+      // Si c'est une extension de carte cadeau, soustraire 29€ (valeur du cadeau)
+      if (isGiftCard) {
+        return Math.max(0, normalPrice - 29);
       }
-      // Sinon, calculer le prix normal
-      if (nbParticipants === 1) return PRICES[1];
-      if (nbParticipants === 2) return PRICES[2];
-      if (nbParticipants >= 3 && nbParticipants <= 4) return PRICES[3];
-      if (nbParticipants >= 5 && nbParticipants <= 8) return PRICES[4];
-      return PRICES[4]; // Max 8 personnes
+      
+      // Sinon, retourner le prix normal
+      return normalPrice;
     };
 
     const currentPrice = calculatePrice(participants.length);
@@ -700,8 +719,7 @@ const handleModifyForm = async () => {
                 <div key={index} className="border-2 border-gray-200 rounded-lg p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-gray-900">Participant {index + 1}</h3>
-                    {/* Bouton Retirer - Désactivé pour les codes cadeaux */}
-                    {!isGiftCard && participants.length > 1 && (
+                    {participants.length > 1 && (
                       <button
                         onClick={() => removeParticipant(index)}
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
@@ -748,8 +766,7 @@ const handleModifyForm = async () => {
                 </div>
               ))}
 
-              {/* Bouton Ajouter - Désactivé pour les codes cadeaux */}
-              {!isGiftCard && participants.length < maxParticipants && (
+              {participants.length < maxParticipants && (
                 <button
                   onClick={addParticipant}
                   className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
@@ -2106,6 +2123,7 @@ const handleModifyForm = async () => {
           travelers={tripData.travelers}
           isGiftCard={tripData.isGiftCard || false}
           giftExtensionPrice={tripData.giftExtensionPrice || null}
+          recipientName={tripData.recipientName || null}
           onBack={() => {
             // Retourner au bon endroit selon le contexte
             if (tripData.isGiftCard && tripData.giftExtensionPrice) {
