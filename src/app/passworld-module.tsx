@@ -1613,8 +1613,9 @@ const handleModifyForm = async () => {
                 </div>
                 <button
                   onClick={() => {
-                    // Utilisation solo - aller directement au questionnaire
-                    setCurrentView('no-code');
+                    // Utilisation solo - aller au tri des critères
+                    setTripData({ ...tripData, travelers: 1 });
+                    setCurrentView('group-setup');
                   }}
                   className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-colors shadow-lg"
                 >
@@ -1693,7 +1694,7 @@ const handleModifyForm = async () => {
               <div 
                 onClick={() => {
                   setTripData({ ...tripData, travelers: 2, giftExtensionPrice: 20 });
-                  setCurrentView('criteria-order');
+                  setCurrentView('group-setup');
                 }}
                 className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
               >
@@ -1715,7 +1716,7 @@ const handleModifyForm = async () => {
               <div 
                 onClick={() => {
                   setTripData({ ...tripData, travelers: 3, giftExtensionPrice: 50 });
-                  setCurrentView('criteria-order');
+                  setCurrentView('group-setup');
                 }}
                 className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
               >
@@ -1737,7 +1738,7 @@ const handleModifyForm = async () => {
               <div 
                 onClick={() => {
                   setTripData({ ...tripData, travelers: 5, giftExtensionPrice: 100 });
-                  setCurrentView('criteria-order');
+                  setCurrentView('group-setup');
                 }}
                 className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50 md:col-span-2"
               >
@@ -2064,15 +2065,43 @@ const handleModifyForm = async () => {
       {currentView === 'group-setup' && (
         <GroupSetupView 
           travelers={tripData.travelers} 
-          onBack={() => setCurrentView('no-code')}
+          onBack={() => {
+            // Retourner au bon endroit selon le contexte
+            if (tripData.isGiftCard && tripData.giftExtensionPrice) {
+              setCurrentView('gift-extend');
+            } else if (tripData.isGiftCard) {
+              setCurrentView('gift-welcome');
+            } else {
+              setCurrentView('no-code');
+            }
+          }}
           onComplete={async (groupData) => {
             setLoading(true);
             try {
-              // Vérifier si c'est une extension de carte cadeau
+              // CAS 1: Code cadeau SOLO gratuit (1 participant, pas de paiement)
+              if (tripData.isGiftCard && groupData.participants.length === 1 && !tripData.giftExtensionPrice) {
+                console.log('🎁 Code cadeau solo - Pas de paiement, aller au formulaire');
+                
+                // Stocker les données pour le formulaire
+                setTripData({
+                  ...tripData,
+                  prenom: groupData.participants[0].prenom,
+                  nom: groupData.participants[0].nom,
+                  email: groupData.participants[0].email,
+                  criteriaOrder: groupData.criteria.map(c => c.id),
+                });
+                
+                // Aller au formulaire
+                setCurrentView('form');
+                setLoading(false);
+                return;
+              }
+              
+              // CAS 2: Extension de carte cadeau ou groupe normal (paiement requis)
               const isGiftExtension = tripData.isGiftCard && tripData.giftExtensionPrice;
               const finalPrice = isGiftExtension ? tripData.giftExtensionPrice : groupData.price;
               
-              console.log('🎁 Extension carte cadeau:', isGiftExtension, 'Prix:', finalPrice);
+              console.log('🎁 Extension carte cadeau ou groupe:', isGiftExtension, 'Prix:', finalPrice);
               
               // Envoyer directement à Stripe avec les metadata
               await redirectToStripe('group', finalPrice, { 
