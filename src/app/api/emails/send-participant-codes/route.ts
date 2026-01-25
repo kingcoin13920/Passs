@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
       try {
         const result = await resend.emails.send({
-         from: 'Passworld <noreply@hihaaa.fr>',
+         from: 'Passworld <noreply@hihaaa.com>',
           to: [email],
           subject: '🌍 Votre voyage surprise vous attend !',
           html: emailHtml,
