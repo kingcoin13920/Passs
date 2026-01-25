@@ -953,8 +953,8 @@ const handleModifyForm = async () => {
           });
           
           const participantData = await participantResponse.json();
-          finalParticipantId = participantData.participant.id;
-          finalParticipantRecordId = participantData.participant.id;
+          finalParticipantId = participantData.id;
+          finalParticipantRecordId = participantData.id;
           console.log('✅ Participant créé:', finalParticipantId);
           
           // Marquer la carte cadeau comme utilisée
@@ -1103,27 +1103,14 @@ const handleModifyForm = async () => {
                 </div>
 
                 <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Combien êtes-vous à voyager ?</label>
-                    <select
-                      value={formData.nbVoyageurs}
-                      onChange={(e) => updateField('nbVoyageurs', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">-</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3-4">3-4</option>
-                      <option value="5-6">5-6</option>
-                      <option value="7+">7+</option>
-                    </select>
-                  </div>
+                  {/* Champ nbVoyageurs supprimé */}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Y a-t-il des enfants ?</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Y a-t-il des enfants ? *</label>
                     <select
                       value={formData.enfants}
                       onChange={(e) => updateField('enfants', e.target.value)}
+                      required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     >
                       <option value="">-</option>
