@@ -960,6 +960,9 @@ const handleModifyForm = async () => {
       interdits: initialData?.existingFormData?.interdits || ''
     });
 
+    // État pour tracker les champs avec des erreurs
+    const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
+
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
@@ -967,6 +970,12 @@ const handleModifyForm = async () => {
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
+      // Retirer l'erreur quand l'utilisateur remplit le champ
+      if (value) {
+        const newErrors = new Set(fieldErrors);
+        newErrors.delete(field);
+        setFieldErrors(newErrors);
+      }
     };
 
     const toggleMultiSelect = (field: string, value: string) => {
@@ -979,6 +988,68 @@ const handleModifyForm = async () => {
     };
 
     const nextStep = () => {
+      // Validation pas à pas avant de passer au step suivant
+      let missingFields = [];
+      const errorFields = new Set<string>();
+      
+      switch (currentStep) {
+        case 1: // Prénom, Nom, Email
+          if (!formData.prenom) { missingFields.push('Prénom'); errorFields.add('prenom'); }
+          if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
+          if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
+          break;
+        
+        case 2: // Budget, Distance
+          if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
+          if (!formData.distance) { missingFields.push('Préférence de distance'); errorFields.add('distance'); }
+          break;
+        
+        case 3: // Motivations
+          if (!formData.motivations || formData.motivations.length === 0) {
+            missingFields.push('Motivations (sélectionnez au moins une)');
+            errorFields.add('motivations');
+          }
+          break;
+        
+        case 4: // Type de voyage
+          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+          break;
+        
+        case 5: // Planning
+          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+          break;
+        
+        case 6: // Environnements
+          if (!formData.environnements || formData.environnements.length === 0) {
+            missingFields.push('Environnements (sélectionnez au moins un)');
+            errorFields.add('environnements');
+          }
+          break;
+        
+        case 7: // Climat
+          if (!formData.climat) { missingFields.push('Climat préféré'); errorFields.add('climat'); }
+          break;
+        
+        case 8: // Activités
+          if (!formData.activites || formData.activites.length === 0) {
+            missingFields.push('Activités (sélectionnez au moins une)');
+            errorFields.add('activites');
+          }
+          break;
+        
+        case 9: // Rythme
+          if (!formData.rythme) { missingFields.push('Rythme de voyage'); errorFields.add('rythme'); }
+          break;
+      }
+      
+      if (missingFields.length > 0) {
+        setFieldErrors(errorFields);
+        alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
+        return;
+      }
+      
+      // Réinitialiser les erreurs et passer au step suivant
+      setFieldErrors(new Set());
       if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
     };
 
@@ -1186,7 +1257,9 @@ const handleModifyForm = async () => {
                       value={formData.prenom}
                       onChange={(e) => updateField('prenom', e.target.value)}
                       readOnly={!!initialData?.prenom}
-                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.prenom ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
 
@@ -1197,7 +1270,9 @@ const handleModifyForm = async () => {
                       value={formData.nom}
                       onChange={(e) => updateField('nom', e.target.value)}
                       readOnly={!!initialData?.nom}
-                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.nom ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('nom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${initialData?.nom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
 
