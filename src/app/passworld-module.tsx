@@ -362,7 +362,7 @@ const verifyCode = async (code: string) => {
       
       // Vérifier si la carte cadeau a déjà été utilisée
       if (giftResult.status === 'used') {
-        alert(`Ce code cadeau a déjà été utilisé.\n\nVous avez dû recevoir un nouveau code par email pour votre voyage.`);
+        alert(`Ce code cadeau a déjà été utilisé.\n\nSi vous avez effectué un voyage de groupe, vous avez dû recevoir un nouveau code par email.\n\nSi vous avez effectué un voyage solo, votre formulaire a déjà été envoyé et est en cours de traitement.`);
         setLoading(false);
         return;
       }
@@ -521,6 +521,14 @@ const handleModifyForm = async () => {
     const [participants, setParticipants] = useState(getInitialParticipants());
     const [selectedGroupSize, setSelectedGroupSize] = useState(travelers || 1);
 
+    // État pour les données communes à tous les participants
+    const [commonData, setCommonData] = useState({
+      enfants: '',
+      villeDepart: '',
+      dateDepart: '',
+      duree: ''
+    });
+
     // Calculer le prix en fonction du nombre réel de participants
     const calculatePrice = (nbParticipants) => {
       // Calculer d'abord le prix normal
@@ -593,9 +601,15 @@ const handleModifyForm = async () => {
       console.log('Group setup complete:', { 
         criteria: criteria.map(c => c.id), 
         participants, 
-        price: currentPrice 
+        price: currentPrice,
+        commonData: commonData  // Ajout des données communes
       });
-      onComplete({ criteria, participants, price: currentPrice });
+      onComplete({ 
+        criteria, 
+        participants, 
+        price: currentPrice,
+        commonData: commonData  // Ajout des données communes
+      });
     };
 
     if (step === 1) {
@@ -610,6 +624,78 @@ const handleModifyForm = async () => {
                 <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Retour
               </button>
+
+              {/* NOUVEAU: Informations communes du voyage */}
+              <div className="mb-10 p-6 bg-blue-50 rounded-2xl border-2 border-blue-200">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                  📋 Informations du voyage
+                </h3>
+                <p className="text-gray-600 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Y a-t-il des enfants ? *
+                    </label>
+                    <select
+                      value={commonData.enfants}
+                      onChange={(e) => setCommonData({...commonData, enfants: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="oui">Oui</option>
+                      <option value="non">Non</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Ville de départ *
+                    </label>
+                    <input
+                      type="text"
+                      value={commonData.villeDepart}
+                      onChange={(e) => setCommonData({...commonData, villeDepart: e.target.value})}
+                      required
+                      placeholder="Ex: Paris, Lyon..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date de départ souhaitée *
+                    </label>
+                    <input
+                      type="date"
+                      value={commonData.dateDepart}
+                      onChange={(e) => setCommonData({...commonData, dateDepart: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Durée du voyage *
+                    </label>
+                    <select
+                      value={commonData.duree}
+                      onChange={(e) => setCommonData({...commonData, duree: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="weekend">Weekend</option>
+                      <option value="3-5j">3-5 jours</option>
+                      <option value="1sem">1 semaine</option>
+                      <option value="2sem">2 semaines</option>
+                      <option value="3sem+">3 semaines+</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
               <div className="text-center mb-10">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4">
@@ -660,7 +746,8 @@ const handleModifyForm = async () => {
                       onComplete({
                         criteria,
                         participants,
-                        price: 0 // Pas de prix pour un cadeau solo
+                        price: 0, // Pas de prix pour un cadeau solo
+                        commonData: commonData // Ajout des données communes
                       });
                     } else {
                       setStep(2);
@@ -680,7 +767,8 @@ const handleModifyForm = async () => {
                       onComplete({
                         criteria: [...CRITERIA],
                         participants,
-                        price: 0
+                        price: 0,
+                        commonData: commonData // Ajout des données communes
                       });
                     } else {
                       setStep(2);
@@ -844,10 +932,6 @@ const handleModifyForm = async () => {
       nom: initialData?.nom || '',
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      enfants: initialData?.existingFormData?.enfants || '',
-      villeDepart: initialData?.existingFormData?.villeDepart || '',
-      dateDepart: initialData?.existingFormData?.dateDepart || '',
-      duree: initialData?.existingFormData?.duree || '',
       budget: initialData?.existingFormData?.budget || '',
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
@@ -867,7 +951,7 @@ const handleModifyForm = async () => {
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = skipFormatStep ? 8 : 9; // Réduit de 1 car nbVoyageurs supprimé
+    const totalSteps = 8; // Réduit: suppression de nbVoyageurs, enfants, ville, date, durée, formule
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1004,7 +1088,14 @@ const handleModifyForm = async () => {
           : 'Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.'
         );
         
-        setCurrentView('dashboard');
+        // Rediriger intelligemment selon le contexte
+        if (tripData.isGiftCard) {
+          // Code cadeau → retour à l'accueil
+          window.location.href = '/';
+        } else {
+          // Code normal → dashboard
+          setCurrentView('dashboard');
+        }
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
@@ -1097,74 +1188,20 @@ const handleModifyForm = async () => {
             {currentStep === 2 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🛫 Le plan de vol commence ici</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">💰 Budget et préférences</h2>
                 </div>
 
                 <div className="space-y-6">
-                  {/* Champ nbVoyageurs supprimé */}
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Y a-t-il des enfants ? *</label>
-                    <select
-                      value={formData.enfants}
-                      onChange={(e) => updateField('enfants', e.target.value)}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    >
-                      <option value="">-</option>
-                      <option value="oui">Oui</option>
-                      <option value="non">Non</option>
-                    </select>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Votre ville de départ</label>
-                      <input
-                        type="text"
-                        value={formData.villeDepart}
-                        onChange={(e) => updateField('villeDepart', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                        placeholder="Lyon"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Date de départ</label>
-                      <input
-                        type="date"
-                        value={formData.dateDepart}
-                        onChange={(e) => updateField('dateDepart', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Durée</label>
-                      <select
-                        value={formData.duree}
-                        onChange={(e) => updateField('duree', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">-</option>
-                        <option value="weekend">Weekend</option>
-                        <option value="3-5j">3-5 jours</option>
-                        <option value="1sem">1 semaine</option>
-                        <option value="2sem">2 semaines</option>
-                        <option value="3sem+">3 semaines+</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Quel est votre budget par personne ? (vols inclus)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Quel est votre budget par personne ? (vols inclus) *</label>
                       <select
                         value={formData.budget}
                         onChange={(e) => updateField('budget', e.target.value)}
+                        required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
-                        <option value="">-</option>
+                        <option value="">Sélectionner</option>
                         <option value="<500">{"< 500€"}</option>
                         <option value="500-1000">500-1000€</option>
                         <option value="1000-2000">1000-2000€</option>
@@ -1174,13 +1211,14 @@ const handleModifyForm = async () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Préférence de distance</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Préférence de distance *</label>
                       <select
                         value={formData.distance}
                         onChange={(e) => updateField('distance', e.target.value)}
+                        required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
-                        <option value="">-</option>
+                        <option value="">Sélectionner</option>
                         <option value="proche">Proche (Europe)</option>
                         <option value="moyen">Moyen (Afrique, Moyen-Orient)</option>
                         <option value="loin">Loin (Amériques, Asie, Océanie)</option>
@@ -1462,7 +1500,7 @@ const handleModifyForm = async () => {
               </div>
             )}
 
-            {/* Step 10 supprimé (Formule) */}
+            {/* Step 10 (Formule) supprimé */}
 
             {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
