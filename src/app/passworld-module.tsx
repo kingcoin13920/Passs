@@ -844,7 +844,6 @@ const handleModifyForm = async () => {
       nom: initialData?.nom || '',
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      nbVoyageurs: initialData?.existingFormData?.nbVoyageurs || '',
       enfants: initialData?.existingFormData?.enfants || '',
       villeDepart: initialData?.existingFormData?.villeDepart || '',
       dateDepart: initialData?.existingFormData?.dateDepart || '',
@@ -862,14 +861,13 @@ const handleModifyForm = async () => {
       rythme: initialData?.existingFormData?.rythme || '',
       problemeSante: initialData?.existingFormData?.problemeSante || '',
       phobies: initialData?.existingFormData?.phobies || '',
-      interdits: initialData?.existingFormData?.interdits || '',
-      formatRevelation: initialData?.existingFormData?.formatRevelation || ''
+      interdits: initialData?.existingFormData?.interdits || ''
     });
 
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = skipFormatStep ? 9 : 10;
+    const totalSteps = skipFormatStep ? 8 : 9; // Réduit de 1 car nbVoyageurs supprimé
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1464,41 +1462,7 @@ const handleModifyForm = async () => {
               </div>
             )}
 
-            {/* Step 10: Format révélation */}
-            {!skipFormatStep && currentStep === 10 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🎁 Formule</h2>
-                  <p className="text-gray-600">Comment souhaitez-vous découvrir votre destination ?</p>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[
-                    { value: 'lettre', label: 'Lettre', desc: 'Révélation physique par courrier' },
-                    { value: 'email', label: 'E-mail (PDF)', desc: 'Révélation numérique instantanée' },
-                    { value: 'lettre-email', label: 'Lettre + Email (PDF)', desc: 'Les deux formats' }
-                  ].map((format) => (
-                    <button
-                      key={format.value}
-                      onClick={() => updateField('formatRevelation', format.value)}
-                      className={`p-6 rounded-xl border-2 transition-all text-left ${
-                        formData.formatRevelation === format.value
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="font-bold text-lg text-gray-900 mb-2">{format.label}</div>
-                      <div className="text-sm text-gray-600">{format.desc}</div>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-lg p-6 text-center">
-                  <p className="text-emerald-800 font-semibold mb-2">✨ Prêt à découvrir votre destination ?</p>
-                  <p className="text-sm text-emerald-700">Votre expérience unique sera préparée dans les 48-72h</p>
-                </div>
-              </div>
-            )}
+            {/* Step 10 supprimé (Formule) */}
 
             {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
