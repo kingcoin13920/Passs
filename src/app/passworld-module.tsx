@@ -966,7 +966,7 @@ const handleModifyForm = async () => {
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = 8; // Réduit: suppression de nbVoyageurs, enfants, ville, date, durée, formule
+    const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1036,10 +1036,6 @@ const handleModifyForm = async () => {
             errorFields.add('activites');
           }
           break;
-        
-        case 9: // Rythme
-          if (!formData.rythme) { missingFields.push('Rythme de voyage'); errorFields.add('rythme'); }
-          break;
       }
       
       if (missingFields.length > 0) {
@@ -1061,46 +1057,8 @@ const handleModifyForm = async () => {
       try {
         setLoading(true);
         
-        // Validation des champs obligatoires
-        const requiredFields = [
-          { field: 'prenom', label: 'Prénom' },
-          { field: 'nom', label: 'Nom' },
-          { field: 'email', label: 'Email' },
-          { field: 'budget', label: 'Budget' },
-          { field: 'distance', label: 'Préférence de distance' },
-          { field: 'voyageType', label: 'Type de voyage' },
-          { field: 'planningStyle', label: 'Style de planning' },
-          { field: 'climat', label: 'Climat préféré' },
-          { field: 'rythme', label: 'Rythme de voyage' }
-        ];
-
-        const missingFields = requiredFields.filter(({ field }) => !formData[field] || formData[field] === '');
-        
-        if (missingFields.length > 0) {
-          const fieldsList = missingFields.map(f => f.label).join(', ');
-          alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n${fieldsList}`);
-          setLoading(false);
-          return;
-        }
-
-        // Validation arrays (doivent avoir au moins 1 élément)
-        if (!formData.motivations || formData.motivations.length === 0) {
-          alert('⚠️ Veuillez sélectionner au moins une motivation');
-          setLoading(false);
-          return;
-        }
-
-        if (!formData.environnements || formData.environnements.length === 0) {
-          alert('⚠️ Veuillez sélectionner au moins un environnement préféré');
-          setLoading(false);
-          return;
-        }
-
-        if (!formData.activites || formData.activites.length === 0) {
-          alert('⚠️ Veuillez sélectionner au moins une activité');
-          setLoading(false);
-          return;
-        }
+        // Validation déjà faite étape par étape dans nextStep()
+        // Pas besoin de re-valider ici
         
         // En mode démo
         if (IS_DEMO_MODE) {
@@ -1528,14 +1486,14 @@ const handleModifyForm = async () => {
               </div>
             )}
 
-            {/* Step 8: Activités */}
+            {/* Step 8: Activités + Rythme + Contraintes */}
             {currentStep === 8 && (
               <div>
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Activités souhaitées</h2>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-3 gap-4 mb-10">
                   {[
                     { value: 'baignade', label: '🏊 Baignade / Farniente' },
                     { value: 'rando', label: '🥾 Randonnée / Marche' },
@@ -1561,17 +1519,10 @@ const handleModifyForm = async () => {
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
 
-            {/* Step 9: Rythme + Contraintes */}
-            {currentStep === 9 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quel rythme vous convient le mieux ?</h2>
-                </div>
-
-                <div className="mb-8">
+                {/* Rythme (optionnel) */}
+                <div className="mb-8 border-t pt-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Quel rythme vous convient le mieux ? (optionnel)</h3>
                   <select
                     value={formData.rythme}
                     onChange={(e) => updateField('rythme', e.target.value)}
@@ -1586,16 +1537,18 @@ const handleModifyForm = async () => {
                   </select>
                 </div>
 
+                {/* Contraintes (optionnel) */}
                 <div className="border-t pt-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6">🌪️ Vos zones de turbulences à prendre en compte</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">🌪️ Vos zones de turbulences à prendre en compte (optionnel)</h3>
                   
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Problèmes de santé ou de mobilité à prendre...</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Problèmes de santé ou de mobilité</label>
                       <textarea
                         value={formData.problemeSante}
                         onChange={(e) => updateField('problemeSante', e.target.value)}
                         rows={3}
+                        placeholder="Ex: Problèmes de dos, allergies..."
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
@@ -1606,16 +1559,18 @@ const handleModifyForm = async () => {
                         value={formData.phobies}
                         onChange={(e) => updateField('phobies', e.target.value)}
                         rows={3}
+                        placeholder="Ex: Peur des hauteurs, claustrophobie..."
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Lieux, ambiances ou choses que vous souhaitez éviter absolument</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Lieux, ambiances ou choses à éviter</label>
                       <textarea
                         value={formData.interdits}
                         onChange={(e) => updateField('interdits', e.target.value)}
                         rows={3}
+                        placeholder="Ex: Endroits trop touristiques, viande..."
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
@@ -1623,6 +1578,9 @@ const handleModifyForm = async () => {
                 </div>
               </div>
             )}
+
+            {/* Step 9 supprimé (fusionné avec Step 8) */}
+            {currentStep === 9 && null}
 
             {/* Step 10 (Formule) supprimé */}
 
