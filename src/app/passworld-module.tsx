@@ -741,6 +741,12 @@ const handleModifyForm = async () => {
               <div className="space-y-4">
                 <button
                   onClick={() => {
+                    // Valider les champs communs obligatoires
+                    if (!commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
+                      alert('⚠️ Veuillez remplir tous les champs obligatoires des informations du voyage');
+                      return;
+                    }
+
                     // Si c'est un code cadeau solo (1 participant), terminer directement
                     if (isGiftCard && participants.length === 1 && !giftExtensionPrice) {
                       onComplete({
@@ -761,6 +767,12 @@ const handleModifyForm = async () => {
 
                 <button
                   onClick={() => {
+                    // Valider les champs communs obligatoires
+                    if (!commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
+                      alert('⚠️ Veuillez remplir tous les champs obligatoires des informations du voyage');
+                      return;
+                    }
+
                     setCriteria([...CRITERIA]);
                     // Si c'est un code cadeau solo, terminer directement
                     if (isGiftCard && participants.length === 1 && !giftExtensionPrice) {
@@ -978,6 +990,47 @@ const handleModifyForm = async () => {
       try {
         setLoading(true);
         
+        // Validation des champs obligatoires
+        const requiredFields = [
+          { field: 'prenom', label: 'Prénom' },
+          { field: 'nom', label: 'Nom' },
+          { field: 'email', label: 'Email' },
+          { field: 'budget', label: 'Budget' },
+          { field: 'distance', label: 'Préférence de distance' },
+          { field: 'voyageType', label: 'Type de voyage' },
+          { field: 'planningStyle', label: 'Style de planning' },
+          { field: 'climat', label: 'Climat préféré' },
+          { field: 'rythme', label: 'Rythme de voyage' }
+        ];
+
+        const missingFields = requiredFields.filter(({ field }) => !formData[field] || formData[field] === '');
+        
+        if (missingFields.length > 0) {
+          const fieldsList = missingFields.map(f => f.label).join(', ');
+          alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n${fieldsList}`);
+          setLoading(false);
+          return;
+        }
+
+        // Validation arrays (doivent avoir au moins 1 élément)
+        if (!formData.motivations || formData.motivations.length === 0) {
+          alert('⚠️ Veuillez sélectionner au moins une motivation');
+          setLoading(false);
+          return;
+        }
+
+        if (!formData.environnements || formData.environnements.length === 0) {
+          alert('⚠️ Veuillez sélectionner au moins un environnement préféré');
+          setLoading(false);
+          return;
+        }
+
+        if (!formData.activites || formData.activites.length === 0) {
+          alert('⚠️ Veuillez sélectionner au moins une activité');
+          setLoading(false);
+          return;
+        }
+        
         // En mode démo
         if (IS_DEMO_MODE) {
           console.log('Mode démo - Formulaire soumis:', formData);
@@ -1088,14 +1141,10 @@ const handleModifyForm = async () => {
           : 'Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.'
         );
         
-        // Rediriger intelligemment selon le contexte
-        if (tripData.isGiftCard) {
-          // Code cadeau → retour à l'accueil
+        // Toujours rediriger vers l'accueil après soumission
+        setTimeout(() => {
           window.location.href = '/';
-        } else {
-          // Code normal → dashboard
-          setCurrentView('dashboard');
-        }
+        }, 2000); // Délai de 2s pour lire le message
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
@@ -2110,7 +2159,7 @@ const handleModifyForm = async () => {
 
       {currentView === 'group-setup' && (
         <GroupSetupView 
-          travelers={tripData.travelers}
+          travelers={tripData.travelers || 1}
           isGiftCard={tripData.isGiftCard || false}
           giftExtensionPrice={tripData.giftExtensionPrice || null}
           recipientName={tripData.recipientName || null}
