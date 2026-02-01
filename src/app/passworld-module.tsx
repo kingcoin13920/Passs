@@ -614,7 +614,7 @@ const handleModifyForm = async () => {
 
     if (step === 1) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 via-sand-50 to-jungle-50 py-12 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
@@ -626,22 +626,22 @@ const handleModifyForm = async () => {
               </button>
 
               {/* NOUVEAU: Informations communes du voyage */}
-              <div className="mb-10 p-6 bg-blue-50 rounded-2xl border-2 border-blue-200">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <div className="mb-10 p-6 bg-blue-50 rounded-4xl border-2 border-blue-200">
+                <h3 className="text-2xl font-bold text-jungle-800 mb-2 flex items-center">
                   📋 Informations du voyage
                 </h3>
-                <p className="text-gray-600 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
+                <p className="text-sand-600 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
                 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Y a-t-il des enfants ? *
                     </label>
                     <select
                       value={commonData.enfants}
                       onChange={(e) => setCommonData({...commonData, enfants: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Sélectionner</option>
                       <option value="oui">Oui</option>
@@ -650,7 +650,7 @@ const handleModifyForm = async () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Ville de départ *
                     </label>
                     <input
@@ -659,12 +659,12 @@ const handleModifyForm = async () => {
                       onChange={(e) => setCommonData({...commonData, villeDepart: e.target.value})}
                       required
                       placeholder="Ex: Paris, Lyon..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Date de départ souhaitée *
                     </label>
                     <input
@@ -672,19 +672,19 @@ const handleModifyForm = async () => {
                       value={commonData.dateDepart}
                       onChange={(e) => setCommonData({...commonData, dateDepart: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Durée du voyage *
                     </label>
                     <select
                       value={commonData.duree}
                       onChange={(e) => setCommonData({...commonData, duree: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Sélectionner</option>
                       <option value="weekend">Weekend</option>
@@ -698,14 +698,14 @@ const handleModifyForm = async () => {
               </div>
 
               <div className="text-center mb-10">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-jungle-500 to-jungle-500 rounded-4xl mb-4">
                   <span className="text-3xl">🎯</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Ordre d'importance des critères</h2>
                 <p className="text-slate-600 text-lg">Glissez-déposez pour définir vos priorités</p>
               </div>
 
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-5 mb-8">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-4xl p-5 mb-8">
                 <p className="text-indigo-900 text-sm font-medium flex items-start gap-2">
                   <span className="text-xl">💡</span>
                   <span>L'ordre des critères permet de trouver LA destination qui convient au mieux à tout le monde. Le critère #1 est le plus important.</span>
@@ -720,7 +720,7 @@ const handleModifyForm = async () => {
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-white border-2 rounded-2xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
+                    className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
                       draggedItem === index 
                         ? 'border-indigo-600 shadow-2xl scale-105 bg-indigo-50' 
                         : 'border-slate-200 hover:border-indigo-300'
@@ -731,7 +731,7 @@ const handleModifyForm = async () => {
                       <span className="text-3xl">{criterion.icon}</span>
                       <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
                     </div>
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">
+                    <div className="bg-gradient-to-br from-cream-500 to-ocean-500 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
                       #{index + 1}
                     </div>
                   </div>
@@ -759,7 +759,7 @@ const handleModifyForm = async () => {
                       setStep(2);
                     }
                   }}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-5 rounded-2xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center group"
+                  className="w-full bg-gradient-to-r from-jungle-500 to-ocean-500 text-white py-5 rounded-4xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center group"
                 >
                   Continuer
                   <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -786,7 +786,7 @@ const handleModifyForm = async () => {
                       setStep(2);
                     }
                   }}
-                  className="w-full text-gray-600 hover:text-gray-900 py-2 text-sm"
+                  className="w-full text-sand-600 hover:text-jungle-800 py-2 text-sm"
                 >
                   Passer avec l'ordre par défaut
                 </button>
@@ -800,25 +800,25 @@ const handleModifyForm = async () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setStep(1)}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
             </button>
 
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Informations des participants</h2>
-              <p className="text-gray-600">Chacun recevra un code unique par email</p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Informations des participants</h2>
+              <p className="text-sand-600">Chacun recevra un code unique par email</p>
             </div>
 
             <div className="space-y-6 mb-8">
               {participants.map((participant, index) => (
-                <div key={index} className="border-2 border-gray-200 rounded-lg p-6">
+                <div key={index} className="border-2 border-sand-200 rounded-2xl p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-gray-900">Participant {index + 1}</h3>
+                    <h3 className="font-semibold text-jungle-800">Participant {index + 1}</h3>
                     {/* Pour les codes cadeaux: minimum 2 participants, sinon minimum 1 */}
                     {((isGiftCard && participants.length > 2) || (!isGiftCard && participants.length > 1)) && (
                       <button
@@ -832,34 +832,34 @@ const handleModifyForm = async () => {
 
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Prénom *</label>
                       <input
                         type="text"
                         value={participant.prenom}
                         onChange={(e) => updateParticipant(index, 'prenom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="Marie"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Nom *</label>
                       <input
                         type="text"
                         value={participant.nom}
                         onChange={(e) => updateParticipant(index, 'nom', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="Dupont"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Email *</label>
                       <input
                         type="email"
                         value={participant.email}
                         onChange={(e) => updateParticipant(index, 'email', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="marie@example.com"
                       />
                     </div>
@@ -870,27 +870,27 @@ const handleModifyForm = async () => {
               {participants.length < maxParticipants && (
                 <button
                   onClick={addParticipant}
-                  className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
+                  className="w-full py-3 border-2 border-dashed border-sand-300 rounded-2xl text-sand-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
                 >
                   + Ajouter un participant (max {maxParticipants})
                 </button>
               )}
             </div>
 
-            <div className="bg-indigo-50 p-6 rounded-lg mb-6">
+            <div className="bg-indigo-50 p-6 rounded-2xl mb-6">
               <div className="flex justify-between items-center mb-3">
                 <div>
-                  <span className="text-gray-700 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sand-700 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
+                  <span className="text-sm text-sand-600">
                     {participants.length === 1 && 'Solo'}
                     {participants.length === 2 && 'Duo'}
                     {participants.length >= 3 && participants.length <= 4 && 'Groupe 3-4'}
                     {participants.length >= 5 && participants.length <= 8 && 'Groupe 5-8'}
                   </span>
                 </div>
-                <span className="font-bold text-3xl text-gray-900">{currentPrice}€</span>
+                <span className="font-bold text-3xl text-jungle-800">{currentPrice}€</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-sand-600">
                 Chaque participant recevra un code unique par email après le paiement
               </p>
               {participants.length > 1 && (
@@ -903,7 +903,7 @@ const handleModifyForm = async () => {
             <button
               onClick={handlePayment}
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 flex items-center justify-center"
+              className="w-full bg-jungle-500 text-white py-4 rounded-2xl font-semibold hover:bg-jungle-600 transition-colors disabled:bg-gray-400 flex items-center justify-center"
             >
               {loading ? 'Chargement...' : (
                 <>
@@ -1183,75 +1183,77 @@ const handleModifyForm = async () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-cream-50 via-sand-50 to-ocean-50 py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Progress bar */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Étape {currentStep} sur {totalSteps}</span>
-              <span className="text-sm font-medium text-emerald-600">{Math.round((currentStep / totalSteps) * 100)}%</span>
+          {/* Progress bar premium */}
+          <div className="mb-8 animate-fade-in">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm font-semibold text-sand-700">Étape {currentStep} sur {totalSteps}</span>
+              <span className="px-4 py-1 rounded-full bg-jungle-100 text-jungle-700 text-sm font-bold">
+                {Math.round((currentStep / totalSteps) * 100)}%
+              </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-sand-200 rounded-full h-3 overflow-hidden shadow-inner">
               <div
-                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-jungle-500 to-jungle-600 h-3 rounded-full transition-all duration-500 ease-out shadow-soft"
                 style={{ width: `${(currentStep / totalSteps) * 100}%` }}
               />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-4xl shadow-soft-lg p-8 md:p-10 animate-scale-in">
             {/* Step 1: Infos personnelles */}
             {currentStep === 1 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Prénom *</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-2">Prénom *</label>
                     <input
                       type="text"
                       value={formData.prenom}
                       onChange={(e) => updateField('prenom', e.target.value)}
                       readOnly={!!initialData?.prenom}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                        fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-sand-300'
+                      } ${initialData?.prenom ? 'bg-sand-50' : ''}`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom *</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-2">Nom *</label>
                     <input
                       type="text"
                       value={formData.nom}
                       onChange={(e) => updateField('nom', e.target.value)}
                       readOnly={!!initialData?.nom}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                        fieldErrors.has('nom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } ${initialData?.nom ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('nom') ? 'border-red-500 bg-red-50' : 'border-sand-300'
+                      } ${initialData?.nom ? 'bg-sand-50' : ''}`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-2">Date de naissance</label>
                     <input
                       type="date"
                       value={formData.dateNaissance}
                       onChange={(e) => updateField('dateNaissance', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-2">E-mail *</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
                       readOnly={!!initialData?.email}
-                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.email ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.email ? 'bg-sand-50' : ''}`}
                       placeholder="john.martin@gmail.com"
                     />
                   </div>
@@ -1259,8 +1261,8 @@ const handleModifyForm = async () => {
 
                 <div className="mt-6">
                   <label className="flex items-center">
-                    <input type="checkbox" className="w-4 h-4 text-emerald-600 border-gray-300 rounded" />
-                    <span className="ml-2 text-sm text-gray-700">J'accepte d'être recontacté·e pour organiser mon voyage.</span>
+                    <input type="checkbox" className="w-4 h-4 text-jungle-600 border-sand-300 rounded" />
+                    <span className="ml-2 text-sm text-sand-700">J'accepte d'être recontacté·e pour organiser mon voyage.</span>
                   </label>
                 </div>
               </div>
@@ -1270,18 +1272,18 @@ const handleModifyForm = async () => {
             {currentStep === 2 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">💰 Budget et préférences</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">💰 Budget et préférences</h2>
                 </div>
 
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Quel est votre budget par personne ? (vols inclus) *</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Quel est votre budget par personne ? (vols inclus) *</label>
                       <select
                         value={formData.budget}
                         onChange={(e) => updateField('budget', e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
                         <option value="">Sélectionner</option>
                         <option value="<500">{"< 500€"}</option>
@@ -1293,12 +1295,12 @@ const handleModifyForm = async () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Préférence de distance *</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Préférence de distance *</label>
                       <select
                         value={formData.distance}
                         onChange={(e) => updateField('distance', e.target.value)}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       >
                         <option value="">Sélectionner</option>
                         <option value="proche">Proche (Europe)</option>
@@ -1316,12 +1318,12 @@ const handleModifyForm = async () => {
             {currentStep === 3 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">✨ Vos motivations, notre boussole</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">✨ Vos motivations, notre boussole</h2>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Que recherchez-vous ?</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-3">Que recherchez-vous ?</label>
                     <div className="grid md:grid-cols-2 gap-3">
                       {[
                         'Besoin de déconnexion',
@@ -1332,26 +1334,26 @@ const handleModifyForm = async () => {
                         'Travailler à distance',
                         'Autre (Précisez)'
                       ].map((option) => (
-                        <label key={option} className="flex items-center p-3 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-3 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={formData.motivations.includes(option)}
                             onChange={() => toggleMultiSelect('motivations', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300 rounded"
+                            className="w-4 h-4 text-jungle-600 border-sand-300 rounded"
                           />
-                          <span className="ml-3 text-sm text-gray-700">{option}</span>
+                          <span className="ml-3 text-sm text-sand-700">{option}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Précisez</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-2">Précisez</label>
                     <textarea
                       value={formData.motivationsDetail}
                       onChange={(e) => updateField('motivationsDetail', e.target.value)}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -1362,41 +1364,41 @@ const handleModifyForm = async () => {
             {currentStep === 4 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">🧭 Quel voyage vous ressemble le plus ?</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">🧭 Quel voyage vous ressemble le plus ?</h2>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Vous préférez :</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-3">Vous préférez :</label>
                     <div className="space-y-3">
                       {['Un seul lieu', 'Plusieurs étapes'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
                           <input
                             type="radio"
                             name="voyageType"
                             checked={formData.voyageType === option}
                             onChange={() => updateField('voyageType', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300"
+                            className="w-4 h-4 text-jungle-600 border-sand-300"
                           />
-                          <span className="ml-3 text-gray-700">{option}</span>
+                          <span className="ml-3 text-sand-700">{option}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Vous aimez plutôt :</label>
+                    <label className="block text-sm font-medium text-sand-700 mb-3">Vous aimez plutôt :</label>
                     <div className="space-y-3">
                       {['Être libre / improviser', 'Être encadré·e / guidé·e'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
                           <input
                             type="radio"
                             name="planningStyle"
                             checked={formData.planningStyle === option}
                             onChange={() => updateField('planningStyle', option)}
-                            className="w-4 h-4 text-emerald-600 border-gray-300"
+                            className="w-4 h-4 text-jungle-600 border-sand-300"
                           />
-                          <span className="ml-3 text-gray-700">{option}</span>
+                          <span className="ml-3 text-sand-700">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -1409,7 +1411,7 @@ const handleModifyForm = async () => {
             {currentStep === 5 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quels types d'environnements vous attirent ?</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Quels types d'environnements vous attirent ?</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-4">
@@ -1424,14 +1426,14 @@ const handleModifyForm = async () => {
                     <button
                       key={env.value}
                       onClick={() => toggleMultiSelect('environnements', env.value)}
-                      className={`p-6 rounded-xl border-2 transition-all ${
+                      className={`p-6 rounded-3xl border-2 transition-all ${
                         formData.environnements.includes(env.value)
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
+                          ? 'border-jungle-500 bg-jungle-50'
+                          : 'border-sand-200 hover:border-emerald-300'
                       }`}
                     >
                       <div className="text-4xl mb-2">{env.label.split(' ')[0]}</div>
-                      <div className="font-medium text-gray-900">{env.label.split(' ')[1]}</div>
+                      <div className="font-medium text-jungle-800">{env.label.split(' ')[1]}</div>
                     </button>
                   ))}
                 </div>
@@ -1442,7 +1444,7 @@ const handleModifyForm = async () => {
             {currentStep === 6 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Quel climat recherchez-vous ?</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Quel climat recherchez-vous ?</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-4">
@@ -1454,14 +1456,14 @@ const handleModifyForm = async () => {
                     <button
                       key={climat.value}
                       onClick={() => updateField('climat', climat.value)}
-                      className={`p-8 rounded-xl border-2 transition-all ${
+                      className={`p-8 rounded-3xl border-2 transition-all ${
                         formData.climat === climat.value
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
+                          ? 'border-jungle-500 bg-jungle-50'
+                          : 'border-sand-200 hover:border-emerald-300'
                       }`}
                     >
                       <div className="text-5xl mb-3">{climat.icon}</div>
-                      <div className="font-semibold text-gray-900">{climat.label.split(' ')[1]}</div>
+                      <div className="font-semibold text-jungle-800">{climat.label.split(' ')[1]}</div>
                     </button>
                   ))}
                 </div>
@@ -1472,15 +1474,15 @@ const handleModifyForm = async () => {
             {currentStep === 7 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Pays ou régions déjà visités</h2>
-                  <p className="text-gray-600">(où vous ne souhaitez pas retourner)</p>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Pays ou régions déjà visités</h2>
+                  <p className="text-sand-600">(où vous ne souhaitez pas retourner)</p>
                 </div>
 
                 <textarea
                   value={formData.paysVisites}
                   onChange={(e) => updateField('paysVisites', e.target.value)}
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder="Bali, Espagne, Italie..."
                 />
               </div>
@@ -1490,7 +1492,7 @@ const handleModifyForm = async () => {
             {currentStep === 8 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Activités souhaitées</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Activités souhaitées</h2>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-4 mb-10">
@@ -1508,25 +1510,25 @@ const handleModifyForm = async () => {
                     <button
                       key={act.value}
                       onClick={() => toggleMultiSelect('activites', act.value)}
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
+                      className={`p-4 rounded-3xl border-2 transition-all text-left ${
                         formData.activites.includes(act.value)
-                          ? 'border-emerald-600 bg-emerald-50'
-                          : 'border-gray-200 hover:border-emerald-300'
+                          ? 'border-jungle-500 bg-jungle-50'
+                          : 'border-sand-200 hover:border-emerald-300'
                       }`}
                     >
                       <div className="text-2xl mb-2">{act.label.split(' ')[0]}</div>
-                      <div className="text-sm text-gray-700">{act.label.substring(act.label.indexOf(' ') + 1)}</div>
+                      <div className="text-sm text-sand-700">{act.label.substring(act.label.indexOf(' ') + 1)}</div>
                     </button>
                   ))}
                 </div>
 
                 {/* Rythme (optionnel) */}
                 <div className="mb-8 border-t pt-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Quel rythme vous convient le mieux ? (optionnel)</h3>
+                  <h3 className="text-xl font-bold text-jungle-800 mb-4">Quel rythme vous convient le mieux ? (optionnel)</h3>
                   <select
                     value={formData.rythme}
                     onChange={(e) => updateField('rythme', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   >
                     <option value="">-</option>
                     <option value="repos">🛌 Repos total</option>
@@ -1539,39 +1541,39 @@ const handleModifyForm = async () => {
 
                 {/* Contraintes (optionnel) */}
                 <div className="border-t pt-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6">🌪️ Vos zones de turbulences à prendre en compte (optionnel)</h3>
+                  <h3 className="text-xl font-bold text-jungle-800 mb-6">🌪️ Vos zones de turbulences à prendre en compte (optionnel)</h3>
                   
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Problèmes de santé ou de mobilité</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Problèmes de santé ou de mobilité</label>
                       <textarea
                         value={formData.problemeSante}
                         onChange={(e) => updateField('problemeSante', e.target.value)}
                         rows={3}
                         placeholder="Ex: Problèmes de dos, allergies..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phobies ou peurs à éviter</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Phobies ou peurs à éviter</label>
                       <textarea
                         value={formData.phobies}
                         onChange={(e) => updateField('phobies', e.target.value)}
                         rows={3}
                         placeholder="Ex: Peur des hauteurs, claustrophobie..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Lieux, ambiances ou choses à éviter</label>
+                      <label className="block text-sm font-medium text-sand-700 mb-2">Lieux, ambiances ou choses à éviter</label>
                       <textarea
                         value={formData.interdits}
                         onChange={(e) => updateField('interdits', e.target.value)}
                         rows={3}
                         placeholder="Ex: Endroits trop touristiques, viande..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -1588,7 +1590,7 @@ const handleModifyForm = async () => {
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
               <button
                 onClick={currentStep === 1 ? onBack : prevStep}
-                className="flex items-center text-gray-600 hover:text-gray-900 font-medium"
+                className="flex items-center px-6 py-3 rounded-full border-2 border-sand-300 text-jungle-700 hover:border-jungle-400 hover:bg-jungle-50 font-semibold transition-all"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 {currentStep === 1 ? 'Annuler' : 'Précédent'}
@@ -1597,7 +1599,7 @@ const handleModifyForm = async () => {
               {currentStep < totalSteps ? (
                 <button
                   onClick={nextStep}
-                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center"
+                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-jungle-500 to-jungle-600 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
                 >
                   Suivant
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -1605,7 +1607,7 @@ const handleModifyForm = async () => {
               ) : (
                 <button
                   onClick={submitForm}
-                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center"
+                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-jungle-500 to-jungle-600 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
                 >
                   Envoyer
                   <Check className="w-5 h-5 ml-2" />
@@ -1619,59 +1621,67 @@ const handleModifyForm = async () => {
   };
 
   const Router = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-cream-50 via-sand-50 to-jungle-50 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <Plane className="w-16 h-16 text-indigo-600 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Passworld</h1>
-          <p className="text-gray-600">Votre prochaine aventure commence ici</p>
+        {/* Hero Section */}
+        <div className="text-center mb-16 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-jungle-500 to-jungle-400 mb-6 shadow-soft-lg animate-float">
+            <Plane className="w-12 h-12 text-white" />
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-jungle-800 mb-4 font-['Poppins']">
+            Passworld
+          </h1>
+          <p className="text-xl md:text-2xl text-sand-700 font-light">
+            Votre prochaine aventure vous attend
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+        {/* Cards Grid */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6 animate-slide-up">
           <button
             onClick={() => setCurrentView('gift')}
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-left group"
+            className="bg-white rounded-4xl p-8 shadow-soft hover:shadow-float transition-all duration-300 hover:-translate-y-2 text-left group"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="bg-pink-100 rounded-full p-4">
-                <Gift className="w-8 h-8 text-pink-600" />
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-jungle-400 to-jungle-500 rounded-3xl flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-300">
+                <Gift className="w-8 h-8 text-white" />
               </div>
-              <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />
+              <ArrowRight className="w-6 h-6 text-sand-400 group-hover:text-jungle-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Offrir l'expérience</h2>
-            <p className="text-gray-600">Offrez une carte cadeau pour une destination surprise</p>
+            <h2 className="text-2xl font-bold text-jungle-800 mb-2 font-['Poppins']">Offrir un voyage</h2>
+            <p className="text-sand-600 leading-relaxed">Le cadeau parfait pour une expérience unique</p>
           </button>
 
           <button
             onClick={() => setCurrentView('start')}
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-left group"
+            className="bg-white rounded-4xl p-8 shadow-soft hover:shadow-float transition-all duration-300 hover:-translate-y-2 text-left group"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="bg-indigo-100 rounded-full p-4">
-                <Plane className="w-8 h-8 text-indigo-600" />
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-ocean-400 to-ocean-500 rounded-3xl flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-300">
+                <Plane className="w-8 h-8 text-white" />
               </div>
-              <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />
+              <ArrowRight className="w-6 h-6 text-sand-400 group-hover:text-ocean-600 group-hover:translate-x-1 transition-all" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Commencer l'expérience</h2>
-            <p className="text-gray-600">Découvrez votre destination mystère maintenant</p>
+            <h2 className="text-2xl font-bold text-jungle-800 mb-2 font-['Poppins']">Découvrir ma destination</h2>
+            <p className="text-sand-600 leading-relaxed">Commencez votre aventure surprise</p>
           </button>
         </div>
 
         <button
           onClick={() => setCurrentView('with-code')}
-          className="w-full bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-left group"
+          className="w-full bg-white rounded-4xl p-6 shadow-soft hover:shadow-float transition-all duration-300 hover:-translate-y-1 text-left group"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="bg-emerald-100 rounded-full p-3">
-                <Code className="w-6 h-6 text-emerald-600" />
+              <div className="w-14 h-14 bg-jungle-100 rounded-3xl flex items-center justify-center group-hover:bg-jungle-200 transition-colors">
+                <Code className="w-7 h-7 text-jungle-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">Accéder à mon dashboard</h3>
-                <p className="text-gray-600 text-sm">J'ai déjà un code participant</p>
+                <h3 className="text-xl font-bold text-jungle-800 mb-1">J'ai un code</h3>
+                <p className="text-sand-600 text-sm">Accéder à mon dashboard</p>
               </div>
             </div>
-            <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+            <ArrowRight className="w-6 h-6 text-sand-400 group-hover:text-jungle-600 group-hover:translate-x-1 transition-all" />
           </div>
         </button>
       </div>
@@ -1683,10 +1693,10 @@ const handleModifyForm = async () => {
       {/* Overlay de chargement pendant la redirection vers Stripe */}
       {isRedirectingToStripe && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4 text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600 mx-auto mb-4"></div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Redirection vers le paiement...</h3>
-            <p className="text-gray-600">Veuillez patienter, vous allez être redirigé vers Stripe</p>
+          <div className="bg-white rounded-4xl shadow-soft-xl p-8 max-w-md mx-4 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-jungle-500 mx-auto mb-4"></div>
+            <h3 className="text-xl font-bold text-jungle-800 mb-2">Redirection sécurisée...</h3>
+            <p className="text-sand-600">Vous allez être redirigé vers le paiement</p>
           </div>
         </div>
       )}
@@ -1695,11 +1705,11 @@ const handleModifyForm = async () => {
       
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-sand-50 to-indigo-50 flex items-center justify-center p-4">
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-8 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1710,13 +1720,13 @@ const handleModifyForm = async () => {
               <div className="bg-gradient-to-br from-pink-100 to-purple-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 <Gift className="w-10 h-10 text-pink-600" />
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl font-bold text-jungle-800 mb-4">
                 Bienvenue {tripData.recipientName} ! 🎁
               </h1>
-              <p className="text-xl text-gray-700 mb-2">
+              <p className="text-xl text-sand-700 mb-2">
                 <strong>{tripData.buyerName}</strong> vous a offert une carte cadeau Passworld !
               </p>
-              <p className="text-gray-600">
+              <p className="text-sand-600">
                 Découvrez votre destination surprise personnalisée
               </p>
             </div>
@@ -1724,13 +1734,13 @@ const handleModifyForm = async () => {
             {/* Options */}
             <div className="space-y-4 mb-8">
               {/* Option 1: Solo */}
-              <div className="border-2 border-indigo-200 rounded-2xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-indigo-50 to-purple-50">
+              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-cream-50 to-purple-50">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-jungle-800 mb-2">
                       🚀 Utiliser pour moi seul
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-sand-600 mb-4">
                       Profitez de votre voyage surprise en solo
                     </p>
                     <div className="flex items-center gap-2">
@@ -1745,23 +1755,23 @@ const handleModifyForm = async () => {
                     setTripData({ ...tripData, travelers: 1 });
                     setCurrentView('group-setup');
                   }}
-                  className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-colors shadow-lg"
+                  className="w-full bg-jungle-500 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-jungle-600 transition-colors shadow-lg"
                 >
                   Commencer mon questionnaire
                 </button>
               </div>
 
               {/* Option 2: Groupe */}
-              <div className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-400 transition-colors cursor-pointer bg-gradient-to-r from-purple-50 to-pink-50">
+              <div className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-400 transition-colors cursor-pointer bg-gradient-to-r from-purple-50 to-jungle-50">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-jungle-800 mb-2">
                       👥 Étendre à plusieurs personnes
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-sand-600 mb-4">
                       Transformez ce cadeau en voyage de groupe
                     </p>
-                    <div className="space-y-2 text-sm text-gray-600">
+                    <div className="space-y-2 text-sm text-sand-600">
                       <div className="flex justify-between">
                         <span>• Duo (2 personnes)</span>
                         <span className="font-semibold">+20€</span>
@@ -1782,7 +1792,7 @@ const handleModifyForm = async () => {
                     // Extension groupe - choix du nombre
                     setCurrentView('gift-extend');
                   }}
-                  className="w-full bg-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-colors shadow-lg"
+                  className="w-full bg-ocean-500 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-ocean-600 transition-colors shadow-lg"
                 >
                   Choisir le nombre de personnes
                 </button>
@@ -1798,21 +1808,21 @@ const handleModifyForm = async () => {
       
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-jungle-50 flex items-center justify-center p-4">
           <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('gift-welcome')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-8"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-8"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
             </button>
 
             <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              <h2 className="text-3xl md:text-4xl font-bold text-jungle-800 mb-3">
                 Combien serez-vous ?
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-sand-600 text-lg">
                 Choisissez le nombre de voyageurs et payez le supplément
               </p>
             </div>
@@ -1824,15 +1834,15 @@ const handleModifyForm = async () => {
                   setTripData({ ...tripData, travelers: 2, giftExtensionPrice: 20 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
+                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👥</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Duo</h3>
-                  <p className="text-gray-600 mb-4">2 personnes</p>
+                  <h3 className="text-2xl font-bold text-jungle-800 mb-2">Duo</h3>
+                  <p className="text-sand-600 mb-4">2 personnes</p>
                   <div className="space-y-1">
                     <p className="text-sm text-gray-500 line-through">Prix normal: 49€</p>
-                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-sand-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +20€
                     </div>
@@ -1846,15 +1856,15 @@ const handleModifyForm = async () => {
                   setTripData({ ...tripData, travelers: 3, giftExtensionPrice: 50 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50"
+                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👨‍👩‍👦</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Trio/Quatuor</h3>
-                  <p className="text-gray-600 mb-4">3-4 personnes</p>
+                  <h3 className="text-2xl font-bold text-jungle-800 mb-2">Trio/Quatuor</h3>
+                  <p className="text-sand-600 mb-4">3-4 personnes</p>
                   <div className="space-y-1">
                     <p className="text-sm text-gray-500 line-through">Prix normal: 79€</p>
-                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-sand-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +50€
                     </div>
@@ -1868,15 +1878,15 @@ const handleModifyForm = async () => {
                   setTripData({ ...tripData, travelers: 5, giftExtensionPrice: 100 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-2xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50 md:col-span-2"
+                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50 md:col-span-2"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👨‍👩‍👧‍👦</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Groupe</h3>
-                  <p className="text-gray-600 mb-4">5-8 personnes</p>
+                  <h3 className="text-2xl font-bold text-jungle-800 mb-2">Groupe</h3>
+                  <p className="text-sand-600 mb-4">5-8 personnes</p>
                   <div className="space-y-1">
                     <p className="text-sm text-gray-500 line-through">Prix normal: 129€</p>
-                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-sand-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +100€
                     </div>
@@ -1890,10 +1900,10 @@ const handleModifyForm = async () => {
 
       {currentView === 'gift' && (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1903,44 +1913,44 @@ const handleModifyForm = async () => {
               <div className="bg-pink-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Gift className="w-8 h-8 text-pink-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Offrir l'expérience</h2>
-              <p className="text-gray-600">Offrez une carte cadeau Passworld à 29€</p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Offrir l'expérience</h2>
+              <p className="text-sand-600">Offrez une carte cadeau Passworld à 29€</p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-sand-700 mb-2">
                   Nom du destinataire *
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   placeholder="Marie Dupont"
                 />
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Vos informations</h3>
+                <h3 className="text-lg font-semibold text-jungle-800 mb-4">Vos informations</h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Votre nom *
                     </label>
                     <input
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                       placeholder="Jean Martin"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-sand-700 mb-2">
                       Votre email *
                     </label>
                     <input
                       type="email"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                       placeholder="jean@example.com"
                     />
                     <p className="text-sm text-gray-500 mt-1">
@@ -1960,7 +1970,7 @@ const handleModifyForm = async () => {
                     buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
                   });
                 }}
-                className="w-full bg-pink-600 text-white py-4 rounded-lg font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center"
+                className="w-full bg-pink-600 text-white py-4 rounded-2xl font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center"
               >
                 Payer 29€
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -1971,11 +1981,11 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1985,14 +1995,14 @@ const handleModifyForm = async () => {
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Plane className="w-8 h-8 text-indigo-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Commencer l'expérience</h2>
-              <p className="text-gray-600">Avez-vous déjà un code ?</p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Commencer l'expérience</h2>
+              <p className="text-sand-600">Avez-vous déjà un code ?</p>
             </div>
 
             <div className="space-y-4">
               <button
                 onClick={() => setCurrentView('with-code')}
-                className="w-full bg-indigo-600 text-white p-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-between group"
+                className="w-full bg-jungle-500 text-white p-6 rounded-3xl hover:bg-jungle-600 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
                   <Code className="w-6 h-6 mr-3" />
@@ -2006,7 +2016,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('no-code')}
-                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
                   <Users className="w-6 h-6 mr-3" />
@@ -2023,11 +2033,11 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2037,15 +2047,15 @@ const handleModifyForm = async () => {
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Code className="w-8 h-8 text-indigo-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Entrez votre code</h2>
-              <p className="text-gray-600">Code de carte cadeau ou code participant</p>
+              <h2 className="text-2xl font-bold text-jungle-800 mb-2">Entrez votre code</h2>
+              <p className="text-sand-600">Code de carte cadeau ou code participant</p>
             </div>
 
             <div className="space-y-6">
               <input
                 id="code-input-field"
                 type="text"
-                className="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
+                className="w-full px-4 py-4 border-2 border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
                 placeholder="CODE-1234567891011-X"
                 maxLength={21}
                 onKeyPress={(e) => {
@@ -2068,7 +2078,7 @@ const handleModifyForm = async () => {
                   }
                 }}
                 disabled={loading}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-jungle-500 text-white py-4 rounded-2xl font-semibold hover:bg-jungle-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {loading ? 'Vérification...' : 'Valider le code'}
               </button>
@@ -2078,19 +2088,19 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
             </button>
 
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Combien êtes-vous ?</h2>
-              <p className="text-gray-600">Sélectionnez le nombre de voyageurs</p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Combien êtes-vous ?</h2>
+              <p className="text-sand-600">Sélectionnez le nombre de voyageurs</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -2120,9 +2130,9 @@ const handleModifyForm = async () => {
       setCurrentView('group-setup');
     }
   }}
-                  className="p-6 rounded-xl border-2 border-gray-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all"
+                  className="p-6 rounded-3xl border-2 border-sand-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all"
                 >
-                  <div className="text-xl font-bold text-gray-900 mb-1">{option.label}</div>
+                  <div className="text-xl font-bold text-jungle-800 mb-1">{option.label}</div>
                   <div className="text-indigo-600 font-semibold">{option.price}€</div>
                 </button>
               ))}
@@ -2132,11 +2142,11 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('no-code')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+              className="flex items-center text-sand-600 hover:text-jungle-800 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2146,28 +2156,28 @@ const handleModifyForm = async () => {
               <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <User className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Voyage solo</h2>
-              <p className="text-gray-600">Un code vous sera envoyé pour accéder au formulaire</p>
+              <h2 className="text-2xl font-bold text-jungle-800 mb-2">Voyage solo</h2>
+              <p className="text-sand-600">Un code vous sera envoyé pour accéder au formulaire</p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-sand-700 mb-2">
                   Votre email *
                 </label>
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="votre@email.com"
                 />
               </div>
 
-              <div className="bg-indigo-50 p-4 rounded-lg">
+              <div className="bg-indigo-50 p-4 rounded-2xl">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-700">Voyage solo</span>
-                  <span className="font-bold text-gray-900">29€</span>
+                  <span className="text-sand-700">Voyage solo</span>
+                  <span className="font-bold text-jungle-800">29€</span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-sand-600">
                   Un code unique vous sera envoyé par email après le paiement
                 </p>
               </div>
@@ -2180,7 +2190,7 @@ const handleModifyForm = async () => {
                     email: emailInput?.value || ''
                   });
                 }}
-                className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center"
+                className="w-full bg-jungle-500 text-white py-4 rounded-2xl font-semibold hover:bg-jungle-600 transition-colors flex items-center justify-center"
               >
                 Payer 29€
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -2254,19 +2264,19 @@ const handleModifyForm = async () => {
 
       {currentView === 'gift-choice' && (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-pink-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Gift className="w-8 h-8 text-pink-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Carte cadeau activée ! 🎉</h2>
-              <p className="text-gray-600">Voyagez-vous seul ou en groupe ?</p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">Carte cadeau activée ! 🎉</h2>
+              <p className="text-sand-600">Voyagez-vous seul ou en groupe ?</p>
             </div>
 
             <div className="space-y-4">
               <button
                 onClick={() => setCurrentView('form')}
-                className="w-full bg-indigo-600 text-white p-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-between group"
+                className="w-full bg-jungle-500 text-white p-6 rounded-3xl hover:bg-jungle-600 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
                   <User className="w-6 h-6 mr-3" />
@@ -2280,7 +2290,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => alert('Config groupe avec cadeau')}
-                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
                   <Users className="w-6 h-6 mr-3" />
@@ -2297,17 +2307,17 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                 <Users className="w-8 h-8 text-indigo-600" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-2">
                 Bonjour {groupStatus.participant.prenom} !
               </h2>
               {groupStatus.hasGroup && (
-                <p className="text-gray-600">Statut de votre groupe</p>
+                <p className="text-sand-600">Statut de votre groupe</p>
               )}
             </div>
 
@@ -2315,7 +2325,7 @@ const handleModifyForm = async () => {
               <>
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Progression du groupe</span>
+                    <span className="text-sm font-medium text-sand-700">Progression du groupe</span>
                     <span className="text-sm font-medium text-indigo-600">
                       {groupStatus.groupParticipants.filter(p => p.formStatus === 'completed').length}/
                       {groupStatus.groupParticipants.length}
@@ -2323,7 +2333,7 @@ const handleModifyForm = async () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div 
-                      className="bg-indigo-600 h-3 rounded-full transition-all" 
+                      className="bg-jungle-500 h-3 rounded-full transition-all" 
                       style={{ 
                         width: `${(groupStatus.groupParticipants.filter(p => p.formStatus === 'completed').length / groupStatus.groupParticipants.length) * 100}%` 
                       }} 
@@ -2333,8 +2343,8 @@ const handleModifyForm = async () => {
 
                 <div className="space-y-3 mb-8">
                   {groupStatus.groupParticipants.map((p, i) => (
-                    <div key={i} className={`flex items-center justify-between p-4 rounded-lg border-2 ${
-                      p.isCurrentUser ? 'border-indigo-200 bg-indigo-50' : 'bg-gray-50 border-transparent'
+                    <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border-2 ${
+                      p.isCurrentUser ? 'border-indigo-200 bg-indigo-50' : 'bg-sand-50 border-transparent'
                     }`}>
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -2347,7 +2357,7 @@ const handleModifyForm = async () => {
                           )}
                         </div>
                         <div>
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-jungle-800">
                             {p.prenom} {p.nom}
                             {p.isCurrentUser && <span className="text-indigo-600 ml-2">(Vous)</span>}
                           </span>
@@ -2363,7 +2373,7 @@ const handleModifyForm = async () => {
                 </div>
 
                 {groupStatus.groupParticipants.filter(p => p.formStatus !== 'completed').length > 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center mb-6">
                     <p className="text-yellow-800">
                       ⏳ En attente que tous les participants complètent leur formulaire
                     </p>
@@ -2374,7 +2384,7 @@ const handleModifyForm = async () => {
               <>
                 {/* Joueur solo - Afficher le statut simple */}
                 {groupStatus.participant.formStatus === 'completed' ? (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center mb-6">
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center mb-6">
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <Check className="w-6 h-6 text-green-600" />
                       <p className="text-green-800 font-semibold text-lg">
@@ -2386,7 +2396,7 @@ const handleModifyForm = async () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center mb-6">
                     <p className="text-blue-800">
                       ℹ️ Complétez votre formulaire pour découvrir votre destination surprise
                     </p>
@@ -2401,7 +2411,7 @@ const handleModifyForm = async () => {
                 <button
                   onClick={handleModifyForm}
                   disabled={isModifying}
-                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-jungle-500 text-white py-3 px-6 rounded-3xl hover:bg-jungle-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Edit className="w-5 h-5" />
                   {isModifying ? 'Chargement...' : 'Modifier mon formulaire'}
@@ -2419,14 +2429,14 @@ const handleModifyForm = async () => {
                     });
                     setCurrentView('form');
                   }}
-                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-jungle-500 text-white py-3 px-6 rounded-3xl hover:bg-jungle-600 transition-colors flex items-center justify-center gap-2"
                 >
                   Compléter mon formulaire
                 </button>
               )}
 
               {groupStatus.participant.formStatus === 'completed' && !groupStatus.canModifyForm && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
                   <p className="text-red-800 text-sm">
                     🔒 Vous ne pouvez plus modifier votre formulaire car d'autres participants ont déjà soumis le leur
                   </p>
@@ -2435,7 +2445,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('router')}
-                className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-cream-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Retour à l'accueil
@@ -2463,19 +2473,19 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 <Plane className="w-10 h-10 text-indigo-600" />
               </div>
             
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-jungle-800 mb-3">
                 Bienvenue {participantInfo.participant.prenom}! 👋
               </h2>
               
               {participantInfo.otherParticipants && participantInfo.otherParticipants.length > 0 ? (
-                <p className="text-xl text-gray-600 mb-6">
+                <p className="text-xl text-sand-600 mb-6">
                   Préparez votre voyage avec{' '}
                   {participantInfo.otherParticipants.map((p, i) => (
                     <span key={i}>
@@ -2487,13 +2497,13 @@ const handleModifyForm = async () => {
                   ))}
                 </p>
               ) : (
-                <p className="text-xl text-gray-600 mb-6">
+                <p className="text-xl text-sand-600 mb-6">
                   Préparez votre voyage surprise! 🌍
                 </p>
               )}
               
-              <div className="bg-blue-50 rounded-lg p-6 mb-6">
-                <p className="text-gray-700 text-lg leading-relaxed">
+              <div className="bg-blue-50 rounded-2xl p-6 mb-6">
+                <p className="text-sand-700 text-lg leading-relaxed">
                   Vous allez remplir un questionnaire sur vos préférences de voyage. 
                   Cela nous permettra de trouver la destination parfaite pour vous!
                 </p>
@@ -2513,7 +2523,7 @@ const handleModifyForm = async () => {
                   });
                   setCurrentView('form');
                 }}
-                className="w-full bg-indigo-600 text-white py-4 px-6 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center text-lg font-semibold"
+                className="w-full bg-jungle-500 text-white py-4 px-6 rounded-3xl hover:bg-jungle-600 transition-colors flex items-center justify-center text-lg font-semibold"
               >
                 Commencer le formulaire
                 <ArrowRight className="w-6 h-6 ml-2" />
@@ -2521,7 +2531,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('home')}
-                className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center"
+                className="w-full bg-cream-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Retour à l'accueil
