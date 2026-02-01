@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User, Edit } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import { Loader2, AlertCircle, Mail } from 'lucide-react';
 import { airtableClient } from '@/lib/airtable';
 
 // Vérifier si on est en mode démo - désactivé par défaut en production
@@ -19,11 +23,101 @@ const CRITERIA = [
 ];
 
 const PRICES = {
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
   1: 29,
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
   2: 49,
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
   3: 79,
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
   4: 129
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
 };
+
+// Nouveaux types pour les améliorations
+interface GiftFormData {
+  recipientName: string;
+  buyerName: string;
+  buyerEmail: string;
+}
+
+type ViewType = string; // On garde string pour compatibilité
+
+const PRICE_OPTIONS = [
+  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
+  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
+  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
+];
 
 interface TripData {
   travelers?: number;
@@ -619,18 +713,18 @@ const handleModifyForm = async () => {
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
                 onClick={onBack}
-                className="flex items-center text-slate-600 hover:text-slate-900 mb-8 transition-colors group"
+                className="flex items-center text-slate-600 hover:text-slate-900 mb-8 transition-colors group active:scale-95 transition-transform duration-150"
               >
-                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
                 Retour
               </button>
 
               {/* NOUVEAU: Informations communes du voyage */}
-              <div className="mb-10 p-6 bg-blue-50 rounded-4xl border-2 border-blue-200">
+              <div className="mb-10 p-7 md:p-6 bg-blue-50 rounded-4xl border-2 border-blue-200">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
                   📋 Informations du voyage
                 </h3>
-                <p className="text-gray-500 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
+                <p className="text-gray-600 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
                 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
@@ -759,10 +853,10 @@ const handleModifyForm = async () => {
                       setStep(2);
                     }
                   }}
-                  className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white py-5 rounded-4xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center group"
+                  className="w-full bg-gradient-to-r from-gray-800 to-gray-700 text-white py-5 rounded-4xl font-bold text-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center group active:scale-95 transition-transform duration-150"
                 >
                   Continuer
-                  <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
                 </button>
 
                 <button
@@ -786,7 +880,7 @@ const handleModifyForm = async () => {
                       setStep(2);
                     }
                   }}
-                  className="w-full text-gray-500 hover:text-gray-900 py-2 text-sm"
+                  className="w-full text-gray-600 hover:text-gray-900 py-2 text-sm active:scale-95 transition-transform duration-150"
                 >
                   Passer avec l'ordre par défaut
                 </button>
@@ -803,7 +897,7 @@ const handleModifyForm = async () => {
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setStep(1)}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-6 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -811,19 +905,19 @@ const handleModifyForm = async () => {
 
             <div className="text-center mb-8">
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Informations des participants</h2>
-              <p className="text-gray-500">Chacun recevra un code unique par email</p>
+              <p className="text-gray-600">Chacun recevra un code unique par email</p>
             </div>
 
             <div className="space-y-6 mb-8">
               {participants.map((participant, index) => (
-                <div key={index} className="border-2 border-sand-200 rounded-2xl p-6">
+                <div key={index} className="border-2 border-sand-200 rounded-2xl p-7 md:p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-gray-900">Participant {index + 1}</h3>
                     {/* Pour les codes cadeaux: minimum 2 participants, sinon minimum 1 */}
                     {((isGiftCard && participants.length > 2) || (!isGiftCard && participants.length > 1)) && (
                       <button
                         onClick={() => removeParticipant(index)}
-                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        className="text-red-600 hover:text-red-700 text-sm font-medium active:scale-95 transition-transform duration-150"
                       >
                         Retirer
                       </button>
@@ -870,18 +964,18 @@ const handleModifyForm = async () => {
               {participants.length < maxParticipants && (
                 <button
                   onClick={addParticipant}
-                  className="w-full py-3 border-2 border-dashed border-sand-300 rounded-2xl text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
+                  className="w-full py-3 border-2 border-dashed border-sand-300 rounded-2xl text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium active:scale-95 transition-transform duration-150"
                 >
                   + Ajouter un participant (max {maxParticipants})
                 </button>
               )}
             </div>
 
-            <div className="bg-indigo-50 p-6 rounded-2xl mb-6">
+            <div className="bg-indigo-50 p-7 md:p-6 rounded-2xl mb-6">
               <div className="flex justify-between items-center mb-3">
                 <div>
                   <span className="text-gray-600 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-600">
                     {participants.length === 1 && 'Solo'}
                     {participants.length === 2 && 'Duo'}
                     {participants.length >= 3 && participants.length <= 4 && 'Groupe 3-4'}
@@ -890,7 +984,7 @@ const handleModifyForm = async () => {
                 </div>
                 <span className="font-bold text-3xl text-gray-900">{currentPrice}€</span>
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-600">
                 Chaque participant recevra un code unique par email après le paiement
               </p>
               {participants.length > 1 && (
@@ -903,7 +997,7 @@ const handleModifyForm = async () => {
             <button
               onClick={handlePayment}
               disabled={loading}
-              className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 flex items-center justify-center"
+              className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 flex items-center justify-center active:scale-95 transition-transform duration-150"
             >
               {loading ? 'Chargement...' : (
                 <>
@@ -1209,7 +1303,7 @@ const handleModifyForm = async () => {
                   <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-7 md:p-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">Prénom *</label>
                     <input
@@ -1334,7 +1428,7 @@ const handleModifyForm = async () => {
                         'Travailler à distance',
                         'Autre (Précisez)'
                       ].map((option) => (
-                        <label key={option} className="flex items-center p-3 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-3 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer active:scale-95 transition-transform duration-150">
                           <input
                             type="checkbox"
                             checked={formData.motivations.includes(option)}
@@ -1372,7 +1466,7 @@ const handleModifyForm = async () => {
                     <label className="block text-sm font-medium text-gray-600 mb-3">Vous préférez :</label>
                     <div className="space-y-3">
                       {['Un seul lieu', 'Plusieurs étapes'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer active:scale-95 transition-transform duration-150">
                           <input
                             type="radio"
                             name="voyageType"
@@ -1390,7 +1484,7 @@ const handleModifyForm = async () => {
                     <label className="block text-sm font-medium text-gray-600 mb-3">Vous aimez plutôt :</label>
                     <div className="space-y-3">
                       {['Être libre / improviser', 'Être encadré·e / guidé·e'].map((option) => (
-                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
+                        <label key={option} className="flex items-center p-4 border-2 border-sand-200 rounded-2xl hover:border-emerald-400 cursor-pointer active:scale-95 transition-transform duration-150">
                           <input
                             type="radio"
                             name="planningStyle"
@@ -1475,7 +1569,7 @@ const handleModifyForm = async () => {
               <div>
                 <div className="text-center mb-8">
                   <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Pays ou régions déjà visités</h2>
-                  <p className="text-gray-500">(où vous ne souhaitez pas retourner)</p>
+                  <p className="text-gray-600">(où vous ne souhaitez pas retourner)</p>
                 </div>
 
                 <textarea
@@ -1590,7 +1684,7 @@ const handleModifyForm = async () => {
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
               <button
                 onClick={currentStep === 1 ? onBack : prevStep}
-                className="flex items-center px-6 py-3 rounded-full border-2 border-sand-300 text-gray-800 hover:border-gray-600 hover:bg-jungle-50 font-semibold transition-all"
+                className="flex items-center px-6 py-3 rounded-full border-2 border-sand-300 text-gray-800 hover:border-gray-600 hover:bg-jungle-50 font-semibold transition-all active:scale-95 transition-transform duration-150"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 {currentStep === 1 ? 'Annuler' : 'Précédent'}
@@ -1599,7 +1693,7 @@ const handleModifyForm = async () => {
               {currentStep < totalSteps ? (
                 <button
                   onClick={nextStep}
-                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
+                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center active:scale-95 transition-transform duration-150"
                 >
                   Suivant
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -1607,7 +1701,7 @@ const handleModifyForm = async () => {
               ) : (
                 <button
                   onClick={submitForm}
-                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
+                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center active:scale-95 transition-transform duration-150"
                 >
                   Envoyer
                   <Check className="w-5 h-5 ml-2" />
@@ -1655,16 +1749,16 @@ const handleModifyForm = async () => {
             </div>
 
             {/* Cards Grid */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid md:grid-cols-2 gap-7 md:p-6 mb-6">
               {/* Card 1: Commencer mon voyage (anciennement Card 2) */}
               <button
                 onClick={() => setCurrentView('start')}
-                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white active:scale-95 transition-transform duration-150"
               >
                 {/* Image de fond - hauteur réduite */}
                 <div className="relative h-48 md:h-56 overflow-hidden">
                   <div 
-                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700 active:scale-95 transition-transform duration-150"
                     style={{
                       backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80)',
                       backgroundSize: 'cover',
@@ -1673,15 +1767,15 @@ const handleModifyForm = async () => {
                   />
                   
                   {/* Icône avion */}
-                  <div className="absolute top-6 left-6 z-10">
+                  <div className="absolute top-7 md:p-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <Plane className="w-7 h-7 text-gray-700" />
                     </div>
                   </div>
 
                   {/* Flèche en overlay */}
-                  <div className="absolute top-6 right-6">
-                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                  <div className="absolute top-7 md:p-6 right-6">
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150">
                       <ArrowRight className="w-5 h-5 text-gray-700" />
                     </div>
                   </div>
@@ -1701,12 +1795,12 @@ const handleModifyForm = async () => {
               {/* Card 2: Offrir une carte cadeau (anciennement Card 1) */}
               <button
                 onClick={() => setCurrentView('gift')}
-                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white active:scale-95 transition-transform duration-150"
               >
                 {/* Image de fond - hauteur réduite */}
                 <div className="relative h-48 md:h-56 overflow-hidden">
                   <div 
-                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700 active:scale-95 transition-transform duration-150"
                     style={{
                       backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
                       backgroundSize: 'cover',
@@ -1715,15 +1809,15 @@ const handleModifyForm = async () => {
                   />
                   
                   {/* Icône cadeau */}
-                  <div className="absolute top-6 left-6 z-10">
+                  <div className="absolute top-7 md:p-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <Gift className="w-7 h-7 text-gray-700" />
                     </div>
                   </div>
 
                   {/* Flèche en overlay */}
-                  <div className="absolute top-6 right-6">
-                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                  <div className="absolute top-7 md:p-6 right-6">
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150">
                       <ArrowRight className="w-5 h-5 text-gray-700" />
                     </div>
                   </div>
@@ -1744,11 +1838,11 @@ const handleModifyForm = async () => {
             {/* Card 3: Dashboard */}
             <button
               onClick={() => setCurrentView('with-code')}
-              className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+              className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-7 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group active:scale-95 transition-transform duration-150"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                  <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors active:scale-95 transition-transform duration-150">
                     <Code className="w-7 h-7 text-gray-700" />
                   </div>
                   <div className="text-left">
@@ -1757,7 +1851,7 @@ const handleModifyForm = async () => {
                     </h3>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-gray-700 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-6 h-6 text-gray-600 group-hover:text-gray-700 group-hover:translate-x-1 transition-all active:scale-95 transition-transform duration-150" />
               </div>
             </button>
           </div>
@@ -1776,7 +1870,7 @@ const handleModifyForm = async () => {
           <div className="bg-white rounded-4xl shadow-soft-xl p-8 max-w-md mx-4 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-700 mx-auto mb-4"></div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Redirection sécurisée...</h3>
-            <p className="text-gray-500">Vous allez être redirigé vers le paiement</p>
+            <p className="text-gray-600">Vous allez être redirigé vers le paiement</p>
           </div>
         </div>
       )}
@@ -1789,7 +1883,7 @@ const handleModifyForm = async () => {
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-8 transition-colors"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-8 transition-colors active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1797,7 +1891,7 @@ const handleModifyForm = async () => {
 
             {/* Message de bienvenue */}
             <div className="text-center mb-12">
-              <div className="bg-gradient-to-br from-pink-100 to-purple-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+              <div className="bg-gradient-to-br from-pink-100 to-purple-100 rounded-full p-7 md:p-6 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                 <Gift className="w-10 h-10 text-pink-600" />
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -1806,7 +1900,7 @@ const handleModifyForm = async () => {
               <p className="text-xl text-gray-600 mb-2">
                 <strong>{tripData.buyerName}</strong> vous a offert une carte cadeau Passworld !
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-600">
                 Découvrez votre destination surprise personnalisée
               </p>
             </div>
@@ -1814,18 +1908,18 @@ const handleModifyForm = async () => {
             {/* Options */}
             <div className="space-y-4 mb-8">
               {/* Option 1: Solo */}
-              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-sand-50 to-purple-50">
+              <div className="border-2 border-indigo-200 rounded-4xl p-7 md:p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-sand-50 to-purple-50 active:scale-95 transition-transform duration-150">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       🚀 Utiliser pour moi seul
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="text-gray-600 mb-4">
                       Profitez de votre voyage surprise en solo
                     </p>
                     <div className="flex items-center gap-2">
                       <span className="text-3xl font-bold text-indigo-600">Gratuit</span>
-                      <span className="text-sm text-gray-500">(déjà payé)</span>
+                      <span className="text-sm text-gray-600">(déjà payé)</span>
                     </div>
                   </div>
                 </div>
@@ -1835,23 +1929,23 @@ const handleModifyForm = async () => {
                     setTripData({ ...tripData, travelers: 1 });
                     setCurrentView('group-setup');
                   }}
-                  className="w-full bg-gray-800 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg"
+                  className="w-full bg-gray-800 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg active:scale-95 transition-transform duration-150"
                 >
                   Commencer mon questionnaire
                 </button>
               </div>
 
               {/* Option 2: Groupe */}
-              <div className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-400 transition-colors cursor-pointer bg-gradient-to-r from-purple-50 to-jungle-50">
+              <div className="border-2 border-purple-200 rounded-4xl p-7 md:p-6 hover:border-purple-400 transition-colors cursor-pointer bg-gradient-to-r from-purple-50 to-jungle-50 active:scale-95 transition-transform duration-150">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       👥 Étendre à plusieurs personnes
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="text-gray-600 mb-4">
                       Transformez ce cadeau en voyage de groupe
                     </p>
-                    <div className="space-y-2 text-sm text-gray-500">
+                    <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex justify-between">
                         <span>• Duo (2 personnes)</span>
                         <span className="font-semibold">+20€</span>
@@ -1872,14 +1966,14 @@ const handleModifyForm = async () => {
                     // Extension groupe - choix du nombre
                     setCurrentView('gift-extend');
                   }}
-                  className="w-full bg-gray-700 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-ocean-600 transition-colors shadow-lg"
+                  className="w-full bg-gray-700 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-ocean-600 transition-colors shadow-lg active:scale-95 transition-transform duration-150"
                 >
                   Choisir le nombre de personnes
                 </button>
               </div>
             </div>
 
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-gray-600">
               <p>💡 Vous pouvez choisir l'option qui vous convient le mieux</p>
             </div>
           </div>
@@ -1892,7 +1986,7 @@ const handleModifyForm = async () => {
           <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('gift-welcome')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-8"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-8 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1902,27 +1996,27 @@ const handleModifyForm = async () => {
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
                 Combien serez-vous ?
               </h2>
-              <p className="text-gray-500 text-lg">
+              <p className="text-gray-600 text-lg">
                 Choisissez le nombre de voyageurs et payez le supplément
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-7 md:p-6">
               {/* Duo */}
               <div 
                 onClick={() => {
                   setTripData({ ...tripData, travelers: 2, giftExtensionPrice: 20 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50"
+                className="border-2 border-purple-200 rounded-4xl p-7 md:p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50 active:scale-95 transition-transform duration-150"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👥</div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Duo</h3>
-                  <p className="text-gray-500 mb-4">2 personnes</p>
+                  <p className="text-gray-600 mb-4">2 personnes</p>
                   <div className="space-y-1">
-                    <p className="text-sm text-gray-500 line-through">Prix normal: 49€</p>
-                    <p className="text-sm text-gray-500">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-gray-600 line-through">Prix normal: 49€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +20€
                     </div>
@@ -1936,15 +2030,15 @@ const handleModifyForm = async () => {
                   setTripData({ ...tripData, travelers: 3, giftExtensionPrice: 50 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50"
+                className="border-2 border-purple-200 rounded-4xl p-7 md:p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50 active:scale-95 transition-transform duration-150"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👨‍👩‍👦</div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Trio/Quatuor</h3>
-                  <p className="text-gray-500 mb-4">3-4 personnes</p>
+                  <p className="text-gray-600 mb-4">3-4 personnes</p>
                   <div className="space-y-1">
-                    <p className="text-sm text-gray-500 line-through">Prix normal: 79€</p>
-                    <p className="text-sm text-gray-500">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-gray-600 line-through">Prix normal: 79€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +50€
                     </div>
@@ -1958,15 +2052,15 @@ const handleModifyForm = async () => {
                   setTripData({ ...tripData, travelers: 5, giftExtensionPrice: 100 });
                   setCurrentView('group-setup');
                 }}
-                className="border-2 border-purple-200 rounded-4xl p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50 md:col-span-2"
+                className="border-2 border-purple-200 rounded-4xl p-7 md:p-6 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer bg-gradient-to-br from-purple-50 to-jungle-50 md:col-span-2 active:scale-95 transition-transform duration-150"
               >
                 <div className="text-center">
                   <div className="text-5xl mb-4">👨‍👩‍👧‍👦</div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Groupe</h3>
-                  <p className="text-gray-500 mb-4">5-8 personnes</p>
+                  <p className="text-gray-600 mb-4">5-8 personnes</p>
                   <div className="space-y-1">
-                    <p className="text-sm text-gray-500 line-through">Prix normal: 129€</p>
-                    <p className="text-sm text-gray-500">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
+                    <p className="text-sm text-gray-600 line-through">Prix normal: 129€</p>
+                    <p className="text-sm text-gray-600">Carte cadeau: <span className="font-semibold text-green-600">-29€</span></p>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       +100€
                     </div>
@@ -2003,7 +2097,7 @@ const handleModifyForm = async () => {
             <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
               <button
                 onClick={() => setCurrentView('router')}
-                className="flex items-center text-gray-500 hover:text-gray-900 mb-6 transition-colors"
+                className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors active:scale-95 transition-transform duration-150"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Retour
@@ -2070,7 +2164,7 @@ const handleModifyForm = async () => {
                       buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
                     });
                   }}
-                  className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
+                  className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-transform duration-150"
                 >
                   Payer 29€
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -2086,7 +2180,7 @@ const handleModifyForm = async () => {
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-6 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2104,7 +2198,7 @@ const handleModifyForm = async () => {
               {/* Bouton 1: Je n'ai pas encore de code (en premier) */}
               <button
                 onClick={() => setCurrentView('no-code')}
-                className="w-full bg-white border-2 border-gray-700 text-gray-900 p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-gray-700 text-gray-900 p-7 md:p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group active:scale-95 transition-transform duration-150"
               >
                 <div className="flex items-center">
                   <Users className="w-6 h-6 mr-3" />
@@ -2113,13 +2207,13 @@ const handleModifyForm = async () => {
                     <div className="text-gray-600 text-sm">Démarrer une nouvelle expérience</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
               </button>
 
               {/* Bouton 2: J'ai déjà un code (en second) */}
               <button
                 onClick={() => setCurrentView('with-code')}
-                className="w-full bg-gray-900 text-white p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
+                className="w-full bg-gray-900 text-white p-7 md:p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group active:scale-95 transition-transform duration-150"
               >
                 <div className="flex items-center">
                   <Code className="w-6 h-6 mr-3" />
@@ -2128,7 +2222,7 @@ const handleModifyForm = async () => {
                     <div className="text-gray-300 text-sm">Carte cadeau ou code reçu par email</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
               </button>
             </div>
           </div>
@@ -2140,7 +2234,7 @@ const handleModifyForm = async () => {
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-6 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2151,7 +2245,7 @@ const handleModifyForm = async () => {
                 <Code className="w-8 h-8 text-indigo-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Entrez votre code</h2>
-              <p className="text-gray-500">Code de carte cadeau ou code participant</p>
+              <p className="text-gray-600">Code de carte cadeau ou code participant</p>
             </div>
 
             <div className="space-y-6">
@@ -2181,7 +2275,7 @@ const handleModifyForm = async () => {
                   }
                 }}
                 disabled={loading}
-                className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed active:scale-95 transition-transform duration-150"
               >
                 {loading ? 'Vérification...' : 'Valider le code'}
               </button>
@@ -2195,7 +2289,7 @@ const handleModifyForm = async () => {
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-6 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2203,7 +2297,7 @@ const handleModifyForm = async () => {
 
             <div className="text-center mb-8">
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Combien êtes-vous ?</h2>
-              <p className="text-gray-500">Sélectionnez le nombre de voyageurs</p>
+              <p className="text-gray-600">Sélectionnez le nombre de voyageurs</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -2233,7 +2327,7 @@ const handleModifyForm = async () => {
       setCurrentView('group-setup');
     }
   }}
-                  className="p-6 rounded-3xl border-2 border-sand-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all"
+                  className="p-7 md:p-6 rounded-3xl border-2 border-sand-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all active:scale-95 transition-transform duration-150"
                 >
                   <div className="text-xl font-bold text-gray-900 mb-1">{option.label}</div>
                   <div className="text-indigo-600 font-semibold">{option.price}€</div>
@@ -2249,7 +2343,7 @@ const handleModifyForm = async () => {
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('no-code')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-600 hover:text-gray-900 mb-6 active:scale-95 transition-transform duration-150"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -2260,7 +2354,7 @@ const handleModifyForm = async () => {
                 <User className="w-8 h-8 text-green-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Voyage solo</h2>
-              <p className="text-gray-500">Un code vous sera envoyé pour accéder au formulaire</p>
+              <p className="text-gray-600">Un code vous sera envoyé pour accéder au formulaire</p>
             </div>
 
             <div className="space-y-6">
@@ -2280,7 +2374,7 @@ const handleModifyForm = async () => {
                   <span className="text-gray-600">Voyage solo</span>
                   <span className="font-bold text-gray-900">29€</span>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600">
                   Un code unique vous sera envoyé par email après le paiement
                 </p>
               </div>
@@ -2293,7 +2387,7 @@ const handleModifyForm = async () => {
                     email: emailInput?.value || ''
                   });
                 }}
-                className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center active:scale-95 transition-transform duration-150"
               >
                 Payer 29€
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -2373,13 +2467,13 @@ const handleModifyForm = async () => {
                 <Gift className="w-8 h-8 text-pink-600" />
               </div>
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Carte cadeau activée ! 🎉</h2>
-              <p className="text-gray-500">Voyagez-vous seul ou en groupe ?</p>
+              <p className="text-gray-600">Voyagez-vous seul ou en groupe ?</p>
             </div>
 
             <div className="space-y-4">
               <button
                 onClick={() => setCurrentView('form')}
-                className="w-full bg-gray-800 text-white p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
+                className="w-full bg-gray-800 text-white p-7 md:p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group active:scale-95 transition-transform duration-150"
               >
                 <div className="flex items-center">
                   <User className="w-6 h-6 mr-3" />
@@ -2388,12 +2482,12 @@ const handleModifyForm = async () => {
                     <div className="text-indigo-100 text-sm">Accéder directement au formulaire</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
               </button>
 
               <button
                 onClick={() => alert('Config groupe avec cadeau')}
-                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-7 md:p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group active:scale-95 transition-transform duration-150"
               >
                 <div className="flex items-center">
                   <Users className="w-6 h-6 mr-3" />
@@ -2402,7 +2496,7 @@ const handleModifyForm = async () => {
                     <div className="text-indigo-400 text-sm">Les autres paieront leur part</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform active:scale-95 transition-transform duration-150" />
               </button>
             </div>
           </div>
@@ -2420,7 +2514,7 @@ const handleModifyForm = async () => {
                 Bonjour {groupStatus.participant.prenom} !
               </h2>
               {groupStatus.hasGroup && (
-                <p className="text-gray-500">Statut de votre groupe</p>
+                <p className="text-gray-600">Statut de votre groupe</p>
               )}
             </div>
 
@@ -2456,7 +2550,7 @@ const handleModifyForm = async () => {
                           {p.formStatus === 'completed' ? (
                             <Check className="w-5 h-5 text-green-600" />
                           ) : (
-                            <Clock className="w-5 h-5 text-gray-400" />
+                            <Clock className="w-5 h-5 text-gray-600" />
                           )}
                         </div>
                         <div>
@@ -2467,7 +2561,7 @@ const handleModifyForm = async () => {
                         </div>
                       </div>
                       <span className={`text-sm font-medium ${
-                        p.formStatus === 'completed' ? 'text-green-600' : 'text-gray-500'
+                        p.formStatus === 'completed' ? 'text-green-600' : 'text-gray-600'
                       }`}>
                         {p.formStatus === 'completed' ? 'Complété' : 'En attente'}
                       </span>
@@ -2487,7 +2581,7 @@ const handleModifyForm = async () => {
               <>
                 {/* Joueur solo - Afficher le statut simple */}
                 {groupStatus.participant.formStatus === 'completed' ? (
-                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center mb-6">
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-7 md:p-6 text-center mb-6">
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <Check className="w-6 h-6 text-green-600" />
                       <p className="text-green-800 font-semibold text-lg">
@@ -2499,7 +2593,7 @@ const handleModifyForm = async () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-7 md:p-6 text-center mb-6">
                     <p className="text-blue-800">
                       ℹ️ Complétez votre formulaire pour découvrir votre destination surprise
                     </p>
@@ -2514,7 +2608,7 @@ const handleModifyForm = async () => {
                 <button
                   onClick={handleModifyForm}
                   disabled={isModifying}
-                  className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 transition-transform duration-150"
                 >
                   <Edit className="w-5 h-5" />
                   {isModifying ? 'Chargement...' : 'Modifier mon formulaire'}
@@ -2532,7 +2626,7 @@ const handleModifyForm = async () => {
                     });
                     setCurrentView('form');
                   }}
-                  className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150"
                 >
                   Compléter mon formulaire
                 </button>
@@ -2548,7 +2642,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('router')}
-                className="w-full bg-sand-100 text-gray-600 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-sand-100 text-gray-600 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 active:scale-95 transition-transform duration-150"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Retour à l'accueil
@@ -2588,7 +2682,7 @@ const handleModifyForm = async () => {
               </h2>
               
               {participantInfo.otherParticipants && participantInfo.otherParticipants.length > 0 ? (
-                <p className="text-xl text-gray-500 mb-6">
+                <p className="text-xl text-gray-600 mb-6">
                   Préparez votre voyage avec{' '}
                   {participantInfo.otherParticipants.map((p, i) => (
                     <span key={i}>
@@ -2600,12 +2694,12 @@ const handleModifyForm = async () => {
                   ))}
                 </p>
               ) : (
-                <p className="text-xl text-gray-500 mb-6">
+                <p className="text-xl text-gray-600 mb-6">
                   Préparez votre voyage surprise! 🌍
                 </p>
               )}
               
-              <div className="bg-blue-50 rounded-2xl p-6 mb-6">
+              <div className="bg-blue-50 rounded-2xl p-7 md:p-6 mb-6">
                 <p className="text-gray-600 text-lg leading-relaxed">
                   Vous allez remplir un questionnaire sur vos préférences de voyage. 
                   Cela nous permettra de trouver la destination parfaite pour vous!
@@ -2626,7 +2720,7 @@ const handleModifyForm = async () => {
                   });
                   setCurrentView('form');
                 }}
-                className="w-full bg-gray-800 text-white py-4 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center text-lg font-semibold"
+                className="w-full bg-gray-800 text-white py-4 px-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-center text-lg font-semibold active:scale-95 transition-transform duration-150"
               >
                 Commencer le formulaire
                 <ArrowRight className="w-6 h-6 ml-2" />
@@ -2634,7 +2728,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('home')}
-                className="w-full bg-sand-100 text-gray-600 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center"
+                className="w-full bg-sand-100 text-gray-600 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center active:scale-95 transition-transform duration-150"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Retour à l'accueil
