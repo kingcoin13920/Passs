@@ -1636,24 +1636,6 @@ const handleModifyForm = async () => {
             }}
           />
           
-          {/* Couche 2: Motif géométrique subtil */}
-          <div 
-            className="absolute inset-0 opacity-5"
-            style={{
-              backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(47, 164, 101, 0.03) 35px, rgba(47, 164, 101, 0.03) 70px)',
-            }}
-          />
-          
-          {/* Couche 3: Points de localisation animés */}
-          <div className="absolute top-20 left-1/4 w-2 h-2 bg-jungle-400 rounded-full opacity-30 animate-pulse" />
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-gray-600 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-1/4 left-1/3 w-2 h-2 bg-jungle-400 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '2s' }} />
-          
-          {/* Couche 4: Lignes de connexion subtiles */}
-          <svg className="absolute inset-0 w-full h-full opacity-5">
-            <line x1="25%" y1="20%" x2="75%" y2="33%" stroke="#2fa465" strokeWidth="1" strokeDasharray="5,5" />
-            <line x1="75%" y1="33%" x2="33%" y2="75%" stroke="#0ba5e9" strokeWidth="1" strokeDasharray="5,5" />
-          </svg>
         </div>
 
         {/* Contenu principal */}
@@ -1672,57 +1654,15 @@ const handleModifyForm = async () => {
               </p>
             </div>
 
-            {/* Cards Grid avec animations au hover */}
+            {/* Cards Grid */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              {/* Card 1: Offrir un voyage */}
-              <button
-                onClick={() => setCurrentView('gift')}
-                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
-              >
-                {/* Image de fond */}
-                <div className="relative h-64 md:h-72 overflow-hidden">
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
-                    style={{
-                      backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  />
-                  
-                  {/* Icône cadeau */}
-                  <div className="absolute top-6 left-6 z-10">
-                    <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                      <Gift className="w-7 h-7 text-gray-700" />
-                    </div>
-                  </div>
-
-                  {/* Flèche en overlay */}
-                  <div className="absolute top-6 right-6">
-                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                      <ArrowRight className="w-5 h-5 text-gray-700" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contenu texte */}
-                <div className="p-6 text-left">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Offrir un voyage
-                  </h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    Le cadeau parfait pour une expérience unique
-                  </p>
-                </div>
-              </button>
-
-              {/* Card 2: Découvrir - sans animation */}
+              {/* Card 1: Commencer mon voyage (anciennement Card 2) */}
               <button
                 onClick={() => setCurrentView('start')}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
-                {/* Image de fond */}
-                <div className="relative h-64 md:h-72 overflow-hidden">
+                {/* Image de fond - hauteur réduite */}
+                <div className="relative h-48 md:h-56 overflow-hidden">
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
@@ -1748,18 +1688,60 @@ const handleModifyForm = async () => {
                 </div>
 
                 {/* Contenu texte */}
-                <div className="p-6 text-left">
+                <div className="p-5 text-left">
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Découvrir ma destination
+                    Commencer mon voyage
                   </h2>
-                  <p className="text-gray-600 leading-relaxed">
-                    Commencez votre aventure surprise
+                  <p className="text-gray-600 leading-relaxed text-sm">
+                    Je découvre ma destination surprise
+                  </p>
+                </div>
+              </button>
+
+              {/* Card 2: Offrir une carte cadeau (anciennement Card 1) */}
+              <button
+                onClick={() => setCurrentView('gift')}
+                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+              >
+                {/* Image de fond - hauteur réduite */}
+                <div className="relative h-48 md:h-56 overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
+                    style={{
+                      backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  
+                  {/* Icône cadeau */}
+                  <div className="absolute top-6 left-6 z-10">
+                    <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                      <Gift className="w-7 h-7 text-gray-700" />
+                    </div>
+                  </div>
+
+                  {/* Flèche en overlay */}
+                  <div className="absolute top-6 right-6">
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                      <ArrowRight className="w-5 h-5 text-gray-700" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contenu texte */}
+                <div className="p-5 text-left">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    Offrir une carte cadeau
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed text-sm">
+                    Le cadeau parfait pour une expérience unique
                   </p>
                 </div>
               </button>
             </div>
 
-            {/* Card 3: Dashboard - texte noir */}
+            {/* Card 3: Dashboard */}
             <button
               onClick={() => setCurrentView('with-code')}
               className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
@@ -2111,37 +2093,39 @@ const handleModifyForm = async () => {
             </button>
 
             <div className="text-center mb-8">
-              <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Plane className="w-8 h-8 text-indigo-600" />
+              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Plane className="w-8 h-8 text-gray-700" />
               </div>
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Commencer l'expérience</h2>
-              <p className="text-gray-500">Avez-vous déjà un code ?</p>
+              <p className="text-gray-600">Avez-vous déjà un code ?</p>
             </div>
 
             <div className="space-y-4">
+              {/* Bouton 1: Je n'ai pas encore de code (en premier) */}
               <button
-                onClick={() => setCurrentView('with-code')}
-                className="w-full bg-gray-800 text-white p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
+                onClick={() => setCurrentView('no-code')}
+                className="w-full bg-white border-2 border-gray-700 text-gray-900 p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
-                  <Code className="w-6 h-6 mr-3" />
+                  <Users className="w-6 h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">J'ai un code</div>
-                    <div className="text-indigo-100 text-sm">Carte cadeau ou code reçu par email</div>
+                    <div className="font-semibold text-lg">Je n'ai pas encore de code</div>
+                    <div className="text-gray-600 text-sm">Démarrer une nouvelle expérience</div>
                   </div>
                 </div>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
 
+              {/* Bouton 2: J'ai déjà un code (en second) */}
               <button
-                onClick={() => setCurrentView('no-code')}
-                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
+                onClick={() => setCurrentView('with-code')}
+                className="w-full bg-gray-900 text-white p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
-                  <Users className="w-6 h-6 mr-3" />
+                  <Code className="w-6 h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">Je n'ai pas de code</div>
-                    <div className="text-indigo-400 text-sm">Démarrer une nouvelle expérience</div>
+                    <div className="font-semibold text-lg">J'ai déjà un code</div>
+                    <div className="text-gray-300 text-sm">Carte cadeau ou code reçu par email</div>
                   </div>
                 </div>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
