@@ -1721,7 +1721,7 @@ const handleModifyForm = async () => {
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
-                      backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2026/02/Passworld-gift2-scaled.webp',
+                      backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2026/02/Passworld-gift2-scaled.webp)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
