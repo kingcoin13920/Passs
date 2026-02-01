@@ -28,13 +28,6 @@ const PRICES = {
   4: 129
 };
 
-// Options de prix pour les cartes cadeaux
-const PRICE_OPTIONS = [
-  { id: 'price_29', amount: 29, label: '29€', description: 'Destination européenne' },
-  { id: 'price_49', amount: 49, label: '49€', description: 'Destination internationale' },
-  { id: 'price_99', amount: 99, label: '99€', description: 'Destination premium' }
-];
-
 interface TripData {
   travelers?: number;
   inputCode?: string;
