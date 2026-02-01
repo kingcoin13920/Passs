@@ -1703,10 +1703,10 @@ const handleModifyForm = async () => {
                 {/* Contenu texte */}
                 <div className="p-5 text-left">
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Commencer mon voyage
+                    Démarrer l'expérience
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-sm">
-                    Je découvre ma destination surprise
+                    Je découvre la destination qui me correspond
                   </p>
                 </div>
               </button>
@@ -1721,7 +1721,7 @@ const handleModifyForm = async () => {
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
-                      backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
+                      backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2026/02/Passworld-gift2-scaled.webp',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
@@ -1745,7 +1745,7 @@ const handleModifyForm = async () => {
                 {/* Contenu texte */}
                 <div className="p-5 text-left">
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Offrir une carte cadeau
+                    Offrir l'expérience
                   </h2>
                   
                   <p className="text-gray-600 leading-relaxed text-sm">
