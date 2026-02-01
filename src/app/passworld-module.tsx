@@ -798,7 +798,10 @@ const handleModifyForm = async () => {
     }
 
     return (
-      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-8 px-4">
+  <div
+  className="min-h-screen relative overflow-hidden py-8 px-4"
+  style={{ backgroundColor: "#f7f7f7" }}
+>
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
@@ -1183,7 +1186,10 @@ const handleModifyForm = async () => {
     };
 
     return (
-      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-12 px-4">
+<div
+  className="min-h-screen relative overflow-hidden py-12 px-4"
+  style={{ backgroundColor: "#f7f7f7" }}
+>
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
