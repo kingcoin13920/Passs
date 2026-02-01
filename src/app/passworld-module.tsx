@@ -193,6 +193,27 @@ const StripeAPI = {
 const PassworldModule = () => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
+  const [selectedPrice, setSelectedPrice] = useState(29);
+const [isSubmitting, setIsSubmitting] = useState(false);
+const [purchaseEmail, setPurchaseEmail] = useState('');
+
+// Tracking
+const trackEvent = (name: string, props?: any) => {
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', name, props);
+  }
+  console.log('📊', name, props);
+};const [selectedPrice, setSelectedPrice] = useState(29);
+const [isSubmitting, setIsSubmitting] = useState(false);
+const [purchaseEmail, setPurchaseEmail] = useState('');
+
+// Tracking
+const trackEvent = (name: string, props?: any) => {
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', name, props);
+  }
+  console.log('📊', name, props);
+};
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
   const [isRedirectingToStripe, setIsRedirectingToStripe] = useState(false);
@@ -1744,9 +1765,33 @@ const handleModifyForm = async () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                     Offrir une carte cadeau
                   </h2>
+                  
                   <p className="text-gray-600 leading-relaxed text-sm">
                     Le cadeau parfait pour une expérience unique
                   </p>
+                  {/* Choix du montant */}
+<div className="mb-6">
+  <label className="block text-sm font-medium text-gray-700 mb-3">
+    Choisissez le montant
+  </label>
+  <div className="grid grid-cols-3 gap-3">
+    {PRICE_OPTIONS.map(option => (
+      <button
+        key={option.id}
+        type="button"
+        onClick={() => setSelectedPrice(option.amount)}
+        className={`p-4 rounded-2xl border-2 transition-all active:scale-95 ${
+          selectedPrice === option.amount
+            ? 'border-gray-900 bg-gray-50 shadow-md'
+            : 'border-gray-300 hover:border-gray-400'
+        }`}
+      >
+        <div className="text-2xl font-bold text-gray-900">{option.label}</div>
+        <div className="text-xs text-gray-600 mt-1">{option.description}</div>
+      </button>
+    ))}
+  </div>
+</div>
                 </div>
               </button>
             </div>
@@ -2058,11 +2103,25 @@ const handleModifyForm = async () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Votre email *
                       </label>
-                      <input
-                        type="email"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                        placeholder="jean@example.com"
-                      />
+                     <input
+  type="email"
+  className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent transition ${
+    purchaseEmail && !purchaseEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) 
+      ? 'border-red-500' 
+      : purchaseEmail 
+        ? 'border-green-500' 
+        : 'border-gray-300'
+  }`}
+  placeholder="jean@example.com"
+  value={purchaseEmail}
+  onChange={(e) => setPurchaseEmail(e.target.value)}
+/>
+{purchaseEmail && !purchaseEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && (
+  <p className="text-red-500 text-sm mt-1 flex items-center">
+    <AlertCircle className="w-4 h-4 mr-1" />
+    Email invalide
+  </p>
+)}
                       <p className="text-sm text-gray-600 mt-1">
                         La carte cadeau vous sera envoyée par email
                       </p>
@@ -2082,7 +2141,7 @@ const handleModifyForm = async () => {
                   }}
                   className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                 >
-                  Payer 29€
+                 Payer {selectedPrice}€
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               </div>
