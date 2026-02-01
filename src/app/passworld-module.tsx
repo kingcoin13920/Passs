@@ -626,7 +626,7 @@ const handleModifyForm = async () => {
               </button>
 
               {/* NOUVEAU: Informations communes du voyage */}
-              <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-blue-200">
+              <div className="mb-10 p-6 bg-blue-50 rounded-4xl border-2 border-blue-200">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
                   📋 Informations du voyage
                 </h3>
@@ -641,7 +641,7 @@ const handleModifyForm = async () => {
                       value={commonData.enfants}
                       onChange={(e) => setCommonData({...commonData, enfants: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-gray-600"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Sélectionner</option>
                       <option value="oui">Oui</option>
@@ -659,7 +659,7 @@ const handleModifyForm = async () => {
                       onChange={(e) => setCommonData({...commonData, villeDepart: e.target.value})}
                       required
                       placeholder="Ex: Paris, Lyon..."
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-gray-600"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
@@ -672,7 +672,7 @@ const handleModifyForm = async () => {
                       value={commonData.dateDepart}
                       onChange={(e) => setCommonData({...commonData, dateDepart: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-gray-600"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
@@ -684,7 +684,7 @@ const handleModifyForm = async () => {
                       value={commonData.duree}
                       onChange={(e) => setCommonData({...commonData, duree: e.target.value})}
                       required
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-gray-600"
+                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Sélectionner</option>
                       <option value="weekend">Weekend</option>
@@ -722,7 +722,7 @@ const handleModifyForm = async () => {
                     onDragEnd={handleDragEnd}
                     className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
                       draggedItem === index 
-                        ? 'border-gray-700 shadow-2xl scale-105 bg-gray-50' 
+                        ? 'border-indigo-600 shadow-2xl scale-105 bg-indigo-50' 
                         : 'border-slate-200 hover:border-indigo-300'
                     }`}
                   >
@@ -837,7 +837,7 @@ const handleModifyForm = async () => {
                         type="text"
                         value={participant.prenom}
                         onChange={(e) => updateParticipant(index, 'prenom', e.target.value)}
-                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="Marie"
                       />
                     </div>
@@ -848,7 +848,7 @@ const handleModifyForm = async () => {
                         type="text"
                         value={participant.nom}
                         onChange={(e) => updateParticipant(index, 'nom', e.target.value)}
-                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="Dupont"
                       />
                     </div>
@@ -859,7 +859,7 @@ const handleModifyForm = async () => {
                         type="email"
                         value={participant.email}
                         onChange={(e) => updateParticipant(index, 'email', e.target.value)}
-                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         placeholder="marie@example.com"
                       />
                     </div>
@@ -870,14 +870,14 @@ const handleModifyForm = async () => {
               {participants.length < maxParticipants && (
                 <button
                   onClick={addParticipant}
-                  className="w-full py-3 border-2 border-dashed border-sand-300 rounded-2xl text-gray-500 hover:border-gray-500 hover:text-gray-700 transition-colors font-medium"
+                  className="w-full py-3 border-2 border-dashed border-sand-300 rounded-2xl text-gray-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors font-medium"
                 >
                   + Ajouter un participant (max {maxParticipants})
                 </button>
               )}
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-2xl mb-6">
+            <div className="bg-indigo-50 p-6 rounded-2xl mb-6">
               <div className="flex justify-between items-center mb-3">
                 <div>
                   <span className="text-gray-600 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
@@ -894,7 +894,7 @@ const handleModifyForm = async () => {
                 Chaque participant recevra un code unique par email après le paiement
               </p>
               {participants.length > 1 && (
-                <p className="text-sm text-gray-700 mt-2">
+                <p className="text-sm text-indigo-600 mt-2">
                   💡 Soit {(currentPrice / participants.length).toFixed(2)}€ par personne
                 </p>
               )}
@@ -1656,7 +1656,7 @@ const handleModifyForm = async () => {
 
             {/* Cards Grid */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              {/* Card 1: Commencer l'expérience */}
+              {/* Card 1: Commencer mon voyage (anciennement Card 2) */}
               <button
                 onClick={() => setCurrentView('start')}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
@@ -1690,25 +1690,25 @@ const handleModifyForm = async () => {
                 {/* Contenu texte */}
                 <div className="p-5 text-left">
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Commencer l'expérience
+                    Commencer mon voyage
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-sm">
-                    Je découvre la destination parfaite
+                    Je découvre ma destination surprise
                   </p>
                 </div>
               </button>
 
-              {/* Card 2: Offrir l'expérience */}
+              {/* Card 2: Offrir une carte cadeau (anciennement Card 1) */}
               <button
                 onClick={() => setCurrentView('gift')}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
-                {/* Image de fond - hauteur réduite + nouvelle image */}
+                {/* Image de fond - hauteur réduite */}
                 <div className="relative h-48 md:h-56 overflow-hidden">
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
-                      backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2026/02/Passworld-gift2-scaled.webp)',
+                      backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
@@ -1732,7 +1732,7 @@ const handleModifyForm = async () => {
                 {/* Contenu texte */}
                 <div className="p-5 text-left">
                   <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Offrir l'expérience
+                    Offrir une carte cadeau
                   </h2>
                   <p className="text-gray-600 leading-relaxed text-sm">
                     Le cadeau parfait pour une expérience unique
@@ -1814,7 +1814,7 @@ const handleModifyForm = async () => {
             {/* Options */}
             <div className="space-y-4 mb-8">
               {/* Option 1: Solo */}
-              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-gray-500 transition-colors cursor-pointer bg-gradient-to-r from-sand-50 to-purple-50">
+              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-sand-50 to-purple-50">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -1824,7 +1824,7 @@ const handleModifyForm = async () => {
                       Profitez de votre voyage surprise en solo
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold text-gray-700">Gratuit</span>
+                      <span className="text-3xl font-bold text-indigo-600">Gratuit</span>
                       <span className="text-sm text-gray-500">(déjà payé)</span>
                     </div>
                   </div>
@@ -2147,8 +2147,8 @@ const handleModifyForm = async () => {
             </button>
 
             <div className="text-center mb-8">
-              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Code className="w-8 h-8 text-gray-700" />
+              <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Code className="w-8 h-8 text-indigo-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Entrez votre code</h2>
               <p className="text-gray-500">Code de carte cadeau ou code participant</p>
@@ -2158,7 +2158,7 @@ const handleModifyForm = async () => {
               <input
                 id="code-input-field"
                 type="text"
-                className="w-full px-4 py-4 border-2 border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent text-center text-2xl font-mono tracking-wider"
+                className="w-full px-4 py-4 border-2 border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
                 placeholder="CODE-1234567891011-X"
                 maxLength={21}
                 onKeyPress={(e) => {
@@ -2233,10 +2233,10 @@ const handleModifyForm = async () => {
       setCurrentView('group-setup');
     }
   }}
-                  className="p-6 rounded-3xl border-2 border-sand-200 hover:border-gray-700 hover:bg-gray-50 transition-all"
+                  className="p-6 rounded-3xl border-2 border-sand-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all"
                 >
                   <div className="text-xl font-bold text-gray-900 mb-1">{option.label}</div>
-                  <div className="text-gray-700 font-semibold">{option.price}€</div>
+                  <div className="text-indigo-600 font-semibold">{option.price}€</div>
                 </button>
               ))}
             </div>
@@ -2270,12 +2270,12 @@ const handleModifyForm = async () => {
                 </label>
                 <input
                   type="email"
-                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="votre@email.com"
                 />
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-2xl">
+              <div className="bg-indigo-50 p-4 rounded-2xl">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Voyage solo</span>
                   <span className="font-bold text-gray-900">29€</span>
@@ -2385,7 +2385,7 @@ const handleModifyForm = async () => {
                   <User className="w-6 h-6 mr-3" />
                   <div className="text-left">
                     <div className="font-semibold text-lg">Je voyage seul</div>
-                    <div className="text-gray-200 text-sm">Accéder directement au formulaire</div>
+                    <div className="text-indigo-100 text-sm">Accéder directement au formulaire</div>
                   </div>
                 </div>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -2393,13 +2393,13 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => alert('Config groupe avec cadeau')}
-                className="w-full bg-white border-2 border-gray-700 text-gray-700 p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-indigo-600 text-indigo-600 p-6 rounded-3xl hover:bg-indigo-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
                   <Users className="w-6 h-6 mr-3" />
                   <div className="text-left">
                     <div className="font-semibold text-lg">Je voyage en groupe</div>
-                    <div className="text-gray-500 text-sm">Les autres paieront leur part</div>
+                    <div className="text-indigo-400 text-sm">Les autres paieront leur part</div>
                   </div>
                 </div>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -2413,8 +2413,8 @@ const handleModifyForm = async () => {
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
-              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Users className="w-8 h-8 text-gray-700" />
+              <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Users className="w-8 h-8 text-indigo-600" />
               </div>
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">
                 Bonjour {groupStatus.participant.prenom} !
@@ -2429,7 +2429,7 @@ const handleModifyForm = async () => {
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-gray-600">Progression du groupe</span>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-indigo-600">
                       {groupStatus.groupParticipants.filter(p => p.formStatus === 'completed').length}/
                       {groupStatus.groupParticipants.length}
                     </span>
@@ -2447,7 +2447,7 @@ const handleModifyForm = async () => {
                 <div className="space-y-3 mb-8">
                   {groupStatus.groupParticipants.map((p, i) => (
                     <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border-2 ${
-                      p.isCurrentUser ? 'border-indigo-200 bg-gray-50' : 'bg-sand-50 border-transparent'
+                      p.isCurrentUser ? 'border-indigo-200 bg-indigo-50' : 'bg-sand-50 border-transparent'
                     }`}>
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -2462,7 +2462,7 @@ const handleModifyForm = async () => {
                         <div>
                           <span className="font-medium text-gray-900">
                             {p.prenom} {p.nom}
-                            {p.isCurrentUser && <span className="text-gray-700 ml-2">(Vous)</span>}
+                            {p.isCurrentUser && <span className="text-indigo-600 ml-2">(Vous)</span>}
                           </span>
                         </div>
                       </div>
@@ -2499,7 +2499,7 @@ const handleModifyForm = async () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="bg-gray-50 border border-blue-200 rounded-2xl p-6 text-center mb-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center mb-6">
                     <p className="text-blue-800">
                       ℹ️ Complétez votre formulaire pour découvrir votre destination surprise
                     </p>
@@ -2579,8 +2579,8 @@ const handleModifyForm = async () => {
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
-              <div className="bg-gray-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                <Plane className="w-10 h-10 text-gray-700" />
+              <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <Plane className="w-10 h-10 text-indigo-600" />
               </div>
             
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-3">
@@ -2605,7 +2605,7 @@ const handleModifyForm = async () => {
                 </p>
               )}
               
-              <div className="bg-gray-50 rounded-2xl p-6 mb-6">
+              <div className="bg-blue-50 rounded-2xl p-6 mb-6">
                 <p className="text-gray-600 text-lg leading-relaxed">
                   Vous allez remplir un questionnaire sur vos préférences de voyage. 
                   Cela nous permettra de trouver la destination parfaite pour vous!
