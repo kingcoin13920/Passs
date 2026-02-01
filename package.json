@@ -13,6 +13,8 @@
     "react-dom": "^18",
     "next": "14.2.35",
     "lucide-react": "^0.263.1",
+    "stripe": "^14.0.0",
+    "resend": "^3.0.0",
     "react-hook-form": "^7.52.0",
     "canvas-confetti": "^1.9.3",
     "framer-motion": "^11.3.0"
