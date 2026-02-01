@@ -1620,156 +1620,262 @@ const handleModifyForm = async () => {
     );
   };
 
-  const Router = () => (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
-      {/* Image de fond */}
-      <div 
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2025/08/Black-and-White-Modern-Travel-To-India-Presentation.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
+  const Router = () => {
+    const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
 
-      {/* Avions décoratifs animés */}
-      <div className="absolute top-20 right-10 animate-float opacity-20">
-        <Plane className="w-8 h-8 text-jungle-600 transform rotate-45" />
-      </div>
-      <div className="absolute bottom-40 left-20 animate-float opacity-15" style={{ animationDelay: '2s' }}>
-        <Plane className="w-6 h-6 text-ocean-500 transform -rotate-12" />
-      </div>
-      <div className="absolute top-1/3 left-1/4 animate-float opacity-10" style={{ animationDelay: '4s' }}>
-        <Plane className="w-10 h-10 text-jungle-400 transform rotate-90" />
-      </div>
-
-      {/* Contenu principal */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4 md:p-8">
-        <div className="max-w-6xl w-full">
-          {/* Hero Section */}
-          <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-jungle-500 mb-6 shadow-2xl animate-float">
-              <Plane className="w-10 h-10 md:w-12 h-12 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-jungle-800 mb-4 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Passworld
-            </h1>
-            <p className="text-base md:text-xl text-sand-700 font-light">
-              Votre prochaine aventure vous attend
-            </p>
-          </div>
-
-          {/* Cards Grid avec vraies photos */}
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {/* Card 1: Offrir un voyage - avec photo */}
-            <button
-              onClick={() => setCurrentView('gift')}
-              className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
-            >
-              {/* Image de fond */}
-              <div className="relative h-64 md:h-72 overflow-hidden">
-                <div 
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
-                  style={{
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                
-                {/* Icône en overlay */}
-                <div className="absolute top-6 left-6">
-                  <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                    <Gift className="w-7 h-7 text-jungle-600" />
-                  </div>
-                </div>
-
-                {/* Flèche en overlay */}
-                <div className="absolute top-6 right-6">
-                  <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                    <ArrowRight className="w-5 h-5 text-jungle-700" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Contenu texte */}
-              <div className="p-6 text-left">
-                <h2 className="text-2xl md:text-3xl font-bold text-jungle-800 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  Offrir un voyage
-                </h2>
-                <p className="text-sand-600 leading-relaxed">
-                  Le cadeau parfait pour une expérience unique
-                </p>
-              </div>
-            </button>
-
-            {/* Card 2: Découvrir ma destination - avec photo */}
-            <button
-              onClick={() => setCurrentView('start')}
-              className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
-            >
-              {/* Image de fond */}
-              <div className="relative h-64 md:h-72 overflow-hidden">
-                <div 
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
-                  style={{
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                
-                {/* Icône en overlay */}
-                <div className="absolute top-6 left-6">
-                  <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                    <Plane className="w-7 h-7 text-ocean-600" />
-                  </div>
-                </div>
-
-                {/* Flèche en overlay */}
-                <div className="absolute top-6 right-6">
-                  <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
-                    <ArrowRight className="w-5 h-5 text-ocean-700" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Contenu texte */}
-              <div className="p-6 text-left">
-                <h2 className="text-2xl md:text-3xl font-bold text-jungle-800 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                  Découvrir ma destination
-                </h2>
-                <p className="text-sand-600 leading-relaxed">
-                  Commencez votre aventure surprise
-                </p>
-              </div>
-            </button>
-          </div>
-
-          {/* Card 3: Dashboard - style différent */}
-          <button
-            onClick={() => setCurrentView('with-code')}
-            className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-jungle-100 rounded-2xl flex items-center justify-center group-hover:bg-jungle-200 transition-colors">
-                  <Code className="w-7 h-7 text-jungle-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="text-xl font-bold text-jungle-800" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Accéder à mon dashboard
-                  </h3>
-                </div>
-              </div>
-              <ArrowRight className="w-6 h-6 text-sand-400 group-hover:text-jungle-600 group-hover:translate-x-1 transition-all" />
-            </div>
-          </button>
+    return (
+      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
+        {/* Fond travaillé multi-couches */}
+        <div className="absolute inset-0">
+          {/* Couche 1: Image principale */}
+          <div 
+            className="absolute inset-0 opacity-8"
+            style={{
+              backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2025/08/Black-and-White-Modern-Travel-To-India-Presentation.jpg)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+          
+          {/* Couche 2: Motif géométrique subtil */}
+          <div 
+            className="absolute inset-0 opacity-5"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(47, 164, 101, 0.03) 35px, rgba(47, 164, 101, 0.03) 70px)',
+            }}
+          />
+          
+          {/* Couche 3: Points de localisation animés */}
+          <div className="absolute top-20 left-1/4 w-2 h-2 bg-jungle-400 rounded-full opacity-30 animate-pulse" />
+          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-ocean-400 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-1/4 left-1/3 w-2 h-2 bg-jungle-400 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '2s' }} />
+          
+          {/* Couche 4: Lignes de connexion subtiles */}
+          <svg className="absolute inset-0 w-full h-full opacity-5">
+            <line x1="25%" y1="20%" x2="75%" y2="33%" stroke="#2fa465" strokeWidth="1" strokeDasharray="5,5" />
+            <line x1="75%" y1="33%" x2="33%" y2="75%" stroke="#0ba5e9" strokeWidth="1" strokeDasharray="5,5" />
+          </svg>
         </div>
+
+        {/* Avions décoratifs animés - plus nombreux et variés */}
+        <div className="absolute top-20 right-10 animate-float opacity-15">
+          <Plane className="w-8 h-8 text-jungle-600 transform rotate-45" />
+        </div>
+        <div className="absolute bottom-40 left-20 animate-float opacity-12" style={{ animationDelay: '2s' }}>
+          <Plane className="w-6 h-6 text-ocean-500 transform -rotate-12" />
+        </div>
+        <div className="absolute top-1/3 left-1/4 animate-float opacity-10" style={{ animationDelay: '4s' }}>
+          <Plane className="w-10 h-10 text-jungle-400 transform rotate-90" />
+        </div>
+        <div className="absolute bottom-1/4 right-1/3 animate-float opacity-8" style={{ animationDelay: '3s' }}>
+          <Plane className="w-7 h-7 text-ocean-400 transform rotate-135" />
+        </div>
+
+        {/* Contenu principal */}
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-4 md:p-8">
+          <div className="max-w-6xl w-full">
+            {/* Hero Section */}
+            <div className="text-center mb-12 md:mb-16">
+              <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-jungle-500 mb-6 shadow-2xl animate-float">
+                <Plane className="w-10 h-10 md:w-12 h-12 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                Passworld
+              </h1>
+              <p className="text-base md:text-xl text-gray-600 font-light">
+                Votre prochaine aventure vous attend
+              </p>
+            </div>
+
+            {/* Cards Grid avec animations au hover */}
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              {/* Card 1: Offrir un voyage - Animation cadeau + confettis */}
+              <button
+                onClick={() => setCurrentView('gift')}
+                onMouseEnter={() => setHoveredCard('gift')}
+                onMouseLeave={() => setHoveredCard(null)}
+                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+              >
+                {/* Confettis animés au hover */}
+                {hoveredCard === 'gift' && (
+                  <div className="absolute inset-0 pointer-events-none z-20">
+                    {[...Array(15)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute animate-pulse"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: '30%',
+                          animation: `confetti ${0.8 + Math.random() * 0.5}s ease-out`,
+                          animationDelay: `${Math.random() * 0.2}s`,
+                        }}
+                      >
+                        <div 
+                          className="w-2 h-2 rounded-full"
+                          style={{
+                            backgroundColor: ['#2fa465', '#0ba5e9', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5],
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Image de fond */}
+                <div className="relative h-64 md:h-72 overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
+                    style={{
+                      backgroundImage: 'url(https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  
+                  {/* Icône cadeau avec animation d'ouverture */}
+                  <div className="absolute top-6 left-6 z-10">
+                    <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                      <Gift 
+                        className={`w-7 h-7 text-jungle-600 transition-all duration-300 ${
+                          hoveredCard === 'gift' ? 'scale-125 rotate-12' : ''
+                        }`} 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Flèche en overlay */}
+                  <div className="absolute top-6 right-6">
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                      <ArrowRight className="w-5 h-5 text-gray-700" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contenu texte */}
+                <div className="p-6 text-left">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    Offrir un voyage
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed">
+                    Le cadeau parfait pour une expérience unique
+                  </p>
+                </div>
+              </button>
+
+              {/* Card 2: Découvrir - Animation avion qui décolle */}
+              <button
+                onClick={() => setCurrentView('start')}
+                onMouseEnter={() => setHoveredCard('discover')}
+                onMouseLeave={() => setHoveredCard(null)}
+                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+              >
+                {/* Traînée d'avion animée */}
+                {hoveredCard === 'discover' && (
+                  <div className="absolute inset-0 pointer-events-none z-20">
+                    <div 
+                      className="absolute left-6 top-6 w-32 h-0.5 bg-gradient-to-r from-ocean-400 to-transparent opacity-60"
+                      style={{
+                        animation: 'trail 1s ease-out infinite',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Image de fond */}
+                <div className="relative h-64 md:h-72 overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
+                    style={{
+                      backgroundImage: 'url(https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                  
+                  {/* Icône avion avec animation de décollage */}
+                  <div className="absolute top-6 left-6 z-10">
+                    <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                      <Plane 
+                        className={`w-7 h-7 text-ocean-600 transition-all duration-500 ${
+                          hoveredCard === 'discover' ? '-translate-y-2 -translate-x-2 rotate-45 scale-110' : ''
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Flèche en overlay */}
+                  <div className="absolute top-6 right-6">
+                    <div className="w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                      <ArrowRight className="w-5 h-5 text-gray-700" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contenu texte */}
+                <div className="p-6 text-left">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    Découvrir ma destination
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed">
+                    Commencez votre aventure surprise
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            {/* Card 3: Dashboard - texte noir */}
+            <button
+              onClick={() => setCurrentView('with-code')}
+              className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-jungle-100 rounded-2xl flex items-center justify-center group-hover:bg-jungle-200 transition-colors">
+                    <Code className="w-7 h-7 text-jungle-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Accéder à mon dashboard
+                    </h3>
+                  </div>
+                </div>
+                <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-jungle-600 group-hover:translate-x-1 transition-all" />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Styles CSS pour les animations personnalisées */}
+        <style jsx>{`
+          @keyframes confetti {
+            0% {
+              transform: translateY(0) rotate(0deg);
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(300px) rotate(720deg);
+              opacity: 0;
+            }
+          }
+          
+          @keyframes trail {
+            0% {
+              opacity: 0;
+              transform: translateX(0);
+            }
+            50% {
+              opacity: 0.6;
+            }
+            100% {
+              opacity: 0;
+              transform: translateX(40px);
+            }
+          }
+        `}</style>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="relative">
