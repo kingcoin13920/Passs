@@ -1707,8 +1707,7 @@ const handleModifyForm = async () => {
                   {/* Icône cadeau */}
                   <div className="absolute top-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                      <Gift className="w-7 h-7 text-jungle-600" /> 
-                      />
+                      <Gift className="w-7 h-7 text-jungle-600" />
                     </div>
                   </div>
 
@@ -1751,7 +1750,6 @@ const handleModifyForm = async () => {
                   <div className="absolute top-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <Plane className="w-7 h-7 text-ocean-600" />
-                      />
                     </div>
                   </div>
 
