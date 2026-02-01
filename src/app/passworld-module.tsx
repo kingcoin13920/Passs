@@ -614,7 +614,7 @@ const handleModifyForm = async () => {
 
     if (step === 1) {
       return (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-12 px-4">
+        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: '#f7f7f7' }}>
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
