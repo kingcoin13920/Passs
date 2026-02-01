@@ -798,10 +798,7 @@ const handleModifyForm = async () => {
     }
 
     return (
-  <div
-  className="min-h-screen relative overflow-hidden py-8 px-4"
-  style={{ backgroundColor: "#f7f7f7" }}
->
+      <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
@@ -1186,10 +1183,7 @@ const handleModifyForm = async () => {
     };
 
     return (
-<div
-  className="min-h-screen relative overflow-hidden py-12 px-4"
-  style={{ backgroundColor: "#f7f7f7" }}
->
+      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
@@ -1809,7 +1803,7 @@ const handleModifyForm = async () => {
       
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('router')}
@@ -1912,7 +1906,7 @@ const handleModifyForm = async () => {
       
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('gift-welcome')}
@@ -2106,7 +2100,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
@@ -2158,7 +2152,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2213,7 +2207,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2267,7 +2261,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('no-code')}
@@ -2388,7 +2382,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'gift-choice' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-pink-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2432,7 +2426,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2598,7 +2592,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
