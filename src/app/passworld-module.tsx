@@ -1752,28 +1752,7 @@ const handleModifyForm = async () => {
                     Le cadeau parfait pour une expérience unique
                   </p>
                   {/* Choix du montant */}
-<div className="mb-6">
-  <label className="block text-sm font-medium text-gray-700 mb-3">
-    Choisissez le montant
-  </label>
-  <div className="grid grid-cols-3 gap-3">
-    {PRICE_OPTIONS.map(option => (
-      <button
-        key={option.id}
-        type="button"
-        onClick={() => setSelectedPrice(option.amount)}
-        className={`p-4 rounded-2xl border-2 transition-all active:scale-95 ${
-          selectedPrice === option.amount
-            ? 'border-gray-900 bg-gray-50 shadow-md'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-      >
-        <div className="text-2xl font-bold text-gray-900">{option.label}</div>
-        <div className="text-xs text-gray-600 mt-1">{option.description}</div>
-      </button>
-    ))}
-  </div>
-</div>
+
                 </div>
               </button>
             </div>
