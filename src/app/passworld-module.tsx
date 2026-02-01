@@ -2090,7 +2090,7 @@ const handleModifyForm = async () => {
                 <div className="flex items-center">
                   <Code className="w-6 h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">Accéder à mon dashboard</div>
+                    <div className="font-semibold text-lg">J'ai un code</div>
                     <div className="text-indigo-100 text-sm">Carte cadeau ou code reçu par email</div>
                   </div>
                 </div>
