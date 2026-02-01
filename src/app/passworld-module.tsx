@@ -614,7 +614,7 @@ const handleModifyForm = async () => {
 
     if (step === 1) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 via-sand-50 to-jungle-50 py-12 px-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-12 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
@@ -798,7 +798,7 @@ const handleModifyForm = async () => {
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-8 px-4">
+      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
@@ -1183,7 +1183,7 @@ const handleModifyForm = async () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-sand-50 via-sand-50 to-ocean-50 py-12 px-4">
+      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
@@ -1656,20 +1656,6 @@ const handleModifyForm = async () => {
           </svg>
         </div>
 
-        {/* Avions décoratifs animés - plus nombreux et variés */}
-        <div className="absolute top-20 right-10 animate-float opacity-15">
-          <Plane className="w-8 h-8 text-gray-700 transform rotate-45" />
-        </div>
-        <div className="absolute bottom-40 left-20 animate-float opacity-12" style={{ animationDelay: '2s' }}>
-          <Plane className="w-6 h-6 text-gray-600 transform -rotate-12" />
-        </div>
-        <div className="absolute top-1/3 left-1/4 animate-float opacity-10" style={{ animationDelay: '4s' }}>
-          <Plane className="w-10 h-10 text-gray-400 transform rotate-90" />
-        </div>
-        <div className="absolute bottom-1/4 right-1/3 animate-float opacity-8" style={{ animationDelay: '3s' }}>
-          <Plane className="w-7 h-7 text-gray-500 transform rotate-135" />
-        </div>
-
         {/* Contenu principal */}
         <div className="relative z-10 flex items-center justify-center min-h-screen p-4 md:p-8">
           <div className="max-w-6xl w-full">
@@ -1678,8 +1664,8 @@ const handleModifyForm = async () => {
               <img 
                 src="https://hihaaa.com/wp-content/uploads/2026/01/Plan-de-travail-1Passworld-logo-noir.png"
                 alt="Passworld"
-                className="h-16 md:h-20 mx-auto mb-6"
-                style={{ maxWidth: '300px', width: 'auto' }}
+                className="mx-auto mb-6"
+                style={{ maxWidth: '280px', width: 'auto', height: 'auto' }}
               />
               <p className="text-base md:text-xl text-gray-600 font-light">
                 Votre prochaine aventure vous attend
@@ -1817,7 +1803,7 @@ const handleModifyForm = async () => {
       
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-sand-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('router')}
@@ -1920,7 +1906,7 @@ const handleModifyForm = async () => {
       
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-jungle-50 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('gift-welcome')}
@@ -2011,89 +1997,110 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'gift' && (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
-            <button
-              onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Retour
-            </button>
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
+          {/* Même fond que l'accueil */}
+          <div className="absolute inset-0">
+            <div 
+              className="absolute inset-0 opacity-8"
+              style={{
+                backgroundImage: 'url(https://hihaaa.com/wp-content/uploads/2025/08/Black-and-White-Modern-Travel-To-India-Presentation.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            />
+            <div 
+              className="absolute inset-0 opacity-5"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(0, 0, 0, 0.02) 35px, rgba(0, 0, 0, 0.02) 70px)',
+              }}
+            />
+          </div>
 
-            <div className="text-center mb-8">
-              <div className="bg-pink-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Gift className="w-8 h-8 text-pink-600" />
+          <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+            <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
+              <button
+                onClick={() => setCurrentView('router')}
+                className="flex items-center text-gray-500 hover:text-gray-900 mb-6 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Retour
+              </button>
+
+              <div className="text-center mb-8">
+                <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Gift className="w-8 h-8 text-gray-700" />
+                </div>
+                <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Offrir l'expérience</h2>
+                <p className="text-gray-600">Offrez une carte cadeau Passworld à 29€</p>
               </div>
-              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Offrir l'expérience</h2>
-              <p className="text-gray-500">Offrez une carte cadeau Passworld à 29€</p>
-            </div>
 
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">
-                  Nom du destinataire *
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="Marie Dupont"
-                />
-              </div>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nom du destinataire *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                    placeholder="Marie Dupont"
+                  />
+                </div>
 
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Vos informations</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Votre nom *
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                      placeholder="Jean Martin"
-                    />
-                  </div>
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Vos informations</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Votre nom *
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                        placeholder="Jean Martin"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Votre email *
-                    </label>
-                    <input
-                      type="email"
-                      className="w-full px-4 py-3 border border-sand-300 rounded-2xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                      placeholder="jean@example.com"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      La carte cadeau vous sera envoyée par email
-                    </p>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Votre email *
+                      </label>
+                      <input
+                        type="email"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                        placeholder="jean@example.com"
+                      />
+                      <p className="text-sm text-gray-600 mt-1">
+                        La carte cadeau vous sera envoyée par email
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <button
-                onClick={() => {
-                  // Récupérer les données du formulaire
-                  const inputs = document.querySelectorAll('input');
-                  redirectToStripe('gift', 29, {
-                    recipientName: (inputs[0] as HTMLInputElement)?.value || '',
-                    buyerName: (inputs[1] as HTMLInputElement)?.value || '',
-                    buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
-                  });
-                }}
-                className="w-full bg-pink-600 text-white py-4 rounded-2xl font-semibold hover:bg-pink-700 transition-colors flex items-center justify-center"
-              >
-                Payer 29€
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
+                <button
+                  onClick={() => {
+                    // Récupérer les données du formulaire
+                    const inputs = document.querySelectorAll('input');
+                    redirectToStripe('gift', 29, {
+                      recipientName: (inputs[0] as HTMLInputElement)?.value || '',
+                      buyerName: (inputs[1] as HTMLInputElement)?.value || '',
+                      buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
+                    });
+                  }}
+                  className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
+                >
+                  Payer 29€
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
@@ -2145,7 +2152,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2200,7 +2207,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2254,7 +2261,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('no-code')}
@@ -2375,7 +2382,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'gift-choice' && (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-pink-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2419,7 +2426,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2585,7 +2592,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }} flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
