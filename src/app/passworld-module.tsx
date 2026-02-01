@@ -1652,10 +1652,10 @@ const handleModifyForm = async () => {
             <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-jungle-500 mb-6 shadow-2xl animate-float">
               <Plane className="w-10 h-10 md:w-12 h-12 text-white" />
             </div>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-jungle-800 mb-4 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-4xl md:text-6xl font-bold text-jungle-800 mb-4 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Passworld
             </h1>
-            <p className="text-lg md:text-2xl text-sand-700 font-light">
+            <p className="text-base md:text-xl text-sand-700 font-light">
               Votre prochaine aventure vous attend
             </p>
           </div>
@@ -1747,7 +1747,7 @@ const handleModifyForm = async () => {
             </button>
           </div>
 
-          {/* Card 3: J'ai un code - style différent */}
+          {/* Card 3: Dashboard - style différent */}
           <button
             onClick={() => setCurrentView('with-code')}
             className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
@@ -1758,12 +1758,9 @@ const handleModifyForm = async () => {
                   <Code className="w-7 h-7 text-jungle-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-xl font-bold text-jungle-800 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    J'ai un code
-                  </h3>
-                  <p className="text-sand-600 text-sm">
+                  <h3 className="text-xl font-bold text-jungle-800" style={{ fontFamily: 'Poppins, sans-serif' }}>
                     Accéder à mon dashboard
-                  </p>
+                  </h3>
                 </div>
               </div>
               <ArrowRight className="w-6 h-6 text-sand-400 group-hover:text-jungle-600 group-hover:translate-x-1 transition-all" />
@@ -2093,7 +2090,7 @@ const handleModifyForm = async () => {
                 <div className="flex items-center">
                   <Code className="w-6 h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">J'ai un code</div>
+                    <div className="font-semibold text-lg">Accéder à mon dashboard</div>
                     <div className="text-indigo-100 text-sm">Carte cadeau ou code reçu par email</div>
                   </div>
                 </div>
