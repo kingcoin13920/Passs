@@ -1621,8 +1621,6 @@ const handleModifyForm = async () => {
   };
 
   const Router = () => {
-    const [hoveredCard, setHoveredCard] = React.useState<string | null>(null);
-
     return (
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
         {/* Fond travaillé multi-couches */}
@@ -1675,14 +1673,14 @@ const handleModifyForm = async () => {
         {/* Contenu principal */}
         <div className="relative z-10 flex items-center justify-center min-h-screen p-4 md:p-8">
           <div className="max-w-6xl w-full">
-            {/* Hero Section */}
+            {/* Hero Section avec logo */}
             <div className="text-center mb-12 md:mb-16">
-              <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-jungle-500 mb-6 shadow-2xl animate-float">
-                <Plane className="w-10 h-10 md:w-12 h-12 text-white" />
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Passworld
-              </h1>
+              <img 
+                src="https://hihaaa.com/wp-content/uploads/2026/01/Plan-de-travail-1Passworld-logo-noir.png"
+                alt="Passworld"
+                className="h-16 md:h-20 mx-auto mb-6"
+                style={{ maxWidth: '300px', width: 'auto' }}
+              />
               <p className="text-base md:text-xl text-gray-600 font-light">
                 Votre prochaine aventure vous attend
               </p>
@@ -1690,38 +1688,11 @@ const handleModifyForm = async () => {
 
             {/* Cards Grid avec animations au hover */}
             <div className="grid md:grid-cols-2 gap-6 mb-6">
-              {/* Card 1: Offrir un voyage - Animation cadeau + confettis */}
+              {/* Card 1: Offrir un voyage */}
               <button
                 onClick={() => setCurrentView('gift')}
-                onMouseEnter={() => setHoveredCard('gift')}
-                onMouseLeave={() => setHoveredCard(null)}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
-                {/* Confettis animés au hover */}
-                {hoveredCard === 'gift' && (
-                  <div className="absolute inset-0 pointer-events-none z-20">
-                    {[...Array(15)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute animate-pulse"
-                        style={{
-                          left: `${Math.random() * 100}%`,
-                          top: '30%',
-                          animation: `confetti ${0.8 + Math.random() * 0.5}s ease-out`,
-                          animationDelay: `${Math.random() * 0.2}s`,
-                        }}
-                      >
-                        <div 
-                          className="w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor: ['#2fa465', '#0ba5e9', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5],
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 {/* Image de fond */}
                 <div className="relative h-64 md:h-72 overflow-hidden">
                   <div 
@@ -1733,13 +1704,10 @@ const handleModifyForm = async () => {
                     }}
                   />
                   
-                  {/* Icône cadeau avec animation d'ouverture */}
+                  {/* Icône cadeau */}
                   <div className="absolute top-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                      <Gift 
-                        className={`w-7 h-7 text-jungle-600 transition-all duration-300 ${
-                          hoveredCard === 'gift' ? 'scale-125 rotate-12' : ''
-                        }`} 
+                      <Gift className="w-7 h-7 text-jungle-600" /> 
                       />
                     </div>
                   </div>
@@ -1763,25 +1731,11 @@ const handleModifyForm = async () => {
                 </div>
               </button>
 
-              {/* Card 2: Découvrir - Animation avion qui décolle */}
+              {/* Card 2: Découvrir - sans animation */}
               <button
                 onClick={() => setCurrentView('start')}
-                onMouseEnter={() => setHoveredCard('discover')}
-                onMouseLeave={() => setHoveredCard(null)}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
-                {/* Traînée d'avion animée */}
-                {hoveredCard === 'discover' && (
-                  <div className="absolute inset-0 pointer-events-none z-20">
-                    <div 
-                      className="absolute left-6 top-6 w-32 h-0.5 bg-gradient-to-r from-ocean-400 to-transparent opacity-60"
-                      style={{
-                        animation: 'trail 1s ease-out infinite',
-                      }}
-                    />
-                  </div>
-                )}
-
                 {/* Image de fond */}
                 <div className="relative h-64 md:h-72 overflow-hidden">
                   <div 
@@ -1793,13 +1747,10 @@ const handleModifyForm = async () => {
                     }}
                   />
                   
-                  {/* Icône avion avec animation de décollage */}
+                  {/* Icône avion */}
                   <div className="absolute top-6 left-6 z-10">
                     <div className="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-                      <Plane 
-                        className={`w-7 h-7 text-ocean-600 transition-all duration-500 ${
-                          hoveredCard === 'discover' ? '-translate-y-2 -translate-x-2 rotate-45 scale-110' : ''
-                        }`}
+                      <Plane className="w-7 h-7 text-ocean-600" />
                       />
                     </div>
                   </div>
@@ -1847,32 +1798,6 @@ const handleModifyForm = async () => {
         </div>
 
         {/* Styles CSS pour les animations personnalisées */}
-        <style jsx>{`
-          @keyframes confetti {
-            0% {
-              transform: translateY(0) rotate(0deg);
-              opacity: 1;
-            }
-            100% {
-              transform: translateY(300px) rotate(720deg);
-              opacity: 0;
-            }
-          }
-          
-          @keyframes trail {
-            0% {
-              opacity: 0;
-              transform: translateX(0);
-            }
-            50% {
-              opacity: 0.6;
-            }
-            100% {
-              opacity: 0;
-              transform: translateX(40px);
-            }
-          }
-        `}</style>
       </div>
     );
   };
