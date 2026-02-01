@@ -189,38 +189,27 @@ const StripeAPI = {
     return result;
   }
 };
-
 const PassworldModule = () => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
   const [selectedPrice, setSelectedPrice] = useState(29);
-const [isSubmitting, setIsSubmitting] = useState(false);
-const [purchaseEmail, setPurchaseEmail] = useState('');
-
-// Tracking
-const trackEvent = (name: string, props?: any) => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', name, props);
-  }
-  console.log('📊', name, props);
-};const [selectedPrice, setSelectedPrice] = useState(29);
-const [isSubmitting, setIsSubmitting] = useState(false);
-const [purchaseEmail, setPurchaseEmail] = useState('');
-
-// Tracking
-const trackEvent = (name: string, props?: any) => {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', name, props);
-  }
-  console.log('📊', name, props);
-};
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [purchaseEmail, setPurchaseEmail] = useState('');
+  
+  // Tracking
+  const trackEvent = (name: string, props?: any) => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', name, props);
+    }
+    console.log('📊', name, props);
+  };
+  
   const [tripData, setTripData] = useState<TripData>({});
   const [loading, setLoading] = useState(false);
   const [isRedirectingToStripe, setIsRedirectingToStripe] = useState(false);
   const [groupStatus, setGroupStatus] = useState(null);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
-
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
