@@ -614,7 +614,7 @@ const handleModifyForm = async () => {
 
     if (step === 1) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 via-sand-50 to-jungle-50 py-12 px-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 via-sand-50 to-jungle-50 py-12 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
@@ -731,7 +731,7 @@ const handleModifyForm = async () => {
                       <span className="text-3xl">{criterion.icon}</span>
                       <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
                     </div>
-                    <div className="bg-gradient-to-br from-cream-500 to-ocean-500 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
+                    <div className="bg-gradient-to-br from-sand-500 to-ocean-500 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
                       #{index + 1}
                     </div>
                   </div>
@@ -1183,7 +1183,7 @@ const handleModifyForm = async () => {
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-cream-50 via-sand-50 to-ocean-50 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-sand-50 via-sand-50 to-ocean-50 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
@@ -1621,7 +1621,7 @@ const handleModifyForm = async () => {
   };
 
   const Router = () => (
-    <div className="min-h-screen bg-gradient-to-b from-cream-50 via-sand-50 to-jungle-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-sand-50 via-sand-50 to-jungle-50 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
         {/* Hero Section */}
         <div className="text-center mb-16 animate-fade-in">
@@ -1734,7 +1734,7 @@ const handleModifyForm = async () => {
             {/* Options */}
             <div className="space-y-4 mb-8">
               {/* Option 1: Solo */}
-              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-cream-50 to-purple-50">
+              <div className="border-2 border-indigo-200 rounded-4xl p-6 hover:border-indigo-400 transition-colors cursor-pointer bg-gradient-to-r from-sand-50 to-purple-50">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-jungle-800 mb-2">
@@ -1981,7 +1981,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
@@ -2033,7 +2033,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2088,7 +2088,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2142,7 +2142,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('no-code')}
@@ -2307,7 +2307,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2445,7 +2445,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('router')}
-                className="w-full bg-cream-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-sand-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Retour à l'accueil
@@ -2473,7 +2473,7 @@ const handleModifyForm = async () => {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen bg-gradient-to-br from-cream-50 to-blue-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-sand-50 to-blue-100 flex items-center justify-center p-4">
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-indigo-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
@@ -2531,7 +2531,7 @@ const handleModifyForm = async () => {
 
               <button
                 onClick={() => setCurrentView('home')}
-                className="w-full bg-cream-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center"
+                className="w-full bg-sand-100 text-sand-700 py-3 px-6 rounded-3xl hover:bg-gray-200 transition-colors flex items-center justify-center"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Retour à l'accueil
