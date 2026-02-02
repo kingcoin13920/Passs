@@ -215,20 +215,33 @@ const PassworldModule = () => {
   const [isModifying, setIsModifying] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const action = params.get('action');
-    const code = params.get('c');
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  const code = params.get('c');
+  const success = params.get('success');
+  const travelers = params.get('travelers');
+  const generatedCodeParam = params.get('code');
 
-    if (action === 'offrir') setCurrentView('gift');
-    else if (action === 'commencer') setCurrentView('start');
-    else if (action === 'code' && code) {
-      setCurrentView('with-code');
-      setTripData({ inputCode: code });
-    } else if (action === 'statut' && code) {
-      setCurrentView('dashboard');
-      setTripData({ statusCode: code });
+  // Retour Stripe succès
+  if (success === 'true') {
+    setPaymentSuccess(true);
+    if (generatedCodeParam) {
+      setGeneratedCode(generatedCodeParam);
+      setTripData({ ...tripData, statusCode: generatedCodeParam, travelers: parseInt(travelers || '1') });
     }
-  }, []);
+    return;
+  }
+
+  if (action === 'offrir') setCurrentView('gift');
+  else if (action === 'commencer') setCurrentView('start');
+  else if (action === 'code' && code) {
+    setCurrentView('with-code');
+    setTripData({ inputCode: code });
+  } else if (action === 'statut' && code) {
+    setCurrentView('dashboard');
+    setTripData({ statusCode: code });
+  }
+}, []);
 
   const generateCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1188,15 +1201,10 @@ const handleModifyForm = async () => {
           throw new Error(error.error || 'Failed to save form');
         }
 
-        alert(initialData?.isModifying 
-          ? 'Formulaire modifié ! 🎉'
-          : 'Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.'
-        );
+       setIsSubmittingForm(false);
+setFormSubmitted(true);
         
-        // Toujours rediriger vers l'accueil après soumission
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000); // Délai de 2s pour lire le message
+      
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
@@ -1643,6 +1651,79 @@ const handleModifyForm = async () => {
       </div>
     );
   };
+
+// Pages de chargement et confirmation
+if (isSubmittingForm) {
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
+      <div className="text-center">
+        <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
+        <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
+        <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
+      </div>
+    </div>
+  );
+}
+
+if (formSubmitted) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+      <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check className="w-10 h-10 text-green-600" />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Formulaire envoyé ! ✅</h2>
+        <p className="text-gray-600 mb-8">
+          Merci ! Nous avons bien reçu vos préférences. Nous allons maintenant travailler sur votre voyage surprise. Vous recevrez une proposition sous 48h.
+        </p>
+        <button
+          onClick={() => window.location.href = "https://hihaaa.com"}
+          className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition active:scale-95"
+        >
+          Retourner sur le site Passworld
+        </button>
+      </div>
+    </div>
+  );
+}
+
+if (paymentSuccess && tripData.travelers === 1) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+      <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check className="w-10 h-10 text-green-600" />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Paiement réussi ! 🎉</h2>
+        <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+          <p className="text-sm font-mono text-gray-700">
+            Votre code : <strong>{generatedCode}</strong>
+          </p>
+        </div>
+        <p className="text-gray-600 mb-6">
+          Vous allez recevoir votre code par email. Mais si vous le souhaitez, vous pouvez gagner du temps et <strong>commencer à remplir le formulaire dès maintenant</strong> !
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              setCurrentView("form");
+              setPaymentSuccess(false);
+            }}
+            className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition active:scale-95"
+          >
+            ✏️ Commencer le formulaire maintenant
+          </button>
+          <button
+            onClick={() => window.location.href = "https://hihaaa.com"}
+            className="w-full border-2 border-gray-300 py-4 rounded-full font-semibold hover:bg-gray-50 transition active:scale-95"
+          >
+            Retourner au site
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
   const Router = () => {
     return (
