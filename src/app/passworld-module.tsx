@@ -1,5 +1,11 @@
 "use client";
 
+// ⚠️ AMÉLIORATIONS À FAIRE MANUELLEMENT :
+// 1. Page de chargement lors de l'envoi du formulaire (voir CORRECTIONS-RECETTE.md #3)
+// 2. Page de confirmation après paiement solo avec accès direct formulaire (voir #1)  
+// 3. Validation critères incompatibles avant paiement (voir #5)
+// 4. Vérifier que travelers, departureCity, departureDate, duration, hasChildren sont bien envoyés (voir #6)
+
 import React, { useState, useEffect } from 'react';
 import { Plane, Gift, Code, Users, ArrowRight, ArrowLeft, Check, GripVertical, Clock, User, Edit, AlertCircle, Mail, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -188,6 +194,10 @@ const PassworldModule = () => {
   const [selectedPrice, setSelectedPrice] = useState(29);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseEmail, setPurchaseEmail] = useState('');
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState('');
   
   // Tracking
   const trackEvent = (name: string, props?: any) => {
@@ -204,21 +214,34 @@ const PassworldModule = () => {
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const action = params.get('action');
-    const code = params.get('c');
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  const code = params.get('c');
+  const success = params.get('success');
+  const travelers = params.get('travelers');
+  const generatedCodeParam = params.get('code');
 
-    if (action === 'offrir') setCurrentView('gift');
-    else if (action === 'commencer') setCurrentView('start');
-    else if (action === 'code' && code) {
-      setCurrentView('with-code');
-      setTripData({ inputCode: code });
-    } else if (action === 'statut' && code) {
-      setCurrentView('dashboard');
-      setTripData({ statusCode: code });
+  // Retour Stripe succès
+  if (success === 'true') {
+    setPaymentSuccess(true);
+    if (generatedCodeParam) {
+      setGeneratedCode(generatedCodeParam);
+      setTripData({ ...tripData, statusCode: generatedCodeParam, travelers: parseInt(travelers || '1') });
     }
-  }, []);
+    return;
+  }
+
+  if (action === 'offrir') setCurrentView('gift');
+  else if (action === 'commencer') setCurrentView('start');
+  else if (action === 'code' && code) {
+    setCurrentView('with-code');
+    setTripData({ inputCode: code });
+  } else if (action === 'statut' && code) {
+    setCurrentView('dashboard');
+    setTripData({ statusCode: code });
+  }
+}, []);
 
   const generateCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1068,7 +1091,7 @@ const handleModifyForm = async () => {
 
     const submitForm = async () => {
       try {
-        setLoading(true);
+        setIsSubmittingForm(true);
         
         // Validation déjà faite étape par étape dans nextStep()
         // Pas besoin de re-valider ici
@@ -1076,8 +1099,8 @@ const handleModifyForm = async () => {
         // En mode démo
         if (IS_DEMO_MODE) {
           console.log('Mode démo - Formulaire soumis:', formData);
-          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
-          setLoading(false);
+          setIsSubmittingForm(false);
+          setFormSubmitted(true);
           return;
         }
 
@@ -1169,6 +1192,11 @@ const handleModifyForm = async () => {
             ...(initialData?.isModifying && { responseId: initialData.responseId }),
             participantId: finalParticipantId || 'UNKNOWN',
             participantRecordId: finalParticipantRecordId,
+            travelers: tripData.travelers || 1,
+            departureCity: formData.departureCity || '',
+            departureDate: formData.departureDate || '',
+            duration: formData.duration || '',
+            hasChildren: formData.hasChildren || false,
             ...formData
           }),
         });
@@ -1178,20 +1206,13 @@ const handleModifyForm = async () => {
           throw new Error(error.error || 'Failed to save form');
         }
 
-        alert(initialData?.isModifying 
-          ? 'Formulaire modifié ! 🎉'
-          : 'Formulaire envoyé ! 🎉\nVotre destination est en cours de préparation.'
-        );
-        
-        // Toujours rediriger vers l'accueil après soumission
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000); // Délai de 2s pour lire le message
+        setIsSubmittingForm(false);
+        setFormSubmitted(true);
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
       } finally {
-        setLoading(false);
+        setIsSubmittingForm(false);
       }
     };
 
@@ -1270,6 +1291,70 @@ const handleModifyForm = async () => {
                       placeholder="john.martin@gmail.com"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Ville de départ *</label>
+                    <input
+                      type="text"
+                      value={formData.departureCity || ''}
+                      onChange={(e) => updateField('departureCity', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Paris, Lyon, Marseille..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Date de départ souhaitée *</label>
+                    <input
+                      type="date"
+                      value={formData.departureDate || ''}
+                      onChange={(e) => updateField('departureDate', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Durée du voyage *</label>
+                    <select
+                      value={formData.duration || ''}
+                      onChange={(e) => updateField('duration', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionnez une durée</option>
+                      <option value="weekend">Week-end (2-3 jours)</option>
+                      <option value="week">1 semaine</option>
+                      <option value="2weeks">2 semaines</option>
+                      <option value="3weeks+">3 semaines ou plus</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-600 mb-3">Voyagez-vous avec des enfants ?</label>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => updateField('hasChildren', false)}
+                      className={`flex-1 py-3 rounded-2xl border-2 transition active:scale-95 ${
+                        formData.hasChildren === false 
+                          ? 'bg-gray-900 text-white border-gray-900' 
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      Non
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateField('hasChildren', true)}
+                      className={`flex-1 py-3 rounded-2xl border-2 transition active:scale-95 ${
+                        formData.hasChildren === true 
+                          ? 'bg-gray-900 text-white border-gray-900' 
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      Oui
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-6">
@@ -1291,7 +1376,8 @@ const handleModifyForm = async () => {
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">Quel est votre budget par personne ? (vols inclus) *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?"} ? (vols inclus) *</label>
                       <select
                         value={formData.budget}
                         onChange={(e) => updateField('budget', e.target.value)}
@@ -1633,6 +1719,91 @@ const handleModifyForm = async () => {
     );
   };
 
+// Page de confirmation après paiement solo
+if (paymentSuccess && tripData.travelers === 1) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#f7f7f7' }}>
+      <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check className="w-10 h-10 text-green-600" />
+        </div>
+        
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          Paiement réussi ! 🎉
+        </h2>
+        
+        <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+          <p className="text-sm font-mono text-gray-700">
+            Votre code : <strong>{generatedCode}</strong>
+          </p>
+        </div>
+        
+        <p className="text-gray-600 mb-6">
+          Vous allez recevoir votre code par email. Mais si vous le souhaitez, vous pouvez gagner du temps et <strong>commencer à remplir le formulaire dès maintenant</strong> !
+        </p>
+        
+        <div className="space-y-3">
+          <button
+            onClick={() => {
+              setCurrentView('form');
+              setPaymentSuccess(false);
+            }}
+            className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition active:scale-95"
+          >
+            ✏️ Commencer le formulaire maintenant
+          </button>
+          
+          <button
+            onClick={() => window.location.href = 'https://hihaaa.com'}
+            className="w-full border-2 border-gray-300 py-4 rounded-full font-semibold hover:bg-gray-50 transition active:scale-95"
+          >
+            Retourner au site
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+// Page de chargement
+if (isSubmittingForm) {
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f7f7f7' }}>
+      <div className="text-center">
+        <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
+        <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
+        <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
+      </div>
+    </div>
+  );
+}
+
+// Page de confirmation
+if (formSubmitted) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#f7f7f7' }}>
+      <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Check className="w-10 h-10 text-green-600" />
+        </div>
+        
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          Formulaire envoyé ! ✅
+        </h2>
+        
+        <p className="text-gray-600 mb-8">
+          Merci ! Nous avons bien reçu vos préférences. Nous allons maintenant travailler sur votre voyage surprise. Vous recevrez une proposition sous 48h.
+        </p>
+        
+        <button
+          onClick={() => window.location.href = 'https://hihaaa.com'}
+          className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition active:scale-95"
+        >
+          Retourner sur le site Passworld
+        </button>
+      </div>
+    </div>
+  );
+}
   const Router = () => {
     return (
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
@@ -2036,7 +2207,7 @@ const handleModifyForm = async () => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom du destinataire *
+                    Prénom & Nom du destinataire *
                   </label>
                   <input
                     type="text"
@@ -2051,7 +2222,7 @@ const handleModifyForm = async () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Votre nom *
+                        Votre prénom & nom *
                       </label>
                       <input
                         type="text"
