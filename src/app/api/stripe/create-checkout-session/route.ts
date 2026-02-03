@@ -26,10 +26,10 @@ export async function POST(req: NextRequest) {
     const generatedCode = generateCode();
     const travelers = metadata?.travelers || 1;
 
-    // Construire les URLs avec les paramètres
+    // Construire les URLs - ON UTILISE /success COMME AVANT
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.headers.get('origin');
-    const successUrl = `${baseUrl}?success=true&code=${generatedCode}&travelers=${travelers}&type=${type}`;
-    const cancelUrl = `${baseUrl}?canceled=true`;
+    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&code=${generatedCode}&travelers=${travelers}&type=${type}`;
+    const cancelUrl = `${baseUrl}/cancel`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
                 ? 'Offrez une destination surprise' 
                 : 'Découvrez votre destination mystère',
             },
-            unit_amount: amount * 100, // Convertir en centimes
+            unit_amount: amount * 100,
           },
           quantity: 1,
         },
@@ -53,37 +53,15 @@ export async function POST(req: NextRequest) {
       cancel_url: cancelUrl,
       metadata: {
         type: type,
-        code: generatedCode, // Sauvegarder le code dans metadata
+        code: generatedCode,
         travelers: travelers.toString(),
-        ...metadata,  // Inclure toutes les metadata
+        ...metadata,
       },
     });
 
     console.log('Stripe session created:', session.id);
     console.log('Success URL:', successUrl);
     console.log('Generated code:', generatedCode);
-
-    // Si c'est un voyage solo, envoyer le code par email
-    if (type === 'solo' && metadata?.email) {
-      console.log('Sending email to:', metadata.email);
-      
-      try {
-        await fetch(`${baseUrl}/api/emails/send-code`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: metadata.email,
-            code: generatedCode,
-            firstName: metadata.firstName || 'Voyageur',
-            travelers: travelers
-          })
-        });
-        console.log('Email sent successfully');
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
-        // On continue quand même, l'utilisateur aura le code dans l'URL
-      }
-    }
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
