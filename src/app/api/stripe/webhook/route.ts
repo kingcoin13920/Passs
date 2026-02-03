@@ -9,11 +9,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 
-// Générer un code unique de 6 caractères
+// Générer un code unique de 9 caractères (format ABC-DEF-GHI)
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 9; i++) {
+    if (i > 0 && i % 3 === 0) code += '-';
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return code;
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
         signature,
         process.env.STRIPE_WEBHOOK_SECRET!
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ Erreur signature webhook:', err.message);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Erreur webhook:', error);
     return NextResponse.json(
       { error: 'Webhook error', details: error.message },
@@ -186,6 +187,11 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
   try {
     console.log('👤 Traitement paiement solo');
     
+    // 🔥 CORRECTION : Utiliser le code des metadata au lieu d'en générer un nouveau
+    const code = metadata.code || generateCode();
+    
+    console.log('🎫 Code utilisé:', code);
+    
     // Récupérer les infos du client depuis Stripe
     const customerEmail = session.customer_details?.email;
     const customerName = session.customer_details?.name || '';
@@ -218,8 +224,7 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
     const tripData = await tripResponse.json();
     const tripRecordId = tripData.records[0].id;
 
-    // Créer le participant
-    const code = generateCode();
+    // Créer le participant avec LE MÊME CODE que dans l'URL
     const participantResponse = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Participants`,
       {
@@ -234,7 +239,7 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
               'Prenom': prenom || 'Voyageur',
               'Nom': nom || '',
               'Email': customerEmail,
-              'code': code,
+              'code': code, // 🔥 UTILISER LE CODE DES METADATA
               'Trip ID': [tripRecordId],
               'Form Status': 'pending',
             }
@@ -243,9 +248,9 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
       }
     );
 
-    console.log('✅ Participant solo créé');
+    console.log('✅ Participant solo créé avec code:', code);
 
-    // Envoyer l'email
+    // Envoyer l'email avec LE MÊME CODE
     await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL || 'https://passs-two.vercel.app'}/api/emails/send-participant-codes`,
       {
@@ -256,14 +261,14 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
             prenom: prenom || 'Voyageur',
             nom: nom || '',
             email: customerEmail,
-            code: code,
+            code: code, // 🔥 UTILISER LE CODE DES METADATA
           }],
           tripId: tripRecordId,
         }),
       }
     );
 
-    console.log('✅ Email solo envoyé');
+    console.log('✅ Email solo envoyé avec code:', code);
 
   } catch (error) {
     console.error('❌ Erreur handleSoloPayment:', error);
