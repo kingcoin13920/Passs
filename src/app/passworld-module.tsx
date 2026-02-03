@@ -215,13 +215,14 @@ const StripeAPI = {
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
   const [isModifying, setIsModifying] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   const action = params.get('action');
   const code = params.get('c');
   const success = params.get('success');
   const travelers = params.get('travelers');
   const generatedCodeParam = params.get('code');
+  const verify = params.get('verify'); // 🔥 NOUVEAU
 
   // Retour Stripe succès
   if (success === 'true') {
@@ -238,6 +239,11 @@ const StripeAPI = {
   else if (action === 'code' && code) {
     setCurrentView('with-code');
     setTripData({ inputCode: code });
+    
+    // 🔥 NOUVEAU : Vérifier automatiquement si verify=true
+    if (verify === 'true') {
+      verifyCode(code);
+    }
   } else if (action === 'statut' && code) {
     setCurrentView('dashboard');
     setTripData({ statusCode: code });
