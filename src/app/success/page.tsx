@@ -229,16 +229,16 @@ function SuccessContent() {
           console.error('❌ Exception lors de l\'envoi des emails:', emailError);
         }
 
+        // 🔥 REDIRECTION IMMÉDIATE pour voyage solo (sans afficher le message)
+        if (typeParam === 'solo' && codeParam && travelersParam === '1') {
+          console.log('🚀 Redirection immédiate vers la page de confirmation solo...');
+          window.location.href = `/?success=true&code=${codeParam}&travelers=${travelersParam}`;
+          return; // Arrêter l'exécution ici
+        }
+        
+        // Pour les autres cas (groupe, carte cadeau), afficher le message
         setStatus('success');
         setMessage(`Voyage créé! ${participantsData.length} participant(s) recevront un email avec leur code unique.`);
-        
-        // 🔥 REDIRECTION VERS LA NOUVELLE PAGE POUR LES VOYAGES SOLO
-        if (typeParam === 'solo' && codeParam && travelersParam === '1') {
-          console.log('🚀 Redirection vers la page de confirmation solo...');
-          setTimeout(() => {
-            window.location.href = `/?success=true&code=${codeParam}&travelers=${travelersParam}`;
-          }, 2000); // 2 secondes pour voir le message
-        }
         
       } catch (error) {
         console.error('❌ Error:', error);
