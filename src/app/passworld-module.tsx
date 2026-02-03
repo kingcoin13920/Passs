@@ -1241,7 +1241,16 @@ const response = await fetch(endpoint, {
     ...filteredFormData
   }),
 });
-
+console.log('🔍 === DEBUG FORMULAIRE ===');
+console.log('motivationsDetail:', formData.motivationsDetail);
+console.log('voyageType:', formData.voyageType);
+console.log('planningStyle:', formData.planningStyle);
+console.log('paysVisites:', formData.paysVisites);
+console.log('activites:', formData.activites);
+console.log('rythme:', formData.rythme);
+console.log('problemeSante:', formData.problemeSante);
+console.log('phobies:', formData.phobies);
+console.log('🔍 === FIN DEBUG ===');
 console.log('📥 Réponse API:', response.status, response.statusText);
 
 if (!response.ok) {
