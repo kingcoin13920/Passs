@@ -37,8 +37,8 @@ export async function POST(request: Request) {
         'distance': data.distance || '',
         'Main Motivations': arrayToText(data.motivations), // Converti en texte
         'Motivation Details': data.motivationsDetail || '',
-        'Type of Trip': data.voyageType || '',
-        'Planning Style': data.planningStyle || '',
+        'Type of Trip': arrayToText(data.voyageType),
+        'Planning Style': arrayToText(data.planningStyle) '',
         'Preferred Environments': arrayToText(data.environnements), // Converti en texte
         'climat': data.climat || '',
         'Countries Visited': data.paysVisites || '',
