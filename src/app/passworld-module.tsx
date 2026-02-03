@@ -1192,21 +1192,44 @@ const handleModifyForm = async () => {
           console.log('✅ Email envoyé');
         }
 
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...(initialData?.isModifying && { responseId: initialData.responseId }),
-            participantId: finalParticipantId || 'UNKNOWN',
-            participantRecordId: finalParticipantRecordId,
-            ...formData
-          }),
-        });
+console.log('📤 Envoi formulaire vers:', endpoint);
+console.log('📤 Données:', {
+  participantId: finalParticipantId || 'UNKNOWN',
+  participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
+  isModifying: initialData?.isModifying,
+  responseId: initialData?.responseId,
+});
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to save form');
-        }
+const response = await fetch(endpoint, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ...(initialData?.isModifying && { responseId: initialData.responseId }),
+    participantId: finalParticipantId || 'UNKNOWN',
+    participantRecordId: finalParticipantRecordId || initialData?.participantRecordId || 'UNKNOWN',
+    ...formData
+  }),
+});
+
+console.log('📥 Réponse API:', response.status, response.statusText);
+
+if (!response.ok) {
+  const errorText = await response.text();
+  console.error('❌ Erreur API complète:', errorText);
+  
+  let errorMessage = 'Erreur lors de la sauvegarde';
+  try {
+    const error = JSON.parse(errorText);
+    errorMessage = error.error || error.message || errorText;
+  } catch {
+    errorMessage = errorText;
+  }
+  
+  throw new Error(errorMessage);
+}
+
+const result = await response.json();
+console.log('✅ Formulaire sauvegardé:', result);
 
        setIsSubmittingForm(false);
 setFormSubmitted(true);
