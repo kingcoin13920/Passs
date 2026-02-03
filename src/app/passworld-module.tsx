@@ -193,7 +193,7 @@ interface PassworldModuleProps {
   initialCode?: string;
 }
 
-const PassworldModule = ({ initialView, initialCode }: PassworldModuleProps = {}) => {
+  const PassworldModule = ({ initialView, initialCode }: PassworldModuleProps) => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState(initialView || 'router');
   const [selectedPrice, setSelectedPrice] = useState(29);
