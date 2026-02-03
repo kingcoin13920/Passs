@@ -1310,7 +1310,7 @@ setFormSubmitted(true);
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?"} ? (vols inclus) *</label>
+                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?*"}</label>
                       <select
                         value={formData.budget}
                         onChange={(e) => updateField('budget', e.target.value)}
