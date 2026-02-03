@@ -232,7 +232,7 @@ function SuccessContent() {
         // 🔥 REDIRECTION IMMÉDIATE pour voyage solo (sans afficher le message)
         if (typeParam === 'solo' && codeParam && travelersParam === '1') {
           console.log('🚀 Redirection immédiate vers la page de confirmation solo...');
-          window.location.href = `/?success=true&code=${codeParam}&travelers=${travelersParam}`;
+          window.location.href = `/payment-success/${codeParam}`;
           return; // Arrêter l'exécution ici
         }
         
