@@ -1200,14 +1200,45 @@ console.log('📤 Données:', {
   responseId: initialData?.responseId,
 });
 
+// Liste des champs qui existent dans Airtable
+const allowedFields = [
+  'budget',
+  'distance',
+  'climat',
+  'environnements',
+  'motivations',
+  'interdits',
+  'departureCity',
+  'departureDate',
+  'duration',
+  'hasChildren',
+  'childrenAges',
+  'companions',
+  'flexibility',
+  'accommodation',
+  'activities',
+  'dietaryRestrictions',
+  'specialRequests'
+];
+
+// Filtrer formData pour ne garder que les champs autorisés
+const filteredFormData = Object.keys(formData)
+  .filter(key => allowedFields.includes(key))
+  .reduce((obj, key) => {
+    obj[key] = formData[key];
+    return obj;
+  }, {});
+
+console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
+
 const response = await fetch(endpoint, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     ...(initialData?.isModifying && { responseId: initialData.responseId }),
     participantId: finalParticipantId || 'UNKNOWN',
-    participantRecordId: finalParticipantRecordId || initialData?.participantRecordId || 'UNKNOWN',
-    ...formData
+    participantRecordId: finalParticipantRecordId,
+    ...filteredFormData
   }),
 });
 
