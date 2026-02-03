@@ -188,12 +188,8 @@ const StripeAPI = {
     return result;
   }
 };
-interface PassworldModuleProps {
-  initialView?: string;
-  initialCode?: string;
-}
 
-  const PassworldModule = ({ initialView, initialCode }: PassworldModuleProps) => {
+  const PassworldModule = () => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState(initialView || 'router');
   const [selectedPrice, setSelectedPrice] = useState(29);
