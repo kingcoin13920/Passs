@@ -11,6 +11,9 @@ function SuccessContent() {
 
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
+    const codeParam = searchParams.get('code');
+    const travelersParam = searchParams.get('travelers');
+    const typeParam = searchParams.get('type');
     
     if (!sessionId) {
       setStatus('error');
@@ -49,7 +52,7 @@ function SuccessContent() {
         const metadata = data.metadata || {};
         const type = metadata.type || 'solo';
         const nbParticipants = parseInt(metadata.nbParticipants) || 1;
-        const amount = data.amount_total / 100; // Convertir centimes en euros
+        const amount = data.amount_total / 100;
         
         console.log('📊 Processing:', { type, nbParticipants, amount });
         
@@ -132,24 +135,24 @@ function SuccessContent() {
           }
         }
         
- // Créer le voyage dans Airtable
-const tripResponse = await fetch('/api/airtable/create-trip', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    tripId,
-    type: type,
-    nbParticipants: nbParticipants,
-    amount: amount,
-    paymentStatus: 'paid',
-    criteriaOrder: metadata.criteriaOrder || ''
-  }),
-});
+        // Créer le voyage dans Airtable
+        const tripResponse = await fetch('/api/airtable/create-trip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tripId,
+            type: type,
+            nbParticipants: nbParticipants,
+            amount: amount,
+            paymentStatus: 'paid',
+            criteriaOrder: metadata.criteriaOrder || ''
+          }),
+        });
 
-const tripData = await tripResponse.json();
-const airtableTripRecordId = tripData.id;  // ← Récupérer le record ID d'Airtable
+        const tripData = await tripResponse.json();
+        const airtableTripRecordId = tripData.id;
 
-console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripRecordId);
+        console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripRecordId);
         
         // Récupérer les participants depuis les metadata
         let participantsData = [];
@@ -175,20 +178,21 @@ console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripReco
         
         for (let i = 0; i < participantsData.length; i++) {
           const participant = participantsData[i];
-          const code = `CODE-${Date.now()}-${i + 1}`;
+          // 🔥 UTILISER LE CODE DE L'URL pour le premier participant
+          const code = (i === 0 && codeParam) ? codeParam : `CODE-${Date.now()}-${i + 1}`;
           
           await fetch('/api/airtable/create-participant', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    tripId: [airtableTripRecordId],  // ← Passer le record ID dans un tableau
-    code,
-    prenom: participant.prenom || '',
-    nom: participant.nom || '',
-    email: participant.email || data.customer_email,
-    paymentStatus: 'paid',
-  }),
-});
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId: [airtableTripRecordId],
+              code,
+              prenom: participant.prenom || '',
+              nom: participant.nom || '',
+              email: participant.email || data.customer_email,
+              paymentStatus: 'paid',
+            }),
+          });
           
           console.log(`✅ Participant ${i + 1} created:`, code);
           
@@ -227,6 +231,14 @@ console.log('✅ Trip created:', tripId, 'Airtable Record ID:', airtableTripReco
 
         setStatus('success');
         setMessage(`Voyage créé! ${participantsData.length} participant(s) recevront un email avec leur code unique.`);
+        
+        // 🔥 REDIRECTION VERS LA NOUVELLE PAGE POUR LES VOYAGES SOLO
+        if (typeParam === 'solo' && codeParam && travelersParam === '1') {
+          console.log('🚀 Redirection vers la page de confirmation solo...');
+          setTimeout(() => {
+            window.location.href = `/?success=true&code=${codeParam}&travelers=${travelersParam}`;
+          }, 2000); // 2 secondes pour voir le message
+        }
         
       } catch (error) {
         console.error('❌ Error:', error);
