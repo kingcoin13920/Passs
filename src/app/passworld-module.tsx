@@ -188,9 +188,14 @@ const StripeAPI = {
     return result;
   }
 };
-const PassworldModule = () => {
+interface PassworldModuleProps {
+  initialView?: string;
+  initialCode?: string;
+}
+
+const PassworldModule = ({ initialView, initialCode }: PassworldModuleProps = {}) => {
   const [participantInfo, setParticipantInfo] = useState(null);
-  const [currentView, setCurrentView] = useState('router');
+  const [currentView, setCurrentView] = useState(initialView || 'router');
   const [selectedPrice, setSelectedPrice] = useState(29);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseEmail, setPurchaseEmail] = useState('');
@@ -207,7 +212,9 @@ const PassworldModule = () => {
     console.log('📊', name, props);
   };
   
-  const [tripData, setTripData] = useState<TripData>({});
+  const [tripData, setTripData] = useState<TripData>(
+  initialCode ? { inputCode: initialCode } : {}
+);
   const [loading, setLoading] = useState(false);
   const [isRedirectingToStripe, setIsRedirectingToStripe] = useState(false);
   const [groupStatus, setGroupStatus] = useState(null);
@@ -221,7 +228,12 @@ const PassworldModule = () => {
   const success = params.get('success');
   const travelers = params.get('travelers');
   const generatedCodeParam = params.get('code');
-
+// Vérifier le code initial si fourni
+useEffect(() => {
+  if (initialCode && initialView === 'with-code') {
+    verifyCode(initialCode);
+  }
+}, [initialCode]);
   // Retour Stripe succès
   if (success === 'true') {
     setPaymentSuccess(true);
