@@ -1322,6 +1322,7 @@ if (!response.ok) {
   try {
     const error = JSON.parse(errorText);
     errorMessage = error.error || error.message || errorText;
+    } 
   } catch {
     errorMessage = errorText;
   }
