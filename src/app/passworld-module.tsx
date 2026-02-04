@@ -1218,7 +1218,15 @@ const allowedFields = [
   'accommodation',
   'activities',
   'dietaryRestrictions',
-  'specialRequests'
+  'specialRequests',
+  'motivationsDetail',
+  'voyageType',
+  'planningStyle',
+  'paysVisites',
+  'activites',
+  'rythme',
+  'problemeSante',
+  'phobies'
 ];
 
 // Filtrer formData pour ne garder que les champs autorisés
@@ -1238,7 +1246,7 @@ const response = await fetch(endpoint, {
     ...(initialData?.isModifying && { responseId: initialData.responseId }),
     participantId: finalParticipantId || 'UNKNOWN',
     participantRecordId: finalParticipantRecordId,
-    ...FormData
+    ...filteredFormData
   }),
 });
 console.log('🔍 === DEBUG FORMULAIRE ===');
