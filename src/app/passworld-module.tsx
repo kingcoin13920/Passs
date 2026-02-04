@@ -1312,7 +1312,7 @@ console.log('rythme:', formData.rythme);
 console.log('problemeSante:', formData.problemeSante);
 console.log('phobies:', formData.phobies);
 console.log('🔍 === FIN DEBUG ===');
-console.log('📥 Réponse API:', response.status, response.statusText);
+console.log('🔥 Réponse API:', response.status, response.statusText);
 
 if (!response.ok) {
   const errorText = await response.text();
@@ -1322,30 +1322,29 @@ if (!response.ok) {
   try {
     const error = JSON.parse(errorText);
     errorMessage = error.error || error.message || errorText;
-    } 
   } catch {
     errorMessage = errorText;
   }
   
   throw new Error(errorMessage);
+}
 
 const result = await response.json();
 console.log('✅ Formulaire sauvegardé:', result);
 
-       setIsSubmittingForm(false);
+setIsSubmittingForm(false);
 setFormSubmitted(true);
-        
-      
-      } catch (error) {
-        console.error('Erreur soumission formulaire:', error);
-        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    return (
-      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+} catch (error) {
+  console.error('Erreur soumission formulaire:', error);
+  alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
+} finally {
+  setLoading(false);
+}
+};
+
+return (
+  <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
