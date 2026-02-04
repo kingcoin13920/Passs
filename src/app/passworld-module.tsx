@@ -1437,39 +1437,195 @@ case 4: // Type de voyage
       if (currentStep > 1) setCurrentStep(currentStep - 1);
     };
 
-    
+    const submitForm = async () => {
+      try {
+        setLoading(true);
+        
+        if (IS_DEMO_MODE) {
+          console.log('Mode démo - Formulaire soumis:', formData);
+          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
+          setLoading(false);
+          return;
+        }
 
-    if (isSubmittingForm) {
-      return (
-        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
-          <div className="text-center">
-            <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
-            <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
-            <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
-          </div>
-        </div>
-      );
-    }
+        const endpoint = initialData?.isModifying 
+          ? '/api/airtable/update-form'
+          : '/api/airtable/save-form';
 
-    if (formSubmitted) {
-      return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
-          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-10 h-10 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Formulaire envoyé avec succès !</h2>
-            <p className="text-gray-600 mb-6">Merci pour vos réponses. Nous préparons votre voyage personnalisé.</p>
-            <button
-              onClick={onBack}
-              className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-900 transition-colors"
-            >
-              Retour à l'accueil
-            </button>
-          </div>
-        </div>
-      );
-    }
+        let finalParticipantId = initialData?.participantId;
+        let finalParticipantRecordId = initialData?.participantRecordId;
+        
+        if (tripData.isGiftCard && !finalParticipantId) {
+          console.log('🎁 Code cadeau solo - Création du participant...');
+          
+          const participantCode = tripData.inputCode;
+          const tripId = `TRIP-${Date.now()}`;
+          const tripResponse = await fetch('/api/airtable/create-trip', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId,
+              type: 'solo',
+              nbParticipants: 1,
+              amount: 29,
+              paymentStatus: 'paid-gift',
+              criteriaOrder: ''
+            }),
+          });
+          
+          const tripDataResponse = await tripResponse.json();
+          const airtableTripRecordId = tripDataResponse.id;
+          console.log('✅ Voyage créé:', airtableTripRecordId);
+          
+          const participantResponse = await fetch('/api/airtable/create-participant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId: [airtableTripRecordId],
+              code: participantCode,
+              prenom: formData.prenom,
+              nom: formData.nom,
+              email: formData.email,
+              paymentStatus: 'paid-gift',
+            }),
+          });
+          
+          const participantData = await participantResponse.json();
+          finalParticipantId = participantData.id;
+          finalParticipantRecordId = participantData.id;
+          console.log('✅ Participant créé:', finalParticipantId);
+          
+          await fetch('/api/airtable/update-gift-card-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              giftCardId: tripData.giftCardId,
+              status: 'used'
+            }),
+          });
+          console.log('✅ Carte cadeau marquée comme utilisée');
+          
+          await fetch('/api/emails/send-participant-codes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              participants: [{
+                prenom: formData.prenom,
+                nom: formData.nom,
+                email: formData.email,
+                code: participantCode,
+              }],
+              tripId: airtableTripRecordId,
+            }),
+          });
+          console.log('✅ Email envoyé');
+        }
+
+        console.log('📤 Envoi formulaire vers:', endpoint);
+        console.log('📤 Données:', {
+          participantId: finalParticipantId || 'UNKNOWN',
+          participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
+          isModifying: initialData?.isModifying,
+          responseId: initialData?.responseId,
+        });
+
+        const allowedFields = [
+          'budget',
+          'distance',
+          'climat',
+          'environnements',
+          'enfants',
+          'ageEnfant1',
+          'ageEnfant2',
+          'ageEnfant3',
+          'ageEnfant4',
+          'villeDepart',
+          'dateDepart',
+          'duree',
+          'ordreCriteres',
+          'motivations',
+          'interdits',
+          'departureCity',
+          'departureDate',
+          'duration',
+          'hasChildren',
+          'childrenAges',
+          'companions',
+          'flexibility',
+          'accommodation',
+          'activities',
+          'dietaryRestrictions',
+          'specialRequests',
+          'motivationsDetail',
+          'voyageType',
+          'planningStyle',
+          'paysVisites',
+          'activites',
+          'rythme',
+          'problemeSante',
+          'phobies'
+        ];
+
+        const filteredFormData = Object.keys(formData)
+          .filter(key => allowedFields.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = formData[key];
+            return obj;
+          }, {});
+
+        console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...(initialData?.isModifying && { responseId: initialData.responseId }),
+            participantId: finalParticipantId || 'UNKNOWN',
+            participantRecordId: finalParticipantRecordId,
+            ...filteredFormData
+          }),
+        });
+        
+        console.log('📋 === DEBUG FORMULAIRE ===');
+        console.log('motivationsDetail:', formData.motivationsDetail);
+        console.log('voyageType:', formData.voyageType);
+        console.log('planningStyle:', formData.planningStyle);
+        console.log('paysVisites:', formData.paysVisites);
+        console.log('activites:', formData.activites);
+        console.log('rythme:', formData.rythme);
+        console.log('problemeSante:', formData.problemeSante);
+        console.log('phobies:', formData.phobies);
+        console.log('📋 === FIN DEBUG ===');
+        console.log('🔥 Réponse API:', response.status, response.statusText);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Erreur API complète:', errorText);
+          
+          let errorMessage = 'Erreur lors de la sauvegarde';
+          try {
+            const error = JSON.parse(errorText);
+            errorMessage = error.error || error.message || errorText;
+          } catch {
+            errorMessage = errorText;
+          }
+          
+          throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+        console.log('✅ Formulaire sauvegardé:', result);
+
+        setIsSubmittingForm(false);
+        setFormSubmitted(true);
+
+      } catch (error) {
+        console.error('Erreur soumission formulaire:', error);
+        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     return (
       <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
