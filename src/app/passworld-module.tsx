@@ -1045,7 +1045,7 @@ const handleModifyForm = async () => {
           if (!formData.prenom) { missingFields.push('Prénom'); errorFields.add('prenom'); }
           if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
-          break;
+          break;}
         
         // ✅ NOUVEAU Step 2: Infos voyage
   if (currentStep === 2) {
