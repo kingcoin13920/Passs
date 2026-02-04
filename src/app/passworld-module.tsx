@@ -1045,7 +1045,8 @@ const handleModifyForm = async () => {
           if (!formData.prenom) { missingFields.push('Prénom'); errorFields.add('prenom'); }
           if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
-          break;}
+          break;
+      }
         
         // ✅ NOUVEAU Step 2: Infos voyage
   if (currentStep === 2) {
@@ -1905,10 +1906,9 @@ setFormSubmitted(true);
         </div>
       </div>
     );
-
 // Pages de chargement et confirmation
-if (isSubmittingForm) {
-  return (
+   if (isSubmittingForm) {
+return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
       <div className="text-center">
         <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
