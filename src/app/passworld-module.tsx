@@ -988,6 +988,18 @@ const handleModifyForm = async () => {
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
       budget: initialData?.existingFormData?.budget || '',
+// ✅ Step 2 - Infos voyage
+  enfants: initialData?.existingFormData?.enfants || '',
+  ageEnfant1: initialData?.existingFormData?.ageEnfant1 || '',
+  ageEnfant2: initialData?.existingFormData?.ageEnfant2 || '',
+  ageEnfant3: initialData?.existingFormData?.ageEnfant3 || '',
+  ageEnfant4: initialData?.existingFormData?.ageEnfant4 || '',
+  villeDepart: initialData?.existingFormData?.villeDepart || '',
+  dateDepart: initialData?.existingFormData?.dateDepart || '',
+  duree: initialData?.existingFormData?.duree || '',
+  budget: initialData?.existingFormData?.budget || '',
+  ordreCriteres: initialData?.existingFormData?.ordreCriteres || ['budget', 'climat', 'distance', 'environnements', 'activites'],
+ordreCriteres: ['budget', 'climat', 'distance', 'environnements', 'activites']
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
       motivationsDetail: initialData?.existingFormData?.motivationsDetail || '',
@@ -1009,7 +1021,7 @@ const handleModifyForm = async () => {
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
+    const totalSteps = 9; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1042,10 +1054,47 @@ const handleModifyForm = async () => {
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
           break;
         
-        case 2: // Budget, Distance
-          if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
-          if (!formData.distance) { missingFields.push('Préférence de distance'); errorFields.add('distance'); }
-          break;
+/* ===== VALIDATION STEP 2 (lignes 1052-1061) ===== */
+
+// ✅ Step 2: Infos voyage
+if (currentStep === 2) {
+  if (!formData.enfants) { 
+    missingFields.push('Enfants'); 
+    errorFields.add('enfants'); 
+  }
+  
+  // Valider les âges des enfants si nécessaire
+  if (formData.enfants && formData.enfants !== 'non') {
+    const nbEnfants = parseInt(formData.enfants) || 0;
+    for (let i = 1; i <= nbEnfants; i++) {
+      if (!formData[`ageEnfant${i}`]) {
+        missingFields.push(`Âge de l'enfant ${i}`);
+        errorFields.add(`ageEnfant${i}`);
+      }
+    }
+  }
+  
+  if (!formData.villeDepart) { 
+    missingFields.push('Ville de départ'); 
+    errorFields.add('villeDepart'); 
+  }
+  if (!formData.dateDepart) { 
+    missingFields.push('Date de départ'); 
+    errorFields.add('dateDepart'); 
+  }
+  if (!formData.duree) { 
+    missingFields.push('Durée du voyage'); 
+    errorFields.add('duree'); 
+  }
+  if (!formData.budget) { 
+    missingFields.push('Budget'); 
+    errorFields.add('budget'); 
+  }
+  if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) { 
+    missingFields.push('Ordre des critères'); 
+    errorFields.add('ordreCriteres'); 
+  }
+}
         
         case 3: // Motivations
           if (!formData.motivations || formData.motivations.length === 0) {
@@ -1185,6 +1234,7 @@ const handleModifyForm = async () => {
                 nom: formData.nom,
                 email: formData.email,
                 code: participantCode,
+                
               }],
               tripId: airtableTripRecordId,
             }),
@@ -1206,6 +1256,16 @@ const allowedFields = [
   'distance',
   'climat',
   'environnements',
+  'enfants',
+'ageEnfant1',
+'ageEnfant2',
+'ageEnfant3',
+'ageEnfant4',
+'villeDepart',
+'dateDepart',
+'duree',
+'budget',
+'ordreCriteres'
   'motivations',
   'interdits',
   'departureCity',
@@ -1381,48 +1441,205 @@ setFormSubmitted(true);
             {currentStep === 2 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">💰 Budget et préférences</h2>
+                  <h2 className="fo/* ===== STEP 2 POUR SOLO - EXACTEMENT COMME FORMULAIRE GROUPE ===== */
+/* Remplacer les lignes 1417-1515 par ce code */
+
+{currentStep === 2 && (
+  <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
+    <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+      📋 Informations du voyage
+    </h3>
+    <p className="text-gray-500 mb-6 text-sm">Ces informations personnaliseront votre voyage</p>
+    
+    <div className="grid md:grid-cols-2 gap-4">
+      {/* Y a-t-il des enfants */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Y a-t-il des enfants ? *
+        </label>
+        <select
+          value={formData.enfants}
+          onChange={(e) => updateField('enfants', e.target.value)}
+          required
+          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+            fieldErrors.has('enfants') ? 'border-red-500' : 'border-gray-300'
+          }`}
+        >
+          <option value="">Sélectionner</option>
+          <option value="non">Non</option>
+          <option value="1">1 enfant</option>
+          <option value="2">2 enfants</option>
+          <option value="3">3 enfants</option>
+          <option value="4">4 enfants ou +</option>
+        </select>
+      </div>
+
+      {/* Champs d'âge pour chaque enfant */}
+      {formData.enfants && formData.enfants !== 'non' && formData.enfants !== '' && (
+        <>
+          {Array.from({ length: parseInt(formData.enfants) || 0 }, (_, i) => (
+            <div key={i}>
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Âge de l'enfant {i + 1} *
+              </label>
+              <input
+                type="number"
+                value={formData[`ageEnfant${i + 1}`] || ''}
+                onChange={(e) => updateField(`ageEnfant${i + 1}`, e.target.value)}
+                required
+                min="0"
+                max="17"
+                placeholder="Ex: 5 ans"
+                className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+                  fieldErrors.has(`ageEnfant${i + 1}`) ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Ville de départ */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Ville de départ *
+        </label>
+        <input
+          type="text"
+          value={formData.villeDepart}
+          onChange={(e) => updateField('villeDepart', e.target.value)}
+          required
+          placeholder="Ex: Paris, Lyon..."
+          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+            fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-300'
+          }`}
+        />
+      </div>
+
+      {/* Date de départ souhaitée */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Date de départ souhaitée *
+        </label>
+        <input
+          type="date"
+          value={formData.dateDepart}
+          onChange={(e) => updateField('dateDepart', e.target.value)}
+          required
+          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+            fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-300'
+          }`}
+        />
+      </div>
+
+      {/* Durée du voyage */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Durée du voyage *
+        </label>
+        <select
+          value={formData.duree}
+          onChange={(e) => updateField('duree', e.target.value)}
+          required
+          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+            fieldErrors.has('duree') ? 'border-red-500' : 'border-gray-300'
+          }`}
+        >
+          <option value="">Sélectionner</option>
+          <option value="weekend">Un week-end (2-3 jours)</option>
+          <option value="semaine">Une semaine (5-7 jours)</option>
+          <option value="10jours">10 jours</option>
+          <option value="2semaines">2 semaines</option>
+          <option value="3semaines">3 semaines ou +</option>
+        </select>
+      </div>
+
+      {/* Budget */}
+      <div>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Budget par personne *
+        </label>
+        <select
+          value={formData.budget}
+          onChange={(e) => updateField('budget', e.target.value)}
+          required
+          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
+            fieldErrors.has('budget') ? 'border-red-500' : 'border-gray-300'
+          }`}
+        >
+          <option value="">Sélectionner</option>
+          <option value="<500">Moins de 500€</option>
+          <option value="500-1000">500€ - 1000€</option>
+          <option value="1000-1500">1000€ - 1500€</option>
+          <option value="1500-2000">1500€ - 2000€</option>
+          <option value="2000-3000">2000€ - 3000€</option>
+          <option value=">3000">Plus de 3000€</option>
+        </select>
+      </div>
+    </div>
+
+    {/* Ordre des critères */}
+    <div className="mt-8">
+      <h3 className="text-xl font-bold text-gray-900 mb-2">
+        🎯 Ordre des critères
+      </h3>
+      <p className="text-gray-500 mb-4 text-sm">
+        Glissez-déposez pour classer les critères par ordre d'importance
+      </p>
+
+      <div className="space-y-3">
+        {formData.ordreCriteres.map((criterionId, index) => {
+          const CRITERIA_LIST = [
+            { id: 'budget', label: 'Budget', icon: '💰' },
+            { id: 'climat', label: 'Climat', icon: '🌡️' },
+            { id: 'distance', label: 'Distance', icon: '✈️' },
+            { id: 'environnements', label: 'Environnements', icon: '🏞️' },
+            { id: 'activites', label: 'Activités', icon: '🎯' }
+          ];
+          
+          const criterion = CRITERIA_LIST.find(c => c.id === criterionId);
+          if (!criterion) return null;
+
+          return (
+            <div
+              key={criterionId}
+              draggable
+              onDragStart={() => {
+                window.__draggedCriterionIndex = index;
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const draggedIndex = window.__draggedCriterionIndex;
+                if (draggedIndex === undefined || draggedIndex === index) return;
+
+                const newOrder = [...formData.ordreCriteres];
+                const [removed] = newOrder.splice(draggedIndex, 1);
+                newOrder.splice(index, 0, removed);
+                
+                updateField('ordreCriteres', newOrder);
+                delete window.__draggedCriterionIndex;
+              }}
+              className="bg-white border-2 border-gray-200 rounded-3xl p-6 cursor-move hover:border-gray-400 hover:shadow-lg transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-3xl">{criterion.icon}</span>
+                  <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
                 </div>
-
-                <div className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?*"}</label>
-                      <select
-                        value={formData.budget}
-                        onChange={(e) => updateField('budget', e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">Sélectionner</option>
-                        <option value="<500">{"< 500€"}</option>
-                        <option value="500-1000">500-1000€</option>
-                        <option value="1000-2000">1000-2000€</option>
-                        <option value="2000-3000">2000-3000€</option>
-                        <option value="3000+">3000€+</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">Préférence de distance *</label>
-                      <select
-                        value={formData.distance}
-                        onChange={(e) => updateField('distance', e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">Sélectionner</option>
-                        <option value="proche">Proche (Europe)</option>
-                        <option value="moyen">Moyen (Afrique, Moyen-Orient)</option>
-                        <option value="loin">Loin (Amériques, Asie, Océanie)</option>
-                        <option value="peu-importe">Peu importe</option>
-                      </select>
-                    </div>
-                  </div>
+                <div className="bg-gradient-to-br from-gray-500 to-gray-700 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
+                  #{index + 1}
                 </div>
               </div>
-            )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+)}
 
             {/* Step 3: Motivations */}
             {currentStep === 3 && (
