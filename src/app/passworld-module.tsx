@@ -188,8 +188,7 @@ const StripeAPI = {
     return result;
   }
 };
-
-  const PassworldModule = () => {
+const PassworldModule = () => {  // ✅ Pas d'indentation
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
   const [selectedPrice, setSelectedPrice] = useState(29);
@@ -987,18 +986,13 @@ const handleModifyForm = async () => {
       nom: initialData?.nom || '',
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      budget: initialData?.existingFormData?.budget || '',
-// ✅ Step 2 - Infos voyage
-  enfants: initialData?.existingFormData?.enfants || '',
-  ageEnfant1: initialData?.existingFormData?.ageEnfant1 || '',
-  ageEnfant2: initialData?.existingFormData?.ageEnfant2 || '',
-  ageEnfant3: initialData?.existingFormData?.ageEnfant3 || '',
-  ageEnfant4: initialData?.existingFormData?.ageEnfant4 || '',
+      hasChildren: initialData?.existingFormData?.hasChildren || 'Non',
+  childrenAges: initialData?.existingFormData?.childrenAges || '',
   villeDepart: initialData?.existingFormData?.villeDepart || '',
   dateDepart: initialData?.existingFormData?.dateDepart || '',
   duree: initialData?.existingFormData?.duree || '',
-  budget: initialData?.existingFormData?.budget || '',
-  ordreCriteres: initialData?.existingFormData?.ordreCriteres || ['budget', 'climat', 'distance', 'environnements', 'activites'],
+  ordreCriteres: initialData?.existingFormData?.ordreCriteres || [],
+      budget: initialData?.existingFormData?.budget || '',
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
       motivationsDetail: initialData?.existingFormData?.motivationsDetail || '',
@@ -1020,7 +1014,7 @@ const handleModifyForm = async () => {
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
+    const totalSteps = 10; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1052,86 +1046,83 @@ const handleModifyForm = async () => {
           if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
           break;
-        
-        case 2: // Infos voyage
-          if (!formData.enfants) { 
-            missingFields.push('Enfants'); 
-            errorFields.add('enfants'); 
-          }
-          if (formData.enfants && formData.enfants !== 'non') {
-            const nbEnfants = parseInt(formData.enfants) || 0;
-            for (let i = 1; i <= nbEnfants; i++) {
-              if (!formData[`ageEnfant${i}`]) {
-                missingFields.push(`Âge de l'enfant ${i}`);
-                errorFields.add(`ageEnfant${i}`);
-              }
-            }
-          }
-          if (!formData.villeDepart) { 
-            missingFields.push('Ville de départ'); 
-            errorFields.add('villeDepart'); 
-          }
-          if (!formData.dateDepart) { 
-            missingFields.push('Date de départ'); 
-            errorFields.add('dateDepart'); 
-          }
-          if (!formData.duree) { 
-            missingFields.push('Durée du voyage'); 
-            errorFields.add('duree'); 
-          }
-          if (!formData.budget) { 
-            missingFields.push('Budget'); 
-            errorFields.add('budget'); 
-          }
-          if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) { 
-            missingFields.push('Ordre des critères'); 
-            errorFields.add('ordreCriteres'); 
-          }
-          break;
-        
-        case 3: // Motivations
-          if (!formData.motivations || formData.motivations.length === 0) {
-            missingFields.push('Motivations (sélectionnez au moins une)');
-            errorFields.add('motivations');
-          }
-          break;
-        
-        case 4: // Type de voyage
-          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
-          break;
-        
-        case 5: // Planning
-          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
-          break;
-        
-        case 6: // Environnements
-          if (!formData.environnements || formData.environnements.length === 0) {
-            missingFields.push('Environnements (sélectionnez au moins un)');
-            errorFields.add('environnements');
-          }
-          break;
-        
-        case 7: // Climat
-          if (!formData.climat) { missingFields.push('Climat préféré'); errorFields.add('climat'); }
-          break;
-        
-        case 8: // Activités
-          if (!formData.activites || formData.activites.length === 0) {
-            missingFields.push('Activités (sélectionnez au moins une)');
-            errorFields.add('activites');
-          }
-          break;
       }
+        
+        // ✅ NOUVEAU Step 2: Infos voyage
+  if (currentStep === 2) {
+    if (!formData.hasChildren) { missingFields.push('Enfants'); errorFields.add('hasChildren'); }
+    if (formData.hasChildren === 'Oui' && !formData.childrenAges) {
+      missingFields.push('Âge des enfants');
+      errorFields.add('childrenAges');
+    }
+    if (!formData.villeDepart) { missingFields.push('Ville de départ'); errorFields.add('villeDepart'); }
+    if (!formData.dateDepart) { missingFields.push('Date de départ'); errorFields.add('dateDepart'); }
+    if (!formData.duree) { missingFields.push('Durée du voyage'); errorFields.add('duree'); }
+  }
+  
+  // Step 3: Budget
+  if (currentStep === 3) {
+    if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
+    if (!formData.distance) { missingFields.push('Distance'); errorFields.add('distance'); }
+  }
+  
+  // Step 4: Motivations
+  if (currentStep === 4) {
+    if (!formData.motivations || formData.motivations.length === 0) {
+      missingFields.push('Motivations');
+      errorFields.add('motivations');
+    }
+  }
+  
+  // Step 5: Type de voyage
+  if (currentStep === 5) {
+    if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+  }
+  
+  // Step 6: Planning
+  if (currentStep === 6) {
+    if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+  }
+  
+  // Step 7: Environnements
+  if (currentStep === 7) {
+    if (!formData.environnements || formData.environnements.length === 0) {
+      missingFields.push('Environnements');
+      errorFields.add('environnements');
+    }
+  }
+  
+  // Step 8: Climat
+  if (currentStep === 8) {
+    if (!formData.climat) { missingFields.push('Climat'); errorFields.add('climat'); }
+  }
+  
+  // Step 9: Activités
+  if (currentStep === 9) {
+    if (!formData.activites || formData.activites.length === 0) {
+      missingFields.push('Activités');
+      errorFields.add('activites');
+    }
+  }
+  
+  // ✅ NOUVEAU Step 10: Ordre des critères
+  if (currentStep === 10) {
+    if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) {
+      missingFields.push('Ordre des critères');
+      errorFields.add('ordreCriteres');
+    }
+  }
+  
+  if (missingFields.length > 0) {
+    setFieldErrors(errorFields);
+    alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
+    return;
+  }
+  
+  setFieldErrors(new Set());
+  if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
+};
       
-      if (missingFields.length > 0) {
-        setFieldErrors(errorFields);
-        alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
-        return;
-      }
-      
-      setFieldErrors(new Set());
-      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
-    };
 
     const prevStep = () => {
       if (currentStep > 1) setCurrentStep(currentStep - 1);
@@ -1141,6 +1132,10 @@ const handleModifyForm = async () => {
       try {
         setLoading(true);
         
+        // Validation déjà faite étape par étape dans nextStep()
+        // Pas besoin de re-valider ici
+        
+        // En mode démo
         if (IS_DEMO_MODE) {
           console.log('Mode démo - Formulaire soumis:', formData);
           alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
@@ -1148,17 +1143,22 @@ const handleModifyForm = async () => {
           return;
         }
 
+        // Si c'est une modification, utiliser l'API update
         const endpoint = initialData?.isModifying 
           ? '/api/airtable/update-form'
           : '/api/airtable/save-form';
 
+        // Vérifier si c'est un code cadeau solo (pas encore de participant créé)
         let finalParticipantId = initialData?.participantId;
         let finalParticipantRecordId = initialData?.participantRecordId;
         
         if (tripData.isGiftCard && !finalParticipantId) {
           console.log('🎁 Code cadeau solo - Création du participant...');
           
-          const participantCode = tripData.inputCode;
+          // Générer un code pour le participant
+          const participantCode = tripData.inputCode; // Utiliser le code cadeau comme code participant
+          
+          // Créer le voyage dans Airtable
           const tripId = `TRIP-${Date.now()}`;
           const tripResponse = await fetch('/api/airtable/create-trip', {
             method: 'POST',
@@ -1177,6 +1177,7 @@ const handleModifyForm = async () => {
           const airtableTripRecordId = tripDataResponse.id;
           console.log('✅ Voyage créé:', airtableTripRecordId);
           
+          // Créer le participant
           const participantResponse = await fetch('/api/airtable/create-participant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1195,6 +1196,7 @@ const handleModifyForm = async () => {
           finalParticipantRecordId = participantData.id;
           console.log('✅ Participant créé:', finalParticipantId);
           
+          // Marquer la carte cadeau comme utilisée
           await fetch('/api/airtable/update-gift-card-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1205,6 +1207,7 @@ const handleModifyForm = async () => {
           });
           console.log('✅ Carte cadeau marquée comme utilisée');
           
+          // Envoyer l'email avec le code
           await fetch('/api/emails/send-participant-codes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1221,104 +1224,101 @@ const handleModifyForm = async () => {
           console.log('✅ Email envoyé');
         }
 
-        console.log('📤 Envoi formulaire vers:', endpoint);
-        console.log('📤 Données:', {
-          participantId: finalParticipantId || 'UNKNOWN',
-          participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
-          isModifying: initialData?.isModifying,
-          responseId: initialData?.responseId,
-        });
+console.log('📤 Envoi formulaire vers:', endpoint);
+console.log('📤 Données:', {
+  participantId: finalParticipantId || 'UNKNOWN',
+  participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
+  isModifying: initialData?.isModifying,
+  responseId: initialData?.responseId,
+});
 
-        const allowedFields = [
-          'budget',
-          'distance',
-          'climat',
-          'environnements',
-          'enfants',
-          'ageEnfant1',
-          'ageEnfant2',
-          'ageEnfant3',
-          'ageEnfant4',
-          'villeDepart',
-          'dateDepart',
-          'duree',
-          'ordreCriteres',
-          'motivations',
-          'interdits',
-          'departureCity',
-          'departureDate',
-          'duration',
-          'hasChildren',
-          'childrenAges',
-          'companions',
-          'flexibility',
-          'accommodation',
-          'activities',
-          'dietaryRestrictions',
-          'specialRequests',
-          'motivationsDetail',
-          'voyageType',
-          'planningStyle',
-          'paysVisites',
-          'activites',
-          'rythme',
-          'problemeSante',
-          'phobies'
-        ];
+// Liste des champs qui existent dans Airtable
+const allowedFields = [
+  'budget',
+  'distance',
+  'climat',
+  'environnements',
+  'motivations',
+  'interdits',
+  'departureCity',
+  'departureDate',
+  'duration',
+  'hasChildren',
+  'childrenAges',
+  'companions',
+  'flexibility',
+  'accommodation',
+  'activities',
+  'dietaryRestrictions',
+  'specialRequests',
+  'motivationsDetail',
+  'voyageType',
+  'planningStyle',
+  'paysVisites',
+  'activites',
+  'rythme',
+  'problemeSante',
+  'phobies',
+  'villeDepart',
+  'dateDepart',
+  'duree',
+  'ordreCriteres'
+];
 
-        const filteredFormData = Object.keys(formData)
-          .filter(key => allowedFields.includes(key))
-          .reduce((obj, key) => {
-            obj[key] = formData[key];
-            return obj;
-          }, {});
+// Filtrer formData pour ne garder que les champs autorisés
+const filteredFormData = Object.keys(formData)
+  .filter(key => allowedFields.includes(key))
+  .reduce((obj, key) => {
+    obj[key] = formData[key];
+    return obj;
+  }, {});
 
-        console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
+console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
 
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...(initialData?.isModifying && { responseId: initialData.responseId }),
-            participantId: finalParticipantId || 'UNKNOWN',
-            participantRecordId: finalParticipantRecordId,
-            ...filteredFormData
-          }),
-        });
+const response = await fetch(endpoint, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    ...(initialData?.isModifying && { responseId: initialData.responseId }),
+    participantId: finalParticipantId || 'UNKNOWN',
+    participantRecordId: finalParticipantRecordId,
+    ...filteredFormData
+  }),
+});
+console.log('🔍 === DEBUG FORMULAIRE ===');
+console.log('motivationsDetail:', formData.motivationsDetail);
+console.log('voyageType:', formData.voyageType);
+console.log('planningStyle:', formData.planningStyle);
+console.log('paysVisites:', formData.paysVisites);
+console.log('activites:', formData.activites);
+console.log('rythme:', formData.rythme);
+console.log('problemeSante:', formData.problemeSante);
+console.log('phobies:', formData.phobies);
+console.log('🔍 === FIN DEBUG ===');
+console.log('📥 Réponse API:', response.status, response.statusText);
+
+if (!response.ok) {
+  const errorText = await response.text();
+  console.error('❌ Erreur API complète:', errorText);
+  
+  let errorMessage = 'Erreur lors de la sauvegarde';
+  try {
+    const error = JSON.parse(errorText);
+    errorMessage = error.error || error.message || errorText;
+  } catch {
+    errorMessage = errorText;
+  }
+  
+  throw new Error(errorMessage);
+}
+
+const result = await response.json();
+console.log('✅ Formulaire sauvegardé:', result);
+
+       setIsSubmittingForm(false);
+setFormSubmitted(true);
         
-        console.log('📋 === DEBUG FORMULAIRE ===');
-        console.log('motivationsDetail:', formData.motivationsDetail);
-        console.log('voyageType:', formData.voyageType);
-        console.log('planningStyle:', formData.planningStyle);
-        console.log('paysVisites:', formData.paysVisites);
-        console.log('activites:', formData.activites);
-        console.log('rythme:', formData.rythme);
-        console.log('problemeSante:', formData.problemeSante);
-        console.log('phobies:', formData.phobies);
-        console.log('📋 === FIN DEBUG ===');
-        console.log('🔥 Réponse API:', response.status, response.statusText);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('❌ Erreur API complète:', errorText);
-          
-          let errorMessage = 'Erreur lors de la sauvegarde';
-          try {
-            const error = JSON.parse(errorText);
-            errorMessage = error.error || error.message || errorText;
-          } catch {
-            errorMessage = errorText;
-          }
-          
-          throw new Error(errorMessage);
-        }
-
-        const result = await response.json();
-        console.log('✅ Formulaire sauvegardé:', result);
-
-        setIsSubmittingForm(false);
-        setFormSubmitted(true);
-
+      
       } catch (error) {
         console.error('Erreur soumission formulaire:', error);
         alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
@@ -1327,41 +1327,10 @@ const handleModifyForm = async () => {
       }
     };
 
-    if (isSubmittingForm) {
-      return (
-        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
-          <div className="text-center">
-            <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
-            <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
-            <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
-          </div>
-        </div>
-      );
-    }
-
-    if (formSubmitted) {
-      return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
-          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-10 h-10 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Formulaire envoyé avec succès !</h2>
-            <p className="text-gray-600 mb-6">Merci pour vos réponses. Nous préparons votre voyage personnalisé.</p>
-            <button
-              onClick={onBack}
-              className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-900 transition-colors"
-            >
-              Retour à l'accueil
-            </button>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-4xl mx-auto">
+          {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm font-semibold text-gray-600">Étape {currentStep} sur {totalSteps}</span>
@@ -1378,6 +1347,7 @@ const handleModifyForm = async () => {
           </div>
 
           <div className="bg-white rounded-4xl shadow-soft-lg p-8 md:p-10 animate-scale-in">
+            {/* Step 1: Infos personnelles */}
             {currentStep === 1 && (
               <div>
                 <div className="text-center mb-8">
@@ -1412,15 +1382,178 @@ const handleModifyForm = async () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Email *</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Date de naissance</label>
+                    <input
+                      type="date"
+                      value={formData.dateNaissance}
+                      onChange={(e) => updateField('dateNaissance', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">E-mail *</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
                       readOnly={!!initialData?.email}
-                      className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                        fieldErrors.has('email') ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } ${initialData?.email ? 'bg-gray-50' : ''}`}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${initialData?.email ? 'bg-gray-50' : ''}`}
+                      placeholder="john.martin@gmail.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="flex items-center">
+                    <input type="checkbox" className="w-4 h-4 text-gray-700 border-gray-300 rounded" />
+                    <span className="ml-2 text-sm text-gray-600">J'accepte d'être recontacté·e pour organiser mon voyage.</span>
+                  </label>
+                </div>
+              </div>
+            )}
+
+           {/* ✅ NOUVEAU Step 2: Informations du voyage */}
+{currentStep === 2 && (
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Informations du voyage</h2>
+    
+    {/* Enfants */}
+    <div>
+      <label className="block text-sm font-medium text-gray-900 mb-3">
+        Voyagez-vous avec des enfants ? *
+      </label>
+      <div className="space-y-2">
+        {['Oui', 'Non'].map((option) => (
+          <label
+            key={option}
+            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+              formData.hasChildren === option
+                ? 'border-black bg-gray-50'
+                : 'border-gray-200 hover:border-gray-300'
+            } ${fieldErrors.has('hasChildren') ? 'border-red-500' : ''}`}
+          >
+            <input
+              type="radio"
+              name="hasChildren"
+              checked={formData.hasChildren === option}
+              onChange={() => updateField('hasChildren', option)}
+              className="mr-3"
+            />
+            <span className="font-medium">{option}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+    
+    {/* Âge des enfants (conditionnel) */}
+    {formData.hasChildren === 'Oui' && (
+      <div>
+        <label className="block text-sm font-medium text-gray-900 mb-2">
+          Âge des enfants *
+        </label>
+        <input
+          type="text"
+          value={formData.childrenAges}
+          onChange={(e) => updateField('childrenAges', e.target.value)}
+          placeholder="Ex: 5 ans, 8 ans, 12 ans"
+          className={`w-full p-3 border-2 rounded-lg ${
+            fieldErrors.has('childrenAges') ? 'border-red-500' : 'border-gray-200'
+          }`}
+        />
+      </div>
+    )}
+    
+    {/* Ville de départ */}
+    <div>
+      <label className="block text-sm font-medium text-gray-900 mb-2">
+        Ville de départ *
+      </label>
+      <input
+        type="text"
+        value={formData.villeDepart}
+        onChange={(e) => updateField('villeDepart', e.target.value)}
+        placeholder="Ex: Paris, Lyon, Marseille"
+        className={`w-full p-3 border-2 rounded-lg ${
+          fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-200'
+        }`}
+      />
+    </div>
+    
+    {/* Date de départ */}
+    <div>
+      <label className="block text-sm font-medium text-gray-900 mb-2">
+        Date de départ souhaitée *
+      </label>
+      <input
+        type="date"
+        value={formData.dateDepart}
+        onChange={(e) => updateField('dateDepart', e.target.value)}
+        className={`w-full p-3 border-2 rounded-lg ${
+          fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-200'
+        }`}
+      />
+    </div>
+    
+    {/* Durée */}
+    <div>
+      <label className="block text-sm font-medium text-gray-900 mb-2">
+        Durée du voyage (en jours) *
+      </label>
+      <input
+        type="number"
+        value={formData.duree}
+        onChange={(e) => updateField('duree', e.target.value)}
+        placeholder="Ex: 7, 10, 14"
+        min="1"
+        className={`w-full p-3 border-2 rounded-lg ${
+          fieldErrors.has('duree') ? 'border-red-500' : 'border-gray-200'
+        }`}
+      />
+    </div>
+  </div>
+)}
+
+            {/* Step 3: Motivations */}
+            {currentStep === 3 && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">✨ Vos motivations, notre boussole</h2>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">Que recherchez-vous ?</label>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {[
+                        'Besoin de déconnexion',
+                        'Envie de changement',
+                        'Célébration (anniversaire, lune de miel, etc.)',
+                        "Retrouver l'inspiration",
+                        'Recharger les batteries',
+                        'Travailler à distance',
+                        'Autre (Précisez)'
+                      ].map((option) => (
+                        <label key={option} className="flex items-center p-3 border-2 border-gray-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.motivations.includes(option)}
+                            onChange={() => toggleMultiSelect('motivations', option)}
+                            className="w-4 h-4 text-gray-700 border-gray-300 rounded"
+                          />
+                          <span className="ml-3 text-sm text-gray-600">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Précisez</label>
+                    <textarea
+                      value={formData.motivationsDetail}
+                      onChange={(e) => updateField('motivationsDetail', e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -1651,7 +1784,95 @@ const handleModifyForm = async () => {
             {/* Step 9 supprimé (fusionné avec Step 8) */}
             {currentStep === 9 && null}
 
-            {/* Step 10 (Formule) supprimé */}
+{/* ✅ NOUVEAU Step 10: Ordre des critères */}
+{currentStep === 10 && (
+  <div className="space-y-6">
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Ordre des critères</h2>
+    
+    <p className="text-gray-700 mb-4">
+      Classez les critères par ordre d'importance (du plus important au moins important).
+      Glissez-déposez pour réorganiser.
+    </p>
+    
+    <div className="space-y-3">
+      {[
+        { id: 'budget', label: 'Budget', icon: '💰' },
+        { id: 'distance', label: 'Distance', icon: '✈️' },
+        { id: 'climat', label: 'Climat', icon: '🌡️' },
+        { id: 'environnements', label: 'Environnements', icon: '🏞️' },
+        { id: 'activites', label: 'Activités', icon: '🎯' },
+        { id: 'planningStyle', label: 'Style de planning', icon: '📅' },
+      ].map((critere, index) => (
+        <div
+          key={critere.id}
+          className={`p-4 border-2 rounded-lg cursor-move ${
+            formData.ordreCriteres.includes(critere.id)
+              ? 'border-black bg-gray-50'
+              : 'border-gray-200'
+          }`}
+          draggable
+          onDragStart={(e) => {
+            e.dataTransfer.setData('critereId', critere.id);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const draggedId = e.dataTransfer.getData('critereId');
+            const newOrder = [...formData.ordreCriteres];
+            const draggedIndex = newOrder.indexOf(draggedId);
+            const dropIndex = newOrder.indexOf(critere.id);
+            
+            if (draggedIndex !== -1) {
+              newOrder.splice(draggedIndex, 1);
+            }
+            if (dropIndex !== -1) {
+              newOrder.splice(dropIndex, 0, draggedId);
+            } else {
+              newOrder.push(draggedId);
+            }
+            
+            updateField('ordreCriteres', newOrder);
+          }}
+          onClick={() => {
+            if (!formData.ordreCriteres.includes(critere.id)) {
+              updateField('ordreCriteres', [...formData.ordreCriteres, critere.id]);
+            }
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{critere.icon}</span>
+              <span className="font-medium">{critere.label}</span>
+            </div>
+            {formData.ordreCriteres.includes(critere.id) && (
+              <span className="text-sm font-bold text-gray-600">
+                #{formData.ordreCriteres.indexOf(critere.id) + 1}
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    {formData.ordreCriteres.length > 0 && (
+      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+        <p className="text-sm font-medium text-blue-900">
+          Ordre actuel : {formData.ordreCriteres.map((id, i) => {
+            const critere = [
+              { id: 'budget', label: 'Budget' },
+              { id: 'distance', label: 'Distance' },
+              { id: 'climat', label: 'Climat' },
+              { id: 'environnements', label: 'Environnements' },
+              { id: 'activites', label: 'Activités' },
+              { id: 'planningStyle', label: 'Planning' },
+            ].find(c => c.id === id);
+            return critere?.label;
+          }).join(' > ')}
+        </p>
+      </div>
+    )}
+  </div>
+)}
 
             {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
@@ -1685,11 +1906,9 @@ const handleModifyForm = async () => {
         </div>
       </div>
     );
-  };
-
 // Pages de chargement et confirmation
-if (isSubmittingForm) {
-  return (
+   if (isSubmittingForm) {
+return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
       <div className="text-center">
         <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
@@ -1806,6 +2025,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       </div>
     );
   }
+     }; 
   const Router = () => {
     return (
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
