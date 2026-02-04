@@ -188,7 +188,8 @@ const StripeAPI = {
     return result;
   }
 };
-const PassworldModule = () => {  // ✅ Pas d'indentation
+
+  const PassworldModule = () => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
   const [selectedPrice, setSelectedPrice] = useState(29);
@@ -986,12 +987,6 @@ const handleModifyForm = async () => {
       nom: initialData?.nom || '',
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      hasChildren: initialData?.existingFormData?.hasChildren || 'Non',
-  childrenAges: initialData?.existingFormData?.childrenAges || '',
-  villeDepart: initialData?.existingFormData?.villeDepart || '',
-  dateDepart: initialData?.existingFormData?.dateDepart || '',
-  duree: initialData?.existingFormData?.duree || '',
-  ordreCriteres: initialData?.existingFormData?.ordreCriteres || [],
       budget: initialData?.existingFormData?.budget || '',
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
@@ -1014,7 +1009,7 @@ const handleModifyForm = async () => {
     // LOG pour voir le formData initialisé
     console.log('📝 FormData initialisé:', formData);
 
-    const totalSteps = 10; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
+    const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1046,83 +1041,56 @@ const handleModifyForm = async () => {
           if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
           break;
-      }
         
-        // ✅ NOUVEAU Step 2: Infos voyage
-  if (currentStep === 2) {
-    if (!formData.hasChildren) { missingFields.push('Enfants'); errorFields.add('hasChildren'); }
-    if (formData.hasChildren === 'Oui' && !formData.childrenAges) {
-      missingFields.push('Âge des enfants');
-      errorFields.add('childrenAges');
-    }
-    if (!formData.villeDepart) { missingFields.push('Ville de départ'); errorFields.add('villeDepart'); }
-    if (!formData.dateDepart) { missingFields.push('Date de départ'); errorFields.add('dateDepart'); }
-    if (!formData.duree) { missingFields.push('Durée du voyage'); errorFields.add('duree'); }
-  }
-  
-  // Step 3: Budget
-  if (currentStep === 3) {
-    if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
-    if (!formData.distance) { missingFields.push('Distance'); errorFields.add('distance'); }
-  }
-  
-  // Step 4: Motivations
-  if (currentStep === 4) {
-    if (!formData.motivations || formData.motivations.length === 0) {
-      missingFields.push('Motivations');
-      errorFields.add('motivations');
-    }
-  }
-  
-  // Step 5: Type de voyage
-  if (currentStep === 5) {
-    if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
-  }
-  
-  // Step 6: Planning
-  if (currentStep === 6) {
-    if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
-  }
-  
-  // Step 7: Environnements
-  if (currentStep === 7) {
-    if (!formData.environnements || formData.environnements.length === 0) {
-      missingFields.push('Environnements');
-      errorFields.add('environnements');
-    }
-  }
-  
-  // Step 8: Climat
-  if (currentStep === 8) {
-    if (!formData.climat) { missingFields.push('Climat'); errorFields.add('climat'); }
-  }
-  
-  // Step 9: Activités
-  if (currentStep === 9) {
-    if (!formData.activites || formData.activites.length === 0) {
-      missingFields.push('Activités');
-      errorFields.add('activites');
-    }
-  }
-  
-  // ✅ NOUVEAU Step 10: Ordre des critères
-  if (currentStep === 10) {
-    if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) {
-      missingFields.push('Ordre des critères');
-      errorFields.add('ordreCriteres');
-    }
-  }
-  
-  if (missingFields.length > 0) {
-    setFieldErrors(errorFields);
-    alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
-    return;
-  }
-  
-  setFieldErrors(new Set());
-  if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
-};
+        case 2: // Budget, Distance
+          if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
+          if (!formData.distance) { missingFields.push('Préférence de distance'); errorFields.add('distance'); }
+          break;
+        
+        case 3: // Motivations
+          if (!formData.motivations || formData.motivations.length === 0) {
+            missingFields.push('Motivations (sélectionnez au moins une)');
+            errorFields.add('motivations');
+          }
+          break;
+        
+        case 4: // Type de voyage
+          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+          break;
+        
+        case 5: // Planning
+          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+          break;
+        
+        case 6: // Environnements
+          if (!formData.environnements || formData.environnements.length === 0) {
+            missingFields.push('Environnements (sélectionnez au moins un)');
+            errorFields.add('environnements');
+          }
+          break;
+        
+        case 7: // Climat
+          if (!formData.climat) { missingFields.push('Climat préféré'); errorFields.add('climat'); }
+          break;
+        
+        case 8: // Activités
+          if (!formData.activites || formData.activites.length === 0) {
+            missingFields.push('Activités (sélectionnez au moins une)');
+            errorFields.add('activites');
+          }
+          break;
+      }
       
+      if (missingFields.length > 0) {
+        setFieldErrors(errorFields);
+        alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
+        return;
+      }
+      
+      // Réinitialiser les erreurs et passer au step suivant
+      setFieldErrors(new Set());
+      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
+    };
 
     const prevStep = () => {
       if (currentStep > 1) setCurrentStep(currentStep - 1);
@@ -1258,11 +1226,7 @@ const allowedFields = [
   'activites',
   'rythme',
   'problemeSante',
-  'phobies',
-  'villeDepart',
-  'dateDepart',
-  'duree',
-  'ordreCriteres'
+  'phobies'
 ];
 
 // Filtrer formData pour ne garder que les champs autorisés
@@ -1413,106 +1377,52 @@ setFormSubmitted(true);
               </div>
             )}
 
-           {/* ✅ NOUVEAU Step 2: Informations du voyage */}
-{currentStep === 2 && (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Informations du voyage</h2>
-    
-    {/* Enfants */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-3">
-        Voyagez-vous avec des enfants ? *
-      </label>
-      <div className="space-y-2">
-        {['Oui', 'Non'].map((option) => (
-          <label
-            key={option}
-            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-              formData.hasChildren === option
-                ? 'border-black bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300'
-            } ${fieldErrors.has('hasChildren') ? 'border-red-500' : ''}`}
-          >
-            <input
-              type="radio"
-              name="hasChildren"
-              checked={formData.hasChildren === option}
-              onChange={() => updateField('hasChildren', option)}
-              className="mr-3"
-            />
-            <span className="font-medium">{option}</span>
-          </label>
-        ))}
-      </div>
-    </div>
-    
-    {/* Âge des enfants (conditionnel) */}
-    {formData.hasChildren === 'Oui' && (
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          Âge des enfants *
-        </label>
-        <input
-          type="text"
-          value={formData.childrenAges}
-          onChange={(e) => updateField('childrenAges', e.target.value)}
-          placeholder="Ex: 5 ans, 8 ans, 12 ans"
-          className={`w-full p-3 border-2 rounded-lg ${
-            fieldErrors.has('childrenAges') ? 'border-red-500' : 'border-gray-200'
-          }`}
-        />
-      </div>
-    )}
-    
-    {/* Ville de départ */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
-        Ville de départ *
-      </label>
-      <input
-        type="text"
-        value={formData.villeDepart}
-        onChange={(e) => updateField('villeDepart', e.target.value)}
-        placeholder="Ex: Paris, Lyon, Marseille"
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-200'
-        }`}
-      />
-    </div>
-    
-    {/* Date de départ */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
-        Date de départ souhaitée *
-      </label>
-      <input
-        type="date"
-        value={formData.dateDepart}
-        onChange={(e) => updateField('dateDepart', e.target.value)}
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-200'
-        }`}
-      />
-    </div>
-    
-    {/* Durée */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
-        Durée du voyage (en jours) *
-      </label>
-      <input
-        type="number"
-        value={formData.duree}
-        onChange={(e) => updateField('duree', e.target.value)}
-        placeholder="Ex: 7, 10, 14"
-        min="1"
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('duree') ? 'border-red-500' : 'border-gray-200'
-        }`}
-      />
-    </div>
-  </div>
-)}
+            {/* Step 2: Plan de vol */}
+            {currentStep === 2 && (
+              <div>
+                <div className="text-center mb-8">
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">💰 Budget et préférences</h2>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?*"}</label>
+                      <select
+                        value={formData.budget}
+                        onChange={(e) => updateField('budget', e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      >
+                        <option value="">Sélectionner</option>
+                        <option value="<500">{"< 500€"}</option>
+                        <option value="500-1000">500-1000€</option>
+                        <option value="1000-2000">1000-2000€</option>
+                        <option value="2000-3000">2000-3000€</option>
+                        <option value="3000+">3000€+</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">Préférence de distance *</label>
+                      <select
+                        value={formData.distance}
+                        onChange={(e) => updateField('distance', e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      >
+                        <option value="">Sélectionner</option>
+                        <option value="proche">Proche (Europe)</option>
+                        <option value="moyen">Moyen (Afrique, Moyen-Orient)</option>
+                        <option value="loin">Loin (Amériques, Asie, Océanie)</option>
+                        <option value="peu-importe">Peu importe</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Step 3: Motivations */}
             {currentStep === 3 && (
@@ -1784,95 +1694,7 @@ setFormSubmitted(true);
             {/* Step 9 supprimé (fusionné avec Step 8) */}
             {currentStep === 9 && null}
 
-{/* ✅ NOUVEAU Step 10: Ordre des critères */}
-{currentStep === 10 && (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Ordre des critères</h2>
-    
-    <p className="text-gray-700 mb-4">
-      Classez les critères par ordre d'importance (du plus important au moins important).
-      Glissez-déposez pour réorganiser.
-    </p>
-    
-    <div className="space-y-3">
-      {[
-        { id: 'budget', label: 'Budget', icon: '💰' },
-        { id: 'distance', label: 'Distance', icon: '✈️' },
-        { id: 'climat', label: 'Climat', icon: '🌡️' },
-        { id: 'environnements', label: 'Environnements', icon: '🏞️' },
-        { id: 'activites', label: 'Activités', icon: '🎯' },
-        { id: 'planningStyle', label: 'Style de planning', icon: '📅' },
-      ].map((critere, index) => (
-        <div
-          key={critere.id}
-          className={`p-4 border-2 rounded-lg cursor-move ${
-            formData.ordreCriteres.includes(critere.id)
-              ? 'border-black bg-gray-50'
-              : 'border-gray-200'
-          }`}
-          draggable
-          onDragStart={(e) => {
-            e.dataTransfer.setData('critereId', critere.id);
-          }}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            const draggedId = e.dataTransfer.getData('critereId');
-            const newOrder = [...formData.ordreCriteres];
-            const draggedIndex = newOrder.indexOf(draggedId);
-            const dropIndex = newOrder.indexOf(critere.id);
-            
-            if (draggedIndex !== -1) {
-              newOrder.splice(draggedIndex, 1);
-            }
-            if (dropIndex !== -1) {
-              newOrder.splice(dropIndex, 0, draggedId);
-            } else {
-              newOrder.push(draggedId);
-            }
-            
-            updateField('ordreCriteres', newOrder);
-          }}
-          onClick={() => {
-            if (!formData.ordreCriteres.includes(critere.id)) {
-              updateField('ordreCriteres', [...formData.ordreCriteres, critere.id]);
-            }
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{critere.icon}</span>
-              <span className="font-medium">{critere.label}</span>
-            </div>
-            {formData.ordreCriteres.includes(critere.id) && (
-              <span className="text-sm font-bold text-gray-600">
-                #{formData.ordreCriteres.indexOf(critere.id) + 1}
-              </span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-    
-    {formData.ordreCriteres.length > 0 && (
-      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-        <p className="text-sm font-medium text-blue-900">
-          Ordre actuel : {formData.ordreCriteres.map((id, i) => {
-            const critere = [
-              { id: 'budget', label: 'Budget' },
-              { id: 'distance', label: 'Distance' },
-              { id: 'climat', label: 'Climat' },
-              { id: 'environnements', label: 'Environnements' },
-              { id: 'activites', label: 'Activités' },
-              { id: 'planningStyle', label: 'Planning' },
-            ].find(c => c.id === id);
-            return critere?.label;
-          }).join(' > ')}
-        </p>
-      </div>
-    )}
-  </div>
-)}
+            {/* Step 10 (Formule) supprimé */}
 
             {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t">
@@ -1906,9 +1728,11 @@ setFormSubmitted(true);
         </div>
       </div>
     );
+  };
+
 // Pages de chargement et confirmation
-   if (isSubmittingForm) {
-return (
+if (isSubmittingForm) {
+  return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
       <div className="text-center">
         <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
@@ -2025,7 +1849,6 @@ if (paymentSuccess && tripData.travelers === 1) {
       </div>
     );
   }
-     }; 
   const Router = () => {
     return (
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
