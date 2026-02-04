@@ -999,7 +999,6 @@ const handleModifyForm = async () => {
   duree: initialData?.existingFormData?.duree || '',
   budget: initialData?.existingFormData?.budget || '',
   ordreCriteres: initialData?.existingFormData?.ordreCriteres || ['budget', 'climat', 'distance', 'environnements', 'activites'],
-ordreCriteres: ['budget', 'climat', 'distance', 'environnements', 'activites']
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
       motivationsDetail: initialData?.existingFormData?.motivationsDetail || '',
