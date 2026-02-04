@@ -1238,7 +1238,7 @@ const response = await fetch(endpoint, {
     ...(initialData?.isModifying && { responseId: initialData.responseId }),
     participantId: finalParticipantId || 'UNKNOWN',
     participantRecordId: finalParticipantRecordId,
-    ...filteredFormData
+    ...FormData
   }),
 });
 console.log('🔍 === DEBUG FORMULAIRE ===');
