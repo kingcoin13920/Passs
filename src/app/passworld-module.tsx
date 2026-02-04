@@ -1328,7 +1328,6 @@ if (!response.ok) {
   }
   
   throw new Error(errorMessage);
-}
 
 const result = await response.json();
 console.log('✅ Formulaire sauvegardé:', result);
