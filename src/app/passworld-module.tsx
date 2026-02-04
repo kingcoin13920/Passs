@@ -1259,8 +1259,6 @@ const allowedFields = [
   'rythme',
   'problemeSante',
   'phobies',
-  'hasChildren',
-  'childrenAges',
   'villeDepart',
   'dateDepart',
   'duree',
