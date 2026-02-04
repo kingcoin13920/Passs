@@ -524,6 +524,142 @@ const handleModifyForm = async () => {
   }
 };
 
+  // Composant pour gérer l'ordre des critères en mode solo
+  const SoloCriteriaOrder = ({ onComplete }: { onComplete: (criteriaOrder: string[], travelData: any) => void }) => {
+    const [criteria, setCriteria] = useState(CRITERIA);
+    const [draggedItem, setDraggedItem] = useState<number | null>(null);
+    const [touchStartY, setTouchStartY] = useState<number | null>(null);
+    const [touchStartIndex, setTouchStartIndex] = useState<number | null>(null);
+
+    const handleDragStart = (index: number) => {
+      setDraggedItem(index);
+    };
+
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+      e.preventDefault();
+      if (draggedItem === null || draggedItem === index) return;
+
+      const newCriteria = [...criteria];
+      const draggedCriterion = newCriteria[draggedItem];
+      newCriteria.splice(draggedItem, 1);
+      newCriteria.splice(index, 0, draggedCriterion);
+      
+      setCriteria(newCriteria);
+      setDraggedItem(index);
+    };
+
+    const handleDragEnd = () => {
+      setDraggedItem(null);
+    };
+
+    // Gestion tactile pour mobile
+    const handleTouchStart = (e: React.TouchEvent, index: number) => {
+      setTouchStartY(e.touches[0].clientY);
+      setTouchStartIndex(index);
+      setDraggedItem(index);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+      if (touchStartY === null || touchStartIndex === null) return;
+      
+      const currentY = e.touches[0].clientY;
+      const element = e.currentTarget as HTMLElement;
+      const rect = element.getBoundingClientRect();
+      const itemHeight = rect.height;
+      
+      const deltaY = currentY - touchStartY;
+      const itemsMoved = Math.round(deltaY / itemHeight);
+      
+      if (itemsMoved !== 0) {
+        const newIndex = Math.max(0, Math.min(criteria.length - 1, touchStartIndex + itemsMoved));
+        
+        if (newIndex !== touchStartIndex) {
+          const newCriteria = [...criteria];
+          const draggedCriterion = newCriteria[touchStartIndex];
+          newCriteria.splice(touchStartIndex, 1);
+          newCriteria.splice(newIndex, 0, draggedCriterion);
+          
+          setCriteria(newCriteria);
+          setTouchStartIndex(newIndex);
+          setTouchStartY(currentY);
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setTouchStartY(null);
+      setTouchStartIndex(null);
+      setDraggedItem(null);
+    };
+
+    const handleSubmit = () => {
+      // Récupérer les données du formulaire
+      const budgetInput = document.getElementById('solo-budget') as HTMLSelectElement;
+      const childrenInput = document.getElementById('solo-children') as HTMLSelectElement;
+      const cityInput = document.getElementById('solo-city') as HTMLInputElement;
+      const dateInput = document.getElementById('solo-date') as HTMLInputElement;
+      const durationInput = document.getElementById('solo-duration') as HTMLSelectElement;
+
+      // Validation
+      if (!budgetInput?.value || !childrenInput?.value || !cityInput?.value || 
+          !dateInput?.value || !durationInput?.value) {
+        alert('Veuillez remplir tous les champs obligatoires des informations du voyage');
+        return;
+      }
+
+      const travelData = {
+        budget: budgetInput.value,
+        hasChildren: childrenInput.value === 'oui',
+        departureCity: cityInput.value,
+        departureDate: dateInput.value,
+        duration: durationInput.value
+      };
+
+      onComplete(criteria.map(c => c.id), travelData);
+    };
+
+    return (
+      <>
+        <div className="space-y-3 mb-10">
+          {criteria.map((criterion, index) => (
+            <div
+              key={criterion.id}
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              onTouchStart={(e) => handleTouchStart(e, index)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
+                draggedItem === index ? 'opacity-50 scale-95' : 'opacity-100'
+              } border-gray-300 hover:border-gray-400`}
+            >
+              <div className="flex items-center gap-4 flex-1">
+                <GripVertical className="w-5 h-5 text-slate-400" />
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{criterion.icon}</span>
+                  <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
+                </div>
+              </div>
+              <div className="bg-gray-800 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-md">
+                {index + 1}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-gray-800 text-white py-4 px-8 rounded-3xl font-semibold text-lg hover:bg-gray-900 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+        >
+          Continuer vers le paiement
+          <ArrowRight className="w-6 h-6" />
+        </button>
+      </>
+    );
+  };
+
   const GroupSetupView = ({ 
     travelers, 
     onBack, 
@@ -612,6 +748,50 @@ const handleModifyForm = async () => {
     };
 
     const handleDragEnd = () => {
+      setDraggedItem(null);
+    };
+
+    // NOUVEAU: Gestion tactile pour mobile
+    const [touchStartY, setTouchStartY] = useState<number | null>(null);
+    const [touchStartIndex, setTouchStartIndex] = useState<number | null>(null);
+
+    const handleTouchStart = (e: React.TouchEvent, index: number) => {
+      setTouchStartY(e.touches[0].clientY);
+      setTouchStartIndex(index);
+      setDraggedItem(index);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+      if (touchStartY === null || touchStartIndex === null) return;
+      
+      const currentY = e.touches[0].clientY;
+      const element = e.currentTarget as HTMLElement;
+      const rect = element.getBoundingClientRect();
+      const itemHeight = rect.height;
+      
+      // Calculer le déplacement en nombre d'éléments
+      const deltaY = currentY - touchStartY;
+      const itemsMoved = Math.round(deltaY / itemHeight);
+      
+      if (itemsMoved !== 0) {
+        const newIndex = Math.max(0, Math.min(criteria.length - 1, touchStartIndex + itemsMoved));
+        
+        if (newIndex !== touchStartIndex) {
+          const newCriteria = [...criteria];
+          const draggedCriterion = newCriteria[touchStartIndex];
+          newCriteria.splice(touchStartIndex, 1);
+          newCriteria.splice(newIndex, 0, draggedCriterion);
+          
+          setCriteria(newCriteria);
+          setTouchStartIndex(newIndex);
+          setTouchStartY(currentY);
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setTouchStartY(null);
+      setTouchStartIndex(null);
       setDraggedItem(null);
     };
 
@@ -763,6 +943,9 @@ const handleModifyForm = async () => {
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
+                    onTouchStart={(e) => handleTouchStart(e, index)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                     className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
                       draggedItem === index 
                         ? 'border-gray-700 shadow-2xl scale-105 bg-gray-50' 
@@ -2474,7 +2657,7 @@ if (paymentSuccess && tripData.travelers === 1) {
     });
     
     if (option.value === 1) {
-      setCurrentView('solo-payment');
+      setCurrentView('solo-setup');
     } else {
       setCurrentView('group-setup');
     }
@@ -2490,11 +2673,150 @@ if (paymentSuccess && tripData.travelers === 1) {
         </div>
       )}
 
+      {currentView === 'solo-setup' && (
+        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
+              <button
+                onClick={() => setCurrentView('no-code')}
+                className="flex items-center text-slate-600 hover:text-slate-900 mb-8 transition-colors group"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                Retour
+              </button>
+
+              {/* Informations du voyage */}
+              <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+                  📋 Informations du voyage
+                </h3>
+                <p className="text-gray-500 mb-6 text-sm">Renseignez les informations de votre voyage</p>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Budget estimé *
+                    </label>
+                    <select
+                      id="solo-budget"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="<500">Moins de 500€</option>
+                      <option value="500-1000">500€ - 1000€</option>
+                      <option value="1000-2000">1000€ - 2000€</option>
+                      <option value="2000+">Plus de 2000€</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Y a-t-il des enfants ? *
+                    </label>
+                    <select
+                      id="solo-children"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="oui">Oui</option>
+                      <option value="non">Non</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Ville de départ *
+                    </label>
+                    <input
+                      type="text"
+                      id="solo-city"
+                      required
+                      placeholder="Ex: Paris, Lyon..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Date de départ souhaitée *
+                    </label>
+                    <input
+                      type="date"
+                      id="solo-date"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Durée du voyage *
+                    </label>
+                    <select
+                      id="solo-duration"
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="weekend">Weekend</option>
+                      <option value="3-5j">3-5 jours</option>
+                      <option value="1sem">1 semaine</option>
+                      <option value="2sem">2 semaines</option>
+                      <option value="3sem+">3 semaines+</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ordre des critères */}
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-800 rounded-4xl mb-4">
+                  <span className="text-3xl">🎯</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Ordre d'importance des critères</h2>
+                <p className="text-slate-600 text-lg">Glissez-déposez pour définir vos priorités</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-gray-50 to-gray-50 border-2 border-gray-300 rounded-4xl p-5 mb-8">
+                <p className="text-gray-900 text-sm font-medium flex items-start gap-2">
+                  <span className="text-xl">💡</span>
+                  <span>L'ordre des critères permet de trouver LA destination qui vous convient le mieux. Le critère #1 est le plus important.</span>
+                </p>
+              </div>
+
+              <SoloCriteriaOrder 
+                onComplete={(criteriaOrder, travelData) => {
+                  setTripData({
+                    ...tripData,
+                    criteriaOrder,
+                    ...travelData
+                  });
+                  setCurrentView('solo-payment');
+                }}
+              />
+
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={() => {
+                    setCurrentView('solo-payment');
+                  }}
+                  className="w-full text-gray-500 hover:text-gray-900 py-2 text-sm"
+                >
+                  Passer avec l'ordre par défaut
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {currentView === 'solo-payment' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
-              onClick={() => setCurrentView('no-code')}
+              onClick={() => setCurrentView('solo-setup')}
               className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
@@ -2516,6 +2838,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 </label>
                 <input
                   type="email"
+                  id="solo-email"
                   className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="votre@email.com"
                 />
@@ -2533,10 +2856,22 @@ if (paymentSuccess && tripData.travelers === 1) {
 
               <button
                 onClick={() => {
-                  // Récupérer l'email du formulaire
-                  const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+                  const emailInput = document.getElementById('solo-email') as HTMLInputElement;
+                  
+                  if (!emailInput?.value) {
+                    alert('Veuillez entrer votre email');
+                    return;
+                  }
+
+                  // Récupérer les données depuis tripData qui ont été enregistrées dans solo-setup
                   redirectToStripe('solo', 29, {
-                    email: emailInput?.value || ''
+                    email: emailInput.value,
+                    budget: tripData.budget || '',
+                    hasChildren: tripData.hasChildren || false,
+                    departureCity: tripData.departureCity || '',
+                    departureDate: tripData.departureDate || '',
+                    duration: tripData.duration || '',
+                    criteriaOrder: tripData.criteriaOrder || []
                   });
                 }}
                 className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center"
