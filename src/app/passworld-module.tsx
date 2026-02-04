@@ -2025,6 +2025,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       </div>
     );
   }
+     }; 
   const Router = () => {
     return (
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
