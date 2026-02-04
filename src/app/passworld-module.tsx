@@ -1258,7 +1258,7 @@ const allowedFields = [
 'dateDepart',
 'duree',
 'budget',
-'ordreCriteres'
+'ordreCriteres',
   'motivations',
   'interdits',
   'departureCity',
