@@ -1046,7 +1046,7 @@ const handleModifyForm = async () => {
       let missingFields = [];
       const errorFields = new Set<string>();
       
-switch (currentStep) {
+      switch (currentStep) {
         case 1: // Prénom, Nom, Email
           if (!formData.prenom) { missingFields.push('Prénom'); errorFields.add('prenom'); }
           if (!formData.nom) { missingFields.push('Nom'); errorFields.add('nom'); }
@@ -1096,7 +1096,7 @@ switch (currentStep) {
           }
           break;
         
-case 4: // Type de voyage
+        case 4: // Type de voyage
           if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
           break;
         
@@ -1396,283 +1396,31 @@ case 4: // Type de voyage
                         fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
                     />
-                  </div>case 4: // Type de voyage
-          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
-          break;
-        
-        case 5: // Planning
-          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
-          break;
-        
-        case 6: // Environnements
-          if (!formData.environnements || formData.environnements.length === 0) {
-            missingFields.push('Environnements (sélectionnez au moins un)');
-            errorFields.add('environnements');
-          }
-          break;
-        
-        case 7: // Climat
-          if (!formData.climat) { missingFields.push('Climat préféré'); errorFields.add('climat'); }
-          break;
-        
-        case 8: // Activités
-          if (!formData.activites || formData.activites.length === 0) {
-            missingFields.push('Activités (sélectionnez au moins une)');
-            errorFields.add('activites');
-          }
-          break;
-      }
-      
-      if (missingFields.length > 0) {
-        setFieldErrors(errorFields);
-        alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
-        return;
-      }
-      
-      setFieldErrors(new Set());
-      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
-    };
+                  </div>
 
-    const prevStep = () => {
-      if (currentStep > 1) setCurrentStep(currentStep - 1);
-    };
-
-    const submitForm = async () => {
-      try {
-        setLoading(true);
-        
-        if (IS_DEMO_MODE) {
-          console.log('Mode démo - Formulaire soumis:', formData);
-          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
-          setLoading(false);
-          return;
-        }
-
-        const endpoint = initialData?.isModifying 
-          ? '/api/airtable/update-form'
-          : '/api/airtable/save-form';
-
-        let finalParticipantId = initialData?.participantId;
-        let finalParticipantRecordId = initialData?.participantRecordId;
-        
-        if (tripData.isGiftCard && !finalParticipantId) {
-          console.log('🎁 Code cadeau solo - Création du participant...');
-          
-          const participantCode = tripData.inputCode;
-          const tripId = `TRIP-${Date.now()}`;
-          const tripResponse = await fetch('/api/airtable/create-trip', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tripId,
-              type: 'solo',
-              nbParticipants: 1,
-              amount: 29,
-              paymentStatus: 'paid-gift',
-              criteriaOrder: ''
-            }),
-          });
-          
-          const tripDataResponse = await tripResponse.json();
-          const airtableTripRecordId = tripDataResponse.id;
-          console.log('✅ Voyage créé:', airtableTripRecordId);
-          
-          const participantResponse = await fetch('/api/airtable/create-participant', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tripId: [airtableTripRecordId],
-              code: participantCode,
-              prenom: formData.prenom,
-              nom: formData.nom,
-              email: formData.email,
-              paymentStatus: 'paid-gift',
-            }),
-          });
-          
-          const participantData = await participantResponse.json();
-          finalParticipantId = participantData.id;
-          finalParticipantRecordId = participantData.id;
-          console.log('✅ Participant créé:', finalParticipantId);
-          
-          await fetch('/api/airtable/update-gift-card-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              giftCardId: tripData.giftCardId,
-              status: 'used'
-            }),
-          });
-          console.log('✅ Carte cadeau marquée comme utilisée');
-          
-          await fetch('/api/emails/send-participant-codes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              participants: [{
-                prenom: formData.prenom,
-                nom: formData.nom,
-                email: formData.email,
-                code: participantCode,
-              }],
-              tripId: airtableTripRecordId,
-            }),
-          });
-          console.log('✅ Email envoyé');
-        }
-
-        console.log('📤 Envoi formulaire vers:', endpoint);
-        console.log('📤 Données:', {
-          participantId: finalParticipantId || 'UNKNOWN',
-          participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
-          isModifying: initialData?.isModifying,
-          responseId: initialData?.responseId,
-        });
-
-        const allowedFields = [
-          'budget',
-          'distance',
-          'climat',
-          'environnements',
-          'enfants',
-          'ageEnfant1',
-          'ageEnfant2',
-          'ageEnfant3',
-          'ageEnfant4',
-          'villeDepart',
-          'dateDepart',
-          'duree',
-          'ordreCriteres',
-          'motivations',
-          'interdits',
-          'departureCity',
-          'departureDate',
-          'duration',
-          'hasChildren',
-          'childrenAges',
-          'companions',
-          'flexibility',
-          'accommodation',
-          'activities',
-          'dietaryRestrictions',
-          'specialRequests',
-          'motivationsDetail',
-          'voyageType',
-          'planningStyle',
-          'paysVisites',
-          'activites',
-          'rythme',
-          'problemeSante',
-          'phobies'
-        ];
-
-        const filteredFormData = Object.keys(formData)
-          .filter(key => allowedFields.includes(key))
-          .reduce((obj, key) => {
-            obj[key] = formData[key];
-            return obj;
-          }, {});
-
-        console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
-
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...(initialData?.isModifying && { responseId: initialData.responseId }),
-            participantId: finalParticipantId || 'UNKNOWN',
-            participantRecordId: finalParticipantRecordId,
-            ...filteredFormData
-          }),
-        });
-        
-        console.log('📋 === DEBUG FORMULAIRE ===');
-        console.log('motivationsDetail:', formData.motivationsDetail);
-        console.log('voyageType:', formData.voyageType);
-        console.log('planningStyle:', formData.planningStyle);
-        console.log('paysVisites:', formData.paysVisites);
-        console.log('activites:', formData.activites);
-        console.log('rythme:', formData.rythme);
-        console.log('problemeSante:', formData.problemeSante);
-        console.log('phobies:', formData.phobies);
-        console.log('📋 === FIN DEBUG ===');
-        console.log('🔥 Réponse API:', response.status, response.statusText);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('❌ Erreur API complète:', errorText);
-          
-          let errorMessage = 'Erreur lors de la sauvegarde';
-          try {
-            const error = JSON.parse(errorText);
-            errorMessage = error.error || error.message || errorText;
-          } catch {
-            errorMessage = errorText;
-          }
-          
-          throw new Error(errorMessage);
-        }
-
-        const result = await response.json();
-        console.log('✅ Formulaire sauvegardé:', result);
-
-        setIsSubmittingForm(false);
-        setFormSubmitted(true);
-
-      } catch (error) {
-        console.error('Erreur soumission formulaire:', error);
-        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return (
-      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 animate-fade-in">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-semibold text-gray-600">Étape {currentStep} sur {totalSteps}</span>
-              <span className="px-4 py-1 rounded-full bg-gray-100 text-gray-800 text-sm font-bold">
-                {Math.round((currentStep / totalSteps) * 100)}%
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-              <div
-                className="bg-gradient-to-r from-gray-800 to-gray-900 h-3 rounded-full transition-all duration-500 ease-out shadow-soft"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-4xl shadow-soft-lg p-8 md:p-10 animate-scale-in">
-            {currentStep === 1 && (
-              <div>
-                <div className="text-center mb-8">
-                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Prénom *</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Nom *</label>
                     <input
                       type="text"
-                      value={formData.prenom}
-                      onChange={(e) => updateField('prenom', e.target.value)}
-                      readOnly={!!initialData?.prenom}
+                      value={formData.nom}
+                      onChange={(e) => updateField('nom', e.target.value)}
+                      readOnly={!!initialData?.nom}
                       className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                        fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
+                        fieldErrors.has('nom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${initialData?.nom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">Précisez</label>
-                    <textarea
-                      value={formData.motivationsDetail}
-                      onChange={(e) => updateField('motivationsDetail', e.target.value)}
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Email *</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => updateField('email', e.target.value)}
+                      readOnly={!!initialData?.email}
+                      className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('email') ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${initialData?.email ? 'bg-gray-50' : ''}`}
                     />
                   </div>
                 </div>
