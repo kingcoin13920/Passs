@@ -1060,58 +1060,76 @@ const handleModifyForm = async () => {
     if (!formData.duree) { missingFields.push('Durée du voyage'); errorFields.add('duree'); }
   }
   
-  // Step 3: Budget
-  if (currentStep === 3) {
-    if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
-    if (!formData.distance) { missingFields.push('Distance'); errorFields.add('distance'); }
+/* ===== VALIDATION nextStep CORRIGÉE ===== */
+/* Remplacer les lignes 1063-1114 par ce code */
+
+// Step 3: Motivations
+if (currentStep === 3) {
+  if (!formData.motivations || formData.motivations.length === 0) {
+    missingFields.push('Motivations');
+    errorFields.add('motivations');
   }
-  
-  // Step 4: Motivations
-  if (currentStep === 4) {
-    if (!formData.motivations || formData.motivations.length === 0) {
-      missingFields.push('Motivations');
-      errorFields.add('motivations');
-    }
+}
+
+// Step 4: Type de voyage
+if (currentStep === 4) {
+  if (!formData.voyageType) { 
+    missingFields.push('Type de voyage'); 
+    errorFields.add('voyageType'); 
   }
-  
-  // Step 5: Type de voyage
-  if (currentStep === 5) {
-    if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+}
+
+// Step 5: Planning
+if (currentStep === 5) {
+  if (!formData.planningStyle) { 
+    missingFields.push('Style de planning'); 
+    errorFields.add('planningStyle'); 
   }
-  
-  // Step 6: Planning
-  if (currentStep === 6) {
-    if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+}
+
+// Step 6: Environnements
+if (currentStep === 6) {
+  if (!formData.environnements || formData.environnements.length === 0) {
+    missingFields.push('Environnements');
+    errorFields.add('environnements');
   }
-  
-  // Step 7: Environnements
-  if (currentStep === 7) {
-    if (!formData.environnements || formData.environnements.length === 0) {
-      missingFields.push('Environnements');
-      errorFields.add('environnements');
-    }
+}
+
+// Step 7: Climat
+if (currentStep === 7) {
+  if (!formData.climat) { 
+    missingFields.push('Climat'); 
+    errorFields.add('climat'); 
   }
-  
-  // Step 8: Climat
-  if (currentStep === 8) {
-    if (!formData.climat) { missingFields.push('Climat'); errorFields.add('climat'); }
+}
+
+// Step 8: Activités
+if (currentStep === 8) {
+  if (!formData.activites || formData.activites.length === 0) {
+    missingFields.push('Activités');
+    errorFields.add('activites');
   }
-  
-  // Step 9: Activités
-  if (currentStep === 9) {
-    if (!formData.activites || formData.activites.length === 0) {
-      missingFields.push('Activités');
-      errorFields.add('activites');
-    }
+}
+
+// Step 9: Budget & Distance
+if (currentStep === 9) {
+  if (!formData.budget) { 
+    missingFields.push('Budget'); 
+    errorFields.add('budget'); 
   }
-  
-  // ✅ NOUVEAU Step 10: Ordre des critères
-  if (currentStep === 10) {
-    if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) {
-      missingFields.push('Ordre des critères');
-      errorFields.add('ordreCriteres');
-    }
+  if (!formData.distance) { 
+    missingFields.push('Distance'); 
+    errorFields.add('distance'); 
   }
+}
+
+// Step 10: Ordre des critères
+if (currentStep === 10) {
+  if (!formData.ordreCriteres || formData.ordreCriteres.length === 0) {
+    missingFields.push('Ordre des critères');
+    errorFields.add('ordreCriteres');
+  }
+}
   
   if (missingFields.length > 0) {
     setFieldErrors(errorFields);
@@ -1414,59 +1432,44 @@ setFormSubmitted(true);
             )}
 
            {/* ✅ NOUVEAU Step 2: Informations du voyage */}
+/* ===== STEP 2 : INFORMATIONS DU VOYAGE - VERSION AMÉLIORÉE ===== */
+/* Remplacer les lignes 1417-1515 par ce code */
+
 {currentStep === 2 && (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Informations du voyage</h2>
-    
+  <div>
+    <div className="text-center mb-8">
+      <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+        📅 Informations du voyage
+      </h2>
+      <p className="text-gray-600">Quelques détails pour personnaliser votre expérience</p>
+    </div>
+
     {/* Enfants */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-3">
+    <div className="mb-6">
+      <label className="block text-sm font-medium text-gray-600 mb-3">
         Voyagez-vous avec des enfants ? *
       </label>
-      <div className="space-y-2">
-        {['Oui', 'Non'].map((option) => (
-          <label
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {['Juste nous', '1 enfant', '2 enfants', '3 enfants', '4 enfants ou +'].map((option) => (
+          <button
             key={option}
-            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+            type="button"
+            onClick={() => updateField('hasChildren', option)}
+            className={`p-4 border-2 rounded-xl font-medium transition-all ${
               formData.hasChildren === option
-                ? 'border-black bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-black bg-black text-white'
+                : 'border-gray-300 hover:border-gray-400'
             } ${fieldErrors.has('hasChildren') ? 'border-red-500' : ''}`}
           >
-            <input
-              type="radio"
-              name="hasChildren"
-              checked={formData.hasChildren === option}
-              onChange={() => updateField('hasChildren', option)}
-              className="mr-3"
-            />
-            <span className="font-medium">{option}</span>
-          </label>
+            {option}
+          </button>
         ))}
       </div>
     </div>
-    
-    {/* Âge des enfants (conditionnel) */}
-    {formData.hasChildren === 'Oui' && (
-      <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
-          Âge des enfants *
-        </label>
-        <input
-          type="text"
-          value={formData.childrenAges}
-          onChange={(e) => updateField('childrenAges', e.target.value)}
-          placeholder="Ex: 5 ans, 8 ans, 12 ans"
-          className={`w-full p-3 border-2 rounded-lg ${
-            fieldErrors.has('childrenAges') ? 'border-red-500' : 'border-gray-200'
-          }`}
-        />
-      </div>
-    )}
-    
+
     {/* Ville de départ */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
+    <div className="mb-6">
+      <label className="block text-sm font-medium text-gray-600 mb-2">
         Ville de départ *
       </label>
       <input
@@ -1474,42 +1477,54 @@ setFormSubmitted(true);
         value={formData.villeDepart}
         onChange={(e) => updateField('villeDepart', e.target.value)}
         placeholder="Ex: Paris, Lyon, Marseille"
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-200'
+        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
+          fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-300'
         }`}
       />
     </div>
-    
+
     {/* Date de départ */}
-    <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
+    <div className="mb-6">
+      <label className="block text-sm font-medium text-gray-600 mb-2">
         Date de départ souhaitée *
       </label>
       <input
         type="date"
         value={formData.dateDepart}
         onChange={(e) => updateField('dateDepart', e.target.value)}
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-200'
+        className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-transparent ${
+          fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-300'
         }`}
       />
     </div>
-    
+
     {/* Durée */}
     <div>
-      <label className="block text-sm font-medium text-gray-900 mb-2">
-        Durée du voyage (en jours) *
+      <label className="block text-sm font-medium text-gray-600 mb-3">
+        Durée du voyage *
       </label>
-      <input
-        type="number"
-        value={formData.duree}
-        onChange={(e) => updateField('duree', e.target.value)}
-        placeholder="Ex: 7, 10, 14"
-        min="1"
-        className={`w-full p-3 border-2 rounded-lg ${
-          fieldErrors.has('duree') ? 'border-red-500' : 'border-gray-200'
-        }`}
-      />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {[
+          'Un week-end (2-3 jours)',
+          'Une semaine (5-7 jours)',
+          '10 jours',
+          '2 semaines',
+          '3 semaines ou +'
+        ].map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => updateField('duree', option)}
+            className={`p-4 border-2 rounded-xl font-medium transition-all ${
+              formData.duree === option
+                ? 'border-black bg-black text-white'
+                : 'border-gray-300 hover:border-gray-400'
+            } ${fieldErrors.has('duree') ? 'border-red-500' : ''}`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
     </div>
   </div>
 )}
@@ -1781,8 +1796,77 @@ setFormSubmitted(true);
               </div>
             )}
 
-            {/* Step 9 supprimé (fusionné avec Step 8) */}
-            {currentStep === 9 && null}
+/* ===== STEP 9 : BUDGET & DISTANCE ===== */
+/* Remplacer la ligne 1785 "{currentStep === 9 && null}" par ce code */
+
+{currentStep === 9 && (
+  <div>
+    <div className="text-center mb-8">
+      <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+        💰 Budget et distance
+      </h2>
+      <p className="text-gray-600">Aidez-nous à trouver le voyage parfait pour vous</p>
+    </div>
+
+    {/* Budget */}
+    <div className="mb-8">
+      <label className="block text-sm font-medium text-gray-600 mb-3">
+        Budget par personne *
+      </label>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {[
+          '< 500€',
+          '500-1000€',
+          '1000-1500€',
+          '1500-2000€',
+          '2000-3000€',
+          '> 3000€'
+        ].map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => updateField('budget', option)}
+            className={`p-4 border-2 rounded-xl font-medium transition-all ${
+              formData.budget === option
+                ? 'border-black bg-black text-white'
+                : 'border-gray-300 hover:border-gray-400'
+            } ${fieldErrors.has('budget') ? 'border-red-500' : ''}`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Distance */}
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-3">
+        Distance de vol souhaitée *
+      </label>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {[
+          'Courte (< 3h)',
+          'Moyenne (3-6h)',
+          'Longue (> 6h)',
+          'Peu importe'
+        ].map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => updateField('distance', option)}
+            className={`p-4 border-2 rounded-xl font-medium transition-all ${
+              formData.distance === option
+                ? 'border-black bg-black text-white'
+                : 'border-gray-300 hover:border-gray-400'
+            } ${fieldErrors.has('distance') ? 'border-red-500' : ''}`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
 {/* ✅ NOUVEAU Step 10: Ordre des critères */}
 {currentStep === 10 && (
