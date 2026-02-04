@@ -1096,14 +1096,7 @@ switch (currentStep) {
           }
           break;
         
-        case 4: // Type de voyage
-          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
-          break;
-        
-        case 5: // Planning
-          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
-          break;
-        case 4: // Type de voyage
+case 4: // Type de voyage
           if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
           break;
         
@@ -1136,7 +1129,6 @@ switch (currentStep) {
         return;
       }
       
-      // Réinitialiser les erreurs et passer au step suivant
       setFieldErrors(new Set());
       if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
     };
@@ -1149,10 +1141,6 @@ switch (currentStep) {
       try {
         setLoading(true);
         
-        // Validation déjà faite étape par étape dans nextStep()
-        // Pas besoin de re-valider ici
-        
-        // En mode démo
         if (IS_DEMO_MODE) {
           console.log('Mode démo - Formulaire soumis:', formData);
           alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
@@ -1160,22 +1148,17 @@ switch (currentStep) {
           return;
         }
 
-        // Si c'est une modification, utiliser l'API update
         const endpoint = initialData?.isModifying 
           ? '/api/airtable/update-form'
           : '/api/airtable/save-form';
 
-        // Vérifier si c'est un code cadeau solo (pas encore de participant créé)
         let finalParticipantId = initialData?.participantId;
         let finalParticipantRecordId = initialData?.participantRecordId;
         
         if (tripData.isGiftCard && !finalParticipantId) {
           console.log('🎁 Code cadeau solo - Création du participant...');
           
-          // Générer un code pour le participant
-          const participantCode = tripData.inputCode; // Utiliser le code cadeau comme code participant
-          
-          // Créer le voyage dans Airtable
+          const participantCode = tripData.inputCode;
           const tripId = `TRIP-${Date.now()}`;
           const tripResponse = await fetch('/api/airtable/create-trip', {
             method: 'POST',
@@ -1194,7 +1177,6 @@ switch (currentStep) {
           const airtableTripRecordId = tripDataResponse.id;
           console.log('✅ Voyage créé:', airtableTripRecordId);
           
-          // Créer le participant
           const participantResponse = await fetch('/api/airtable/create-participant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1213,7 +1195,6 @@ switch (currentStep) {
           finalParticipantRecordId = participantData.id;
           console.log('✅ Participant créé:', finalParticipantId);
           
-          // Marquer la carte cadeau comme utilisée
           await fetch('/api/airtable/update-gift-card-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1224,7 +1205,6 @@ switch (currentStep) {
           });
           console.log('✅ Carte cadeau marquée comme utilisée');
           
-          // Envoyer l'email avec le code
           await fetch('/api/emails/send-participant-codes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1234,7 +1214,6 @@ switch (currentStep) {
                 nom: formData.nom,
                 email: formData.email,
                 code: participantCode,
-                
               }],
               tripId: airtableTripRecordId,
             }),
@@ -1250,7 +1229,6 @@ switch (currentStep) {
           responseId: initialData?.responseId,
         });
 
-        // Liste des champs qui existent dans Airtable
         const allowedFields = [
           'budget',
           'distance',
@@ -1288,7 +1266,6 @@ switch (currentStep) {
           'phobies'
         ];
 
-        // Filtrer formData pour ne garder que les champs autorisés
         const filteredFormData = Object.keys(formData)
           .filter(key => allowedFields.includes(key))
           .reduce((obj, key) => {
@@ -1350,10 +1327,41 @@ switch (currentStep) {
       }
     };
 
+    if (isSubmittingForm) {
+      return (
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
+            <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
+            <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (formSubmitted) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Formulaire envoyé avec succès !</h2>
+            <p className="text-gray-600 mb-6">Merci pour vos réponses. Nous préparons votre voyage personnalisé.</p>
+            <button
+              onClick={onBack}
+              className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-900 transition-colors"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-4xl mx-auto">
-          {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm font-semibold text-gray-600">Étape {currentStep} sur {totalSteps}</span>
@@ -1370,7 +1378,6 @@ switch (currentStep) {
           </div>
 
           <div className="bg-white rounded-4xl shadow-soft-lg p-8 md:p-10 animate-scale-in">
-            {/* Step 1: Infos personnelles */}
             {currentStep === 1 && (
               <div>
                 <div className="text-center mb-8">
@@ -1389,215 +1396,306 @@ switch (currentStep) {
                         fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
                     />
-                  </div>
-          <option value="">Sélectionner</option>
-          <option value="non">Non</option>
-          <option value="1">1 enfant</option>
-          <option value="2">2 enfants</option>
-          <option value="3">3 enfants</option>
-          <option value="4">4 enfants ou +</option>
-        </select>
-      </div>
+                  </div>case 4: // Type de voyage
+          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+          break;
+        
+        case 5: // Planning
+          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+          break;
+        
+        case 6: // Environnements
+          if (!formData.environnements || formData.environnements.length === 0) {
+            missingFields.push('Environnements (sélectionnez au moins un)');
+            errorFields.add('environnements');
+          }
+          break;
+        
+        case 7: // Climat
+          if (!formData.climat) { missingFields.push('Climat préféré'); errorFields.add('climat'); }
+          break;
+        
+        case 8: // Activités
+          if (!formData.activites || formData.activites.length === 0) {
+            missingFields.push('Activités (sélectionnez au moins une)');
+            errorFields.add('activites');
+          }
+          break;
+      }
+      
+      if (missingFields.length > 0) {
+        setFieldErrors(errorFields);
+        alert(`⚠️ Veuillez remplir les champs obligatoires :\n\n• ${missingFields.join('\n• ')}`);
+        return;
+      }
+      
+      setFieldErrors(new Set());
+      if (currentStep < totalSteps) setCurrentStep(currentStep + 1);
+    };
 
-      {/* Champs d'âge pour chaque enfant */}
-      {formData.enfants && formData.enfants !== 'non' && formData.enfants !== '' && (
-        <>
-          {Array.from({ length: parseInt(formData.enfants) || 0 }, (_, i) => (
-            <div key={i}>
-              <label className="block text-sm font-medium text-gray-600 mb-2">
-                Âge de l'enfant {i + 1} *
-              </label>
-              <input
-                type="number"
-                value={formData[`ageEnfant${i + 1}`] || ''}
-                onChange={(e) => updateField(`ageEnfant${i + 1}`, e.target.value)}
-                required
-                min="0"
-                max="17"
-                placeholder="Ex: 5 ans"
-                className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-                  fieldErrors.has(`ageEnfant${i + 1}`) ? 'border-red-500' : 'border-gray-300'
-                }`}
+    const prevStep = () => {
+      if (currentStep > 1) setCurrentStep(currentStep - 1);
+    };
+
+    const submitForm = async () => {
+      try {
+        setLoading(true);
+        
+        if (IS_DEMO_MODE) {
+          console.log('Mode démo - Formulaire soumis:', formData);
+          alert('Mode démo:\nFormulaire envoyé avec succès! 🎉\n\nVotre destination sera préparée dans les 48-72h.');
+          setLoading(false);
+          return;
+        }
+
+        const endpoint = initialData?.isModifying 
+          ? '/api/airtable/update-form'
+          : '/api/airtable/save-form';
+
+        let finalParticipantId = initialData?.participantId;
+        let finalParticipantRecordId = initialData?.participantRecordId;
+        
+        if (tripData.isGiftCard && !finalParticipantId) {
+          console.log('🎁 Code cadeau solo - Création du participant...');
+          
+          const participantCode = tripData.inputCode;
+          const tripId = `TRIP-${Date.now()}`;
+          const tripResponse = await fetch('/api/airtable/create-trip', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId,
+              type: 'solo',
+              nbParticipants: 1,
+              amount: 29,
+              paymentStatus: 'paid-gift',
+              criteriaOrder: ''
+            }),
+          });
+          
+          const tripDataResponse = await tripResponse.json();
+          const airtableTripRecordId = tripDataResponse.id;
+          console.log('✅ Voyage créé:', airtableTripRecordId);
+          
+          const participantResponse = await fetch('/api/airtable/create-participant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tripId: [airtableTripRecordId],
+              code: participantCode,
+              prenom: formData.prenom,
+              nom: formData.nom,
+              email: formData.email,
+              paymentStatus: 'paid-gift',
+            }),
+          });
+          
+          const participantData = await participantResponse.json();
+          finalParticipantId = participantData.id;
+          finalParticipantRecordId = participantData.id;
+          console.log('✅ Participant créé:', finalParticipantId);
+          
+          await fetch('/api/airtable/update-gift-card-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              giftCardId: tripData.giftCardId,
+              status: 'used'
+            }),
+          });
+          console.log('✅ Carte cadeau marquée comme utilisée');
+          
+          await fetch('/api/emails/send-participant-codes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              participants: [{
+                prenom: formData.prenom,
+                nom: formData.nom,
+                email: formData.email,
+                code: participantCode,
+              }],
+              tripId: airtableTripRecordId,
+            }),
+          });
+          console.log('✅ Email envoyé');
+        }
+
+        console.log('📤 Envoi formulaire vers:', endpoint);
+        console.log('📤 Données:', {
+          participantId: finalParticipantId || 'UNKNOWN',
+          participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
+          isModifying: initialData?.isModifying,
+          responseId: initialData?.responseId,
+        });
+
+        const allowedFields = [
+          'budget',
+          'distance',
+          'climat',
+          'environnements',
+          'enfants',
+          'ageEnfant1',
+          'ageEnfant2',
+          'ageEnfant3',
+          'ageEnfant4',
+          'villeDepart',
+          'dateDepart',
+          'duree',
+          'ordreCriteres',
+          'motivations',
+          'interdits',
+          'departureCity',
+          'departureDate',
+          'duration',
+          'hasChildren',
+          'childrenAges',
+          'companions',
+          'flexibility',
+          'accommodation',
+          'activities',
+          'dietaryRestrictions',
+          'specialRequests',
+          'motivationsDetail',
+          'voyageType',
+          'planningStyle',
+          'paysVisites',
+          'activites',
+          'rythme',
+          'problemeSante',
+          'phobies'
+        ];
+
+        const filteredFormData = Object.keys(formData)
+          .filter(key => allowedFields.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = formData[key];
+            return obj;
+          }, {});
+
+        console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...(initialData?.isModifying && { responseId: initialData.responseId }),
+            participantId: finalParticipantId || 'UNKNOWN',
+            participantRecordId: finalParticipantRecordId,
+            ...filteredFormData
+          }),
+        });
+        
+        console.log('📋 === DEBUG FORMULAIRE ===');
+        console.log('motivationsDetail:', formData.motivationsDetail);
+        console.log('voyageType:', formData.voyageType);
+        console.log('planningStyle:', formData.planningStyle);
+        console.log('paysVisites:', formData.paysVisites);
+        console.log('activites:', formData.activites);
+        console.log('rythme:', formData.rythme);
+        console.log('problemeSante:', formData.problemeSante);
+        console.log('phobies:', formData.phobies);
+        console.log('📋 === FIN DEBUG ===');
+        console.log('🔥 Réponse API:', response.status, response.statusText);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Erreur API complète:', errorText);
+          
+          let errorMessage = 'Erreur lors de la sauvegarde';
+          try {
+            const error = JSON.parse(errorText);
+            errorMessage = error.error || error.message || errorText;
+          } catch {
+            errorMessage = errorText;
+          }
+          
+          throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+        console.log('✅ Formulaire sauvegardé:', result);
+
+        setIsSubmittingForm(false);
+        setFormSubmitted(true);
+
+      } catch (error) {
+        console.error('Erreur soumission formulaire:', error);
+        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isSubmittingForm) {
+      return (
+        <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
+            <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
+            <p className="text-sm text-gray-600 mt-2">Veuillez patienter</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (formSubmitted) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Formulaire envoyé avec succès !</h2>
+            <p className="text-gray-600 mb-6">Merci pour vos réponses. Nous préparons votre voyage personnalisé.</p>
+            <button
+              onClick={onBack}
+              className="w-full bg-gray-800 text-white py-3 px-6 rounded-3xl hover:bg-gray-900 transition-colors"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 animate-fade-in">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm font-semibold text-gray-600">Étape {currentStep} sur {totalSteps}</span>
+              <span className="px-4 py-1 rounded-full bg-gray-100 text-gray-800 text-sm font-bold">
+                {Math.round((currentStep / totalSteps) * 100)}%
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+              <div
+                className="bg-gradient-to-r from-gray-800 to-gray-900 h-3 rounded-full transition-all duration-500 ease-out shadow-soft"
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
               />
             </div>
-          ))}
-        </>
-      )}
+          </div>
 
-      {/* Ville de départ */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
-          Ville de départ *
-        </label>
-        <input
-          type="text"
-          value={formData.villeDepart}
-          onChange={(e) => updateField('villeDepart', e.target.value)}
-          required
-          placeholder="Ex: Paris, Lyon..."
-          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-            fieldErrors.has('villeDepart') ? 'border-red-500' : 'border-gray-300'
-          }`}
-        />
-      </div>
-
-      {/* Date de départ souhaitée */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
-          Date de départ souhaitée *
-        </label>
-        <input
-          type="date"
-          value={formData.dateDepart}
-          onChange={(e) => updateField('dateDepart', e.target.value)}
-          required
-          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-            fieldErrors.has('dateDepart') ? 'border-red-500' : 'border-gray-300'
-          }`}
-        />
-      </div>
-
-      {/* Durée du voyage */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
-          Durée du voyage *
-        </label>
-        <select
-          value={formData.duree}
-          onChange={(e) => updateField('duree', e.target.value)}
-          required
-          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-            fieldErrors.has('duree') ? 'border-red-500' : 'border-gray-300'
-          }`}
-        >
-          <option value="">Sélectionner</option>
-          <option value="weekend">Un week-end (2-3 jours)</option>
-          <option value="semaine">Une semaine (5-7 jours)</option>
-          <option value="10jours">10 jours</option>
-          <option value="2semaines">2 semaines</option>
-          <option value="3semaines">3 semaines ou +</option>
-        </select>
-      </div>
-
-      {/* Budget */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
-          Budget par personne *
-        </label>
-        <select
-          value={formData.budget}
-          onChange={(e) => updateField('budget', e.target.value)}
-          required
-          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-            fieldErrors.has('budget') ? 'border-red-500' : 'border-gray-300'
-          }`}
-        >
-          <option value="">Sélectionner</option>
-          <option value="<500">Moins de 500€</option>
-          <option value="500-1000">500€ - 1000€</option>
-          <option value="1000-1500">1000€ - 1500€</option>
-          <option value="1500-2000">1500€ - 2000€</option>
-          <option value="2000-3000">2000€ - 3000€</option>
-          <option value=">3000">Plus de 3000€</option>
-        </select>
-      </div>
-    </div>
-
-    {/* Ordre des critères */}
-    <div className="mt-8">
-      <h3 className="text-xl font-bold text-gray-900 mb-2">
-        🎯 Ordre des critères
-      </h3>
-      <p className="text-gray-500 mb-4 text-sm">
-        Glissez-déposez pour classer les critères par ordre d'importance
-      </p>
-
-      <div className="space-y-3">
-        {formData.ordreCriteres.map((criterionId, index) => {
-          const CRITERIA_LIST = [
-            { id: 'budget', label: 'Budget', icon: '💰' },
-            { id: 'climat', label: 'Climat', icon: '🌡️' },
-            { id: 'distance', label: 'Distance', icon: '✈️' },
-            { id: 'environnements', label: 'Environnements', icon: '🏞️' },
-            { id: 'activites', label: 'Activités', icon: '🎯' }
-          ];
-          
-          const criterion = CRITERIA_LIST.find(c => c.id === criterionId);
-          if (!criterion) return null;
-
-          return (
-            <div
-              key={criterionId}
-              draggable
-              onDragStart={() => {
-                window.__draggedCriterionIndex = index;
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                const draggedIndex = window.__draggedCriterionIndex;
-                if (draggedIndex === undefined || draggedIndex === index) return;
-
-                const newOrder = [...formData.ordreCriteres];
-                const [removed] = newOrder.splice(draggedIndex, 1);
-                newOrder.splice(index, 0, removed);
-                
-                updateField('ordreCriteres', newOrder);
-                delete window.__draggedCriterionIndex;
-              }}
-              className="bg-white border-2 border-gray-200 rounded-3xl p-6 cursor-move hover:border-gray-400 hover:shadow-lg transition-all duration-300"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-3xl">{criterion.icon}</span>
-                  <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
-                </div>
-                <div className="bg-gradient-to-br from-gray-500 to-gray-700 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
-                  #{index + 1}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-)}
-
-
-            {/* Step 3: Motivations */}
-            {currentStep === 3 && (
+          <div className="bg-white rounded-4xl shadow-soft-lg p-8 md:p-10 animate-scale-in">
+            {currentStep === 1 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">✨ Vos motivations, notre boussole</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">✈️ Avant de décoller, faisons connaissance</h2>
                 </div>
 
-                <div className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-3">Que recherchez-vous ?</label>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      {[
-                        'Besoin de déconnexion',
-                        'Envie de changement',
-                        'Célébration (anniversaire, lune de miel, etc.)',
-                        "Retrouver l'inspiration",
-                        'Recharger les batteries',
-                        'Travailler à distance',
-                        'Autre (Précisez)'
-                      ].map((option) => (
-                        <label key={option} className="flex items-center p-3 border-2 border-gray-200 rounded-2xl hover:border-emerald-400 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.motivations.includes(option)}
-                            onChange={() => toggleMultiSelect('motivations', option)}
-                            className="w-4 h-4 text-gray-700 border-gray-300 rounded"
-                          />
-                          <span className="ml-3 text-sm text-gray-600">{option}</span>
-                        </label>
-                      ))}
-                    </div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">Prénom *</label>
+                    <input
+                      type="text"
+                      value={formData.prenom}
+                      onChange={(e) => updateField('prenom', e.target.value)}
+                      readOnly={!!initialData?.prenom}
+                      className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
+                        fieldErrors.has('prenom') ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
+                    />
                   </div>
 
                   <div>
