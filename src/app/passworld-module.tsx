@@ -1103,6 +1103,13 @@ switch (currentStep) {
         case 5: // Planning
           if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
           break;
+        case 4: // Type de voyage
+          if (!formData.voyageType) { missingFields.push('Type de voyage'); errorFields.add('voyageType'); }
+          break;
+        
+        case 5: // Planning
+          if (!formData.planningStyle) { missingFields.push('Style de planning'); errorFields.add('planningStyle'); }
+          break;
         
         case 6: // Environnements
           if (!formData.environnements || formData.environnements.length === 0) {
@@ -1235,116 +1242,116 @@ switch (currentStep) {
           console.log('✅ Email envoyé');
         }
 
-console.log('📤 Envoi formulaire vers:', endpoint);
-console.log('📤 Données:', {
-  participantId: finalParticipantId || 'UNKNOWN',
-  participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
-  isModifying: initialData?.isModifying,
-  responseId: initialData?.responseId,
-});
+        console.log('📤 Envoi formulaire vers:', endpoint);
+        console.log('📤 Données:', {
+          participantId: finalParticipantId || 'UNKNOWN',
+          participantRecordId: finalParticipantRecordId || initialData?.participantRecordId,
+          isModifying: initialData?.isModifying,
+          responseId: initialData?.responseId,
+        });
 
-// Liste des champs qui existent dans Airtable
-const allowedFields = [
-  'budget',
-  'distance',
-  'climat',
-  'environnements',
-  'enfants',
-'ageEnfant1',
-'ageEnfant2',
-'ageEnfant3',
-'ageEnfant4',
-'villeDepart',
-'dateDepart',
-'duree',
-'budget',
-'ordreCriteres',
-  'motivations',
-  'interdits',
-  'departureCity',
-  'departureDate',
-  'duration',
-  'hasChildren',
-  'childrenAges',
-  'companions',
-  'flexibility',
-  'accommodation',
-  'activities',
-  'dietaryRestrictions',
-  'specialRequests',
-  'motivationsDetail',
-  'voyageType',
-  'planningStyle',
-  'paysVisites',
-  'activites',
-  'rythme',
-  'problemeSante',
-  'phobies'
-];
+        // Liste des champs qui existent dans Airtable
+        const allowedFields = [
+          'budget',
+          'distance',
+          'climat',
+          'environnements',
+          'enfants',
+          'ageEnfant1',
+          'ageEnfant2',
+          'ageEnfant3',
+          'ageEnfant4',
+          'villeDepart',
+          'dateDepart',
+          'duree',
+          'ordreCriteres',
+          'motivations',
+          'interdits',
+          'departureCity',
+          'departureDate',
+          'duration',
+          'hasChildren',
+          'childrenAges',
+          'companions',
+          'flexibility',
+          'accommodation',
+          'activities',
+          'dietaryRestrictions',
+          'specialRequests',
+          'motivationsDetail',
+          'voyageType',
+          'planningStyle',
+          'paysVisites',
+          'activites',
+          'rythme',
+          'problemeSante',
+          'phobies'
+        ];
 
-// Filtrer formData pour ne garder que les champs autorisés
-const filteredFormData = Object.keys(formData)
-  .filter(key => allowedFields.includes(key))
-  .reduce((obj, key) => {
-    obj[key] = formData[key];
-    return obj;
-  }, {});
+        // Filtrer formData pour ne garder que les champs autorisés
+        const filteredFormData = Object.keys(formData)
+          .filter(key => allowedFields.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = formData[key];
+            return obj;
+          }, {});
 
-console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
+        console.log('📤 Champs envoyés:', Object.keys(filteredFormData));
 
-const response = await fetch(endpoint, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    ...(initialData?.isModifying && { responseId: initialData.responseId }),
-    participantId: finalParticipantId || 'UNKNOWN',
-    participantRecordId: finalParticipantRecordId,
-    ...filteredFormData
-  }),
-});
-console.log('🔍 === DEBUG FORMULAIRE ===');
-console.log('motivationsDetail:', formData.motivationsDetail);
-console.log('voyageType:', formData.voyageType);
-console.log('planningStyle:', formData.planningStyle);
-console.log('paysVisites:', formData.paysVisites);
-console.log('activites:', formData.activites);
-console.log('rythme:', formData.rythme);
-console.log('problemeSante:', formData.problemeSante);
-console.log('phobies:', formData.phobies);
-console.log('🔍 === FIN DEBUG ===');
-console.log('🔥 Réponse API:', response.status, response.statusText);
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...(initialData?.isModifying && { responseId: initialData.responseId }),
+            participantId: finalParticipantId || 'UNKNOWN',
+            participantRecordId: finalParticipantRecordId,
+            ...filteredFormData
+          }),
+        });
+        
+        console.log('📋 === DEBUG FORMULAIRE ===');
+        console.log('motivationsDetail:', formData.motivationsDetail);
+        console.log('voyageType:', formData.voyageType);
+        console.log('planningStyle:', formData.planningStyle);
+        console.log('paysVisites:', formData.paysVisites);
+        console.log('activites:', formData.activites);
+        console.log('rythme:', formData.rythme);
+        console.log('problemeSante:', formData.problemeSante);
+        console.log('phobies:', formData.phobies);
+        console.log('📋 === FIN DEBUG ===');
+        console.log('🔥 Réponse API:', response.status, response.statusText);
 
-if (!response.ok) {
-  const errorText = await response.text();
-  console.error('❌ Erreur API complète:', errorText);
-  
-  let errorMessage = 'Erreur lors de la sauvegarde';
-  try {
-    const error = JSON.parse(errorText);
-    errorMessage = error.error || error.message || errorText;
-  } catch {
-    errorMessage = errorText;
-  }
-  
-  throw new Error(errorMessage);
-}
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Erreur API complète:', errorText);
+          
+          let errorMessage = 'Erreur lors de la sauvegarde';
+          try {
+            const error = JSON.parse(errorText);
+            errorMessage = error.error || error.message || errorText;
+          } catch {
+            errorMessage = errorText;
+          }
+          
+          throw new Error(errorMessage);
+        }
 
-const result = await response.json();
-console.log('✅ Formulaire sauvegardé:', result);
+        const result = await response.json();
+        console.log('✅ Formulaire sauvegardé:', result);
 
-setIsSubmittingForm(false);
-setFormSubmitted(true);
+        setIsSubmittingForm(false);
+        setFormSubmitted(true);
 
-} catch (error) {
-  console.error('Erreur soumission formulaire:', error);
-  alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
-} finally {
-  setLoading(false);
-}
-};
+      } catch (error) {
+        console.error('Erreur soumission formulaire:', error);
+        alert('Erreur lors de l\'envoi du formulaire : ' + (error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-return (
-  <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+    return (
+      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
@@ -1383,31 +1390,6 @@ return (
                       } ${initialData?.prenom ? 'bg-gray-50' : ''}`}
                     />
                   </div>
-
-                /* ===== STEP 2 POUR SOLO - EXACTEMENT COMME FORMULAIRE GROUPE ===== */
-/* Remplacer les lignes 1417-1515 par ce code */
-
-{currentStep === 2 && (
-  <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
-    <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
-      📋 Informations du voyage
-    </h3>
-    <p className="text-gray-500 mb-6 text-sm">Ces informations personnaliseront votre voyage</p>
-    
-    <div className="grid md:grid-cols-2 gap-4">
-      {/* Y a-t-il des enfants */}
-      <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
-          Y a-t-il des enfants ? *
-        </label>
-        <select
-          value={formData.enfants}
-          onChange={(e) => updateField('enfants', e.target.value)}
-          required
-          className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 ${
-            fieldErrors.has('enfants') ? 'border-red-500' : 'border-gray-300'
-          }`}
-        >
           <option value="">Sélectionner</option>
           <option value="non">Non</option>
           <option value="1">1 enfant</option>
