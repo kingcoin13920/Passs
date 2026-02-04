@@ -188,7 +188,7 @@ const StripeAPI = {
     return result;
   }
 };
-  const PassworldModule = () => {  // ✅ Pas d'indentation
+const PassworldModule = () => {  // ✅ Pas d'indentation
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
   const [selectedPrice, setSelectedPrice] = useState(29);
