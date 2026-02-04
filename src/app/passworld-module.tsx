@@ -1905,7 +1905,6 @@ setFormSubmitted(true);
         </div>
       </div>
     );
-  };
 
 // Pages de chargement et confirmation
 if (isSubmittingForm) {
