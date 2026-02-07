@@ -19,7 +19,7 @@ const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
 const CRITERIA = [
   { id: 'budget', label: 'Budget', icon: '💰' },
   { id: 'dates', label: 'Dates / Durée', icon: '📅' },
-  { id: 'environment', label: "Type d'environnement", icon: '🏖️' },
+  { id: 'environment', label: 'Environnement', icon: '🏖️' },
   { id: 'climate', label: 'Climat', icon: '☀️' },
   { id: 'activities', label: 'Activités souhaitées', icon: '🎯' },
   { id: 'rhythm', label: 'Rythme du voyage', icon: '⚡' },
@@ -205,6 +205,28 @@ const StripeAPI = {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
+  // Gestion de l'historique du navigateur
+  useEffect(() => {
+    // Ajouter l'état actuel à l'historique
+    window.history.pushState({ view: currentView }, '', '');
+
+    // Gérer le bouton retour du navigateur
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state?.view) {
+        setCurrentView(event.state.view);
+      } else {
+        // Si on revient en arrière et qu'il n'y a pas d'état, retourner au router
+        setCurrentView('router');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [currentView]);
   
   // Tracking
   const trackEvent = (name: string, props?: any) => {
@@ -532,6 +554,33 @@ const handleModifyForm = async () => {
     setIsModifying(false);
   }
 };
+
+  // Composant Tooltip simple
+  const Tooltip = ({ children, text }: { children: React.ReactNode; text: string }) => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    return (
+      <div className="relative inline-block">
+        <button
+          type="button"
+          onMouseEnter={() => setIsVisible(true)}
+          onMouseLeave={() => setIsVisible(false)}
+          onClick={() => setIsVisible(!isVisible)}
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
+        >
+          ?
+        </button>
+        {isVisible && (
+          <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-normal w-64">
+            {text}
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+              <div className="border-4 border-transparent border-t-gray-800"></div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Composant pour gérer l'ordre des critères en mode solo
   const SoloCriteriaOrder = ({ onComplete }: { onComplete: (criteriaOrder: string[], travelData: any) => void }) => {
@@ -1065,7 +1114,7 @@ const handleModifyForm = async () => {
 
     return (
       <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1520,7 +1569,7 @@ setFormSubmitted(true);
 
     return (
       <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1968,7 +2017,7 @@ setFormSubmitted(true);
 if (isSubmittingForm) {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1985,7 +2034,7 @@ if (isSubmittingForm) {
 if (formSubmitted) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2012,7 +2061,7 @@ if (formSubmitted) {
 if (paymentSuccess && tripData.travelers === 1) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2267,7 +2316,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2375,7 +2424,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2588,7 +2637,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'start' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2647,7 +2696,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'with-code' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2707,7 +2756,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'no-code' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2766,7 +2815,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'solo-setup' && (
         <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2792,6 +2841,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Budget estimé *
+                      <Tooltip text="Indiquez votre budget par personne pour ce voyage. Cela nous aide à trouver la destination parfaite pour vous." />
                     </label>
                     <select
                       id="solo-budget"
@@ -2950,7 +3000,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'solo-payment' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -3019,7 +3069,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                     departureCity: tripData.departureCity || '',
                     departureDate: tripData.departureDate || '',
                     duration: tripData.duration || '',
-                    criteriaOrder: tripData.criteriaOrder || []
+                    criteriaOrder: JSON.stringify(tripData.criteriaOrder || [])
                   });
                 }}
                 className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center"
@@ -3096,7 +3146,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'gift-choice' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -3145,7 +3195,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'dashboard' && groupStatus && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -3316,7 +3366,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'personalized-welcome' && participantInfo && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
