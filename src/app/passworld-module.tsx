@@ -2794,7 +2794,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       onChange={(e) => {
                         const childrenFields = document.getElementById('solo-children-fields');
                         if (childrenFields) {
-                          childrenFields.style.display = e.target.value === 'oui' ? 'contents' : 'none';
+                          childrenFields.style.display = e.target.value === 'oui' ? 'grid' : 'none';
                         }
                       }}
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
@@ -2804,36 +2804,40 @@ if (paymentSuccess && tripData.travelers === 1) {
                       <option value="non">Non</option>
                     </select>
                   </div>
+                </div>
 
-                  <div id="solo-children-fields" style={{ display: 'none', contents: 'contents' }}>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">
-                        Nombre d'enfants *
-                      </label>
-                      <select
-                        id="solo-nb-children"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                      >
-                        <option value="">Sélectionner</option>
-                        <option value="1">1 enfant</option>
-                        <option value="2">2 enfants</option>
-                        <option value="3">3 enfants</option>
-                        <option value="4+">4 enfants ou plus</option>
-                      </select>
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-600 mb-2">
-                        Âge(s) des enfants *
-                      </label>
-                      <input
-                        type="text"
-                        id="solo-ages-children"
-                        placeholder="Ex: 3 ans, 7 ans"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                      />
-                    </div>
+                {/* Champs conditionnels enfants */}
+                <div id="solo-children-fields" style={{ display: 'none' }} className="grid md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Nombre d'enfants *
+                    </label>
+                    <select
+                      id="solo-nb-children"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="1">1 enfant</option>
+                      <option value="2">2 enfants</option>
+                      <option value="3">3 enfants</option>
+                      <option value="4+">4 enfants ou plus</option>
+                    </select>
                   </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Âge(s) des enfants *
+                    </label>
+                    <input
+                      type="text"
+                      id="solo-ages-children"
+                      placeholder="Ex: 3 ans, 7 ans"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    />
+                  </div>
+                </div>
 
+                {/* Reprise de la grille normale */}
+                <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Ville de départ *
