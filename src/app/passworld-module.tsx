@@ -556,7 +556,7 @@ const handleModifyForm = async () => {
 };
 
   // Composant Tooltip simple
-  const Tooltip = ({ children, text }: { children: React.ReactNode; text: string }) => {
+  const Tooltip = ({ text }: { text: string }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
