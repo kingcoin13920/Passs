@@ -491,8 +491,8 @@ const verifyCode = async (code: string) => {
     console.log('👤 ParticipantInfo stocké:', result);
     console.log('👤 Participant prenom:', result.participant?.prenom);
 
-    // Charger le statut du groupe
-    await loadGroupStatus(code);
+    // Charger le statut du groupe avec le code en majuscules
+    await loadGroupStatus(upperCode);
 
     // Rediriger vers le dashboard
     setCurrentView('dashboard');
@@ -504,8 +504,11 @@ const verifyCode = async (code: string) => {
     
   } catch (error) {
     console.error('❌ Erreur:', error);
-    alert('Erreur lors de la vérification du code');
     setLoading(false);
+    
+    // Rester sur l'écran with-code en cas d'erreur
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    alert(`Erreur lors de la vérification du code: ${errorMessage}\n\nVeuillez réessayer.`);
   }
 };
 
@@ -901,15 +904,16 @@ const handleModifyForm = async () => {
               </button>
 
               {/* NOUVEAU: Informations communes du voyage */}
-              <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <div className="mb-10 p-4 md:p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 flex items-center">
                   📋 Informations du voyage
                 </h3>
-                <p className="text-gray-500 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
+                <p className="text-gray-500 mb-4 md:mb-6 text-xs md:text-sm">Ces informations s'appliqueront à tous les participants</p>
                 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  {/* Budget - toute la largeur sur mobile */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                    <label className="block text-sm font-medium text-gray-600 mb-2 flex items-center">
                       Budget estimé (par personne) *
                       <Tooltip text="Indiquez le budget par personne pour ce voyage. Cela nous aide à trouver la destination parfaite. Ce budget commun permet à tous les participants de s'accorder sur un montant." />
                     </label>
@@ -927,6 +931,7 @@ const handleModifyForm = async () => {
                     </select>
                   </div>
 
+                  {/* Enfants */}
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Y a-t-il des enfants ? *
@@ -943,6 +948,7 @@ const handleModifyForm = async () => {
                     </select>
                   </div>
 
+                  {/* Champs conditionnels enfants */}
                   {commonData.enfants === 'oui' && (
                     <>
                       <div>
@@ -962,7 +968,7 @@ const handleModifyForm = async () => {
                           <option value="4+">4 enfants ou plus</option>
                         </select>
                       </div>
-                      <div className="md:col-span-2">
+                      <div>
                         <label className="block text-sm font-medium text-gray-600 mb-2">
                           Âge(s) des enfants *
                         </label>
@@ -978,7 +984,8 @@ const handleModifyForm = async () => {
                     </>
                   )}
 
-                  <div className={commonData.enfants === 'oui' ? '' : 'md:col-start-2'}>
+                  {/* Ville de départ */}
+                  <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Ville de départ *
                     </label>
@@ -992,6 +999,7 @@ const handleModifyForm = async () => {
                     />
                   </div>
 
+                  {/* Date de départ */}
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Date de départ souhaitée *
@@ -1006,6 +1014,7 @@ const handleModifyForm = async () => {
                     />
                   </div>
 
+                  {/* Durée */}
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Durée du voyage *
