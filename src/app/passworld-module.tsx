@@ -771,6 +771,7 @@ const handleModifyForm = async () => {
 
     // État pour les données communes à tous les participants
     const [commonData, setCommonData] = useState({
+      budget: '',
       enfants: '',
       nbEnfants: '',
       agesEnfants: '',
@@ -907,6 +908,25 @@ const handleModifyForm = async () => {
                 <p className="text-gray-500 mb-6 text-sm">Ces informations s'appliqueront à tous les participants</p>
                 
                 <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Budget estimé (par personne) *
+                      <Tooltip text="Indiquez le budget par personne pour ce voyage. Cela nous aide à trouver la destination parfaite. Ce budget commun permet à tous les participants de s'accorder sur un montant." />
+                    </label>
+                    <select
+                      value={commonData.budget}
+                      onChange={(e) => setCommonData({...commonData, budget: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    >
+                      <option value="">Sélectionner</option>
+                      <option value="<500">Moins de 500€</option>
+                      <option value="500-1000">500€ - 1000€</option>
+                      <option value="1000-2000">1000€ - 2000€</option>
+                      <option value="2000+">Plus de 2000€</option>
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Y a-t-il des enfants ? *
@@ -1075,7 +1095,7 @@ const handleModifyForm = async () => {
                 <button
                   onClick={() => {
                     // Valider les champs communs obligatoires
-                    if (!commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
+                    if (!commonData.budget || !commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
                       alert('⚠️ Veuillez remplir tous les champs obligatoires des informations du voyage');
                       return;
                     }
@@ -1101,7 +1121,7 @@ const handleModifyForm = async () => {
                 <button
                   onClick={() => {
                     // Valider les champs communs obligatoires
-                    if (!commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
+                    if (!commonData.budget || !commonData.enfants || !commonData.villeDepart || !commonData.dateDepart || !commonData.duree) {
                       alert('⚠️ Veuillez remplir tous les champs obligatoires des informations du voyage');
                       return;
                     }
@@ -2215,7 +2235,7 @@ if (paymentSuccess && tripData.travelers === 1) {
   }
   const Router = () => {
     return (
-      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
+      <div className="min-h-screen relative overflow-auto" style={{ backgroundColor: '#f7f7f7' }}>
         {/* Fond travaillé multi-couches */}
         <div className="absolute inset-0">
           {/* Couche 1: Image principale */}
@@ -2381,7 +2401,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -2489,7 +2509,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -2585,7 +2605,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'gift' && (
-        <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f7f7f7' }}>
+        <div className="min-h-screen relative overflow-auto" style={{ backgroundColor: '#f7f7f7' }}>
           {/* Même fond que l'accueil */}
           <div className="absolute inset-0">
             <div 
@@ -2761,35 +2781,34 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-3 md:p-4 py-6 md:py-0" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundPosition: 'center'
       }}>
-          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
+          <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-5 md:p-8 my-auto">
             <button
               onClick={() => setCurrentView('start')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-500 hover:text-gray-900 mb-4 md:mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
             </button>
 
-            <div className="text-center mb-8">
-              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Code className="w-8 h-8 text-gray-700" />
+            <div className="text-center mb-6 md:mb-8">
+              <div className="bg-gray-100 rounded-full p-3 w-14 h-14 mx-auto mb-3 flex items-center justify-center">
+                <Code className="w-7 h-7 text-gray-700" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Entrez votre code</h2>
-              <p className="text-gray-500">Code de carte cadeau ou code participant</p>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Entrez votre code</h2>
+              <p className="text-gray-500 text-sm md:text-base">Code de carte cadeau ou code participant</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               <input
                 id="code-input-field"
                 type="text"
-                className="w-full px-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-transparent text-center text-2xl font-mono tracking-wider"
-                placeholder="CODE-1234567891011-X"
+                className="w-full px-4 py-4 border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-transparent text-center text-lg md:text-2xl font-mono tracking-wider"
+                placeholder="CODE-123..."
                 maxLength={21}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -2821,7 +2840,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -3065,7 +3084,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -3211,7 +3230,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'gift-choice' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -3260,7 +3279,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -3431,7 +3450,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
