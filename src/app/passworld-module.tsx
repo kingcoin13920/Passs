@@ -208,6 +208,11 @@ const StripeAPI = {
 
   // Gestion de l'historique du navigateur
   useEffect(() => {
+    // Ne pas gérer l'historique si on est dans le formulaire (FormView le gère lui-même)
+    if (currentView === 'form') {
+      return;
+    }
+
     // Ajouter l'état actuel à l'historique
     window.history.pushState({ view: currentView }, '', '');
 
@@ -2667,58 +2672,58 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-3 md:p-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       }}>
-          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-5 md:p-8 my-3">
             <button
               onClick={() => setCurrentView('router')}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              className="flex items-center text-gray-500 hover:text-gray-900 mb-4 md:mb-6"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
             </button>
 
-            <div className="text-center mb-8">
-              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Plane className="w-8 h-8 text-gray-700" />
+            <div className="text-center mb-5 md:mb-8">
+              <div className="bg-gray-100 rounded-full p-3 w-14 h-14 mx-auto mb-3 flex items-center justify-center">
+                <Plane className="w-7 h-7 text-gray-700" />
               </div>
-              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Commencer l'expérience</h2>
-              <p className="text-gray-600">Avez-vous déjà un code ?</p>
+              <h2 className="font-['Poppins'] text-2xl md:text-4xl font-bold text-gray-900 mb-2">Commencer l'expérience</h2>
+              <p className="text-gray-600 text-sm md:text-base">Avez-vous déjà un code ?</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {/* Bouton 1: Je n'ai pas encore de code (en premier) */}
               <button
                 onClick={() => setCurrentView('no-code')}
-                className="w-full bg-white border-2 border-gray-700 text-gray-900 p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
+                className="w-full bg-white border-2 border-gray-700 text-gray-900 p-4 md:p-6 rounded-3xl hover:bg-gray-50 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
-                  <Users className="w-6 h-6 mr-3" />
+                  <Users className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">Je n'ai pas encore de code</div>
-                    <div className="text-gray-600 text-sm">Démarrer une nouvelle expérience</div>
+                    <div className="font-semibold text-base md:text-lg">Je n'ai pas encore de code</div>
+                    <div className="text-gray-600 text-xs md:text-sm">Démarrer une nouvelle expérience</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </button>
 
               {/* Bouton 2: J'ai déjà un code (en second) */}
               <button
                 onClick={() => setCurrentView('with-code')}
-                className="w-full bg-gray-900 text-white p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
+                className="w-full bg-gray-900 text-white p-4 md:p-6 rounded-3xl hover:bg-gray-800 transition-colors flex items-center justify-between group"
               >
                 <div className="flex items-center">
-                  <Code className="w-6 h-6 mr-3" />
+                  <Code className="w-5 h-5 md:w-6 md:h-6 mr-3" />
                   <div className="text-left">
-                    <div className="font-semibold text-lg">J'ai déjà un code</div>
-                    <div className="text-gray-300 text-sm">Carte cadeau ou code reçu par email</div>
+                    <div className="font-semibold text-base md:text-lg">J'ai déjà un code</div>
+                    <div className="text-gray-300 text-xs md:text-sm">Carte cadeau ou code reçu par email</div>
                   </div>
                 </div>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform flex-shrink-0" />
               </button>
             </div>
           </div>
