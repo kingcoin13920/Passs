@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
           
-          <!-- Header -->
+          <!-- Header avec fond dégradé -->
           <tr>
             <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
               <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
@@ -48,16 +48,16 @@ export async function POST(request: Request) {
           
           <!-- Content -->
           <tr>
-            <td style="padding: 40px 30px;">
+            <td style="padding: 40px 30px; background-color: #ffffff;">
               <h2 style="color: #2d3748; margin: 0 0 20px 0; font-size: 22px;">
                 Bonjour ${prenom} ! 👋
               </h2>
               
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              <p style="color: #2d3748; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
                 Vous avez été invité(e) à participer à un <strong>voyage surprise</strong> ! 🌍
               </p>
               
-              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
+              <p style="color: #2d3748; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
                 Pour que nous puissions trouver la destination parfaite pour vous, merci de compléter le questionnaire ci-dessous avec votre code d'accès.
               </p>
               
@@ -76,14 +76,14 @@ export async function POST(request: Request) {
                 <tr>
                   <td align="center" style="padding: 20px 0;">
                     <a href="https://passs-two.vercel.app?action=code&c=${code}" 
-                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);">
+                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff !important; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);">
                       🚀 Accéder à mon questionnaire
                     </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="color: #718096; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #2d3748; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                 💡 <strong>Astuce :</strong> Complétez le questionnaire en toute honnêteté pour que votre destination soit vraiment adaptée à vos envies !
               </p>
             </td>
@@ -92,10 +92,10 @@ export async function POST(request: Request) {
           <!-- Footer -->
           <tr>
             <td style="background-color: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="color: #a0aec0; font-size: 14px; margin: 0 0 10px 0;">
+              <p style="color: #4a5568; font-size: 14px; margin: 0 0 10px 0;">
                 Passworld - Voyages Surprise
               </p>
-              <p style="color: #cbd5e0; font-size: 12px; margin: 0;">
+              <p style="color: #718096; font-size: 12px; margin: 0;">
                 Si vous avez des questions, répondez simplement à cet email.
               </p>
             </td>
