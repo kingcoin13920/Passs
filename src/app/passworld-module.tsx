@@ -199,6 +199,12 @@ const StripeAPI = {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
+
+  // Fonction de validation d'email
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
   
   // Tracking
   const trackEvent = (name: string, props?: any) => {
@@ -380,18 +386,21 @@ const verifyCode = async (code: string) => {
     return;
   }
 
+  // Convertir en majuscules pour la vérification
+  const upperCode = code.trim().toUpperCase();
+
   setLoading(true);
   try {
-    console.log('🔍 Vérification du code:', code);
+    console.log('🔍 Vérification du code:', upperCode);
     
     // Vérifier d'abord si c'est un code cadeau
-    if (code.startsWith('GIFT-')) {
+    if (upperCode.startsWith('GIFT-')) {
       console.log('🎁 Détection d\'un code cadeau');
       
       const response = await fetch('/api/airtable/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code: upperCode }),
       });
       
       const giftResult = await response.json();
@@ -412,7 +421,7 @@ const verifyCode = async (code: string) => {
       
       // Stocker les infos de la carte cadeau
       setTripData({ 
-        inputCode: code, 
+        inputCode: upperCode, 
         isGiftCard: true,
         giftCardId: giftResult.giftCardId,
         buyerName: giftResult.buyerName,
@@ -427,7 +436,7 @@ const verifyCode = async (code: string) => {
     }
     
     // Code participant normal
-    const result = await airtableClient.getParticipantWithTripInfo(code);
+    const result = await airtableClient.getParticipantWithTripInfo(upperCode);
     
     console.log('📋 Résultat:', result);
     
@@ -601,40 +610,42 @@ const handleModifyForm = async () => {
               onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
-              className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between transition-all hover:shadow-lg ${
+              className={`bg-white border-2 rounded-4xl p-5 transition-all hover:shadow-lg ${
                 draggedItem === index ? 'opacity-50 scale-95' : 'opacity-100'
               } border-gray-300 hover:border-gray-400`}
             >
-              <div className="flex items-center gap-4 flex-1">
-                <GripVertical className="w-5 h-5 text-slate-400 hidden md:block" />
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{criterion.icon}</span>
-                  <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <GripVertical className="w-5 h-5 text-slate-400 hidden md:block flex-shrink-0" />
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-3xl flex-shrink-0">{criterion.icon}</span>
+                    <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
+                  </div>
                 </div>
-              </div>
-              
-              {/* Flèches pour mobile */}
-              <div className="flex gap-2 md:hidden">
-                <button
-                  type="button"
-                  onClick={() => moveUp(index)}
-                  disabled={index === 0}
-                  className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
-                >
-                  <ArrowLeft className="w-4 h-4 rotate-90" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveDown(index)}
-                  disabled={index === criteria.length - 1}
-                  className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
-                >
-                  <ArrowLeft className="w-4 h-4 -rotate-90" />
-                </button>
-              </div>
-              
-              <div className="bg-gray-800 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-md">
-                {index + 1}
+                
+                {/* Flèches pour mobile - verticalement */}
+                <div className="flex flex-col gap-1 md:hidden flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => moveUp(index)}
+                    disabled={index === 0}
+                    className="p-1 text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed hover:text-gray-900"
+                  >
+                    <ArrowLeft className="w-5 h-5 rotate-90" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveDown(index)}
+                    disabled={index === criteria.length - 1}
+                    className="p-1 text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed hover:text-gray-900"
+                  >
+                    <ArrowLeft className="w-5 h-5 -rotate-90" />
+                  </button>
+                </div>
+                
+                <div className="bg-gray-800 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-md flex-shrink-0">
+                  {index + 1}
+                </div>
               </div>
             </div>
           ))}
@@ -785,6 +796,15 @@ const handleModifyForm = async () => {
         alert('Veuillez remplir toutes les informations des participants');
         return;
       }
+      
+      // Validation des emails
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const invalidEmails = participants.filter(p => !emailRegex.test(p.email));
+      if (invalidEmails.length > 0) {
+        alert('Veuillez entrer des adresses email valides pour tous les participants');
+        return;
+      }
+      
       console.log('Group setup complete:', { 
         criteria: criteria.map(c => c.id), 
         participants, 
@@ -943,40 +963,42 @@ const handleModifyForm = async () => {
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
+                    className={`bg-white border-2 rounded-4xl p-5 transition-all hover:shadow-lg ${
                       draggedItem === index 
                         ? 'border-gray-700 shadow-2xl scale-105 bg-gray-50' 
                         : 'border-slate-200 hover:border-gray-400'
                     }`}
                   >
-                    <div className="flex items-center gap-4 flex-1">
-                      <GripVertical className="w-6 h-6 text-slate-400 hidden md:block" />
-                      <span className="text-3xl">{criterion.icon}</span>
-                      <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
-                    </div>
-                    
-                    {/* Flèches pour mobile */}
-                    <div className="flex gap-2 md:hidden mr-3">
-                      <button
-                        type="button"
-                        onClick={() => moveUp(index)}
-                        disabled={index === 0}
-                        className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
-                      >
-                        <ArrowLeft className="w-4 h-4 rotate-90" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveDown(index)}
-                        disabled={index === criteria.length - 1}
-                        className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
-                      >
-                        <ArrowLeft className="w-4 h-4 -rotate-90" />
-                      </button>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-gray-500 to-gray-700 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
-                      #{index + 1}
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <GripVertical className="w-6 h-6 text-slate-400 hidden md:block flex-shrink-0" />
+                        <span className="text-3xl flex-shrink-0">{criterion.icon}</span>
+                        <span className="font-semibold text-slate-900 text-lg break-words">{criterion.label}</span>
+                      </div>
+                      
+                      {/* Flèches pour mobile - verticalement */}
+                      <div className="flex flex-col gap-1 md:hidden flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveUp(index)}
+                          disabled={index === 0}
+                          className="p-1 text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed hover:text-gray-900"
+                        >
+                          <ArrowLeft className="w-5 h-5 rotate-90" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveDown(index)}
+                          disabled={index === criteria.length - 1}
+                          className="p-1 text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed hover:text-gray-900"
+                        >
+                          <ArrowLeft className="w-5 h-5 -rotate-90" />
+                        </button>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-gray-500 to-gray-700 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg flex-shrink-0">
+                        #{index + 1}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1043,7 +1065,7 @@ const handleModifyForm = async () => {
 
     return (
       <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1498,7 +1520,7 @@ setFormSubmitted(true);
 
     return (
       <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1909,7 +1931,7 @@ setFormSubmitted(true);
             {/* Step 10 (Formule) supprimé */}
 
             {/* Navigation buttons */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t">
+            <div className="flex justify-between items-center gap-4 mt-8 pt-6 border-t">
               <button
                 onClick={currentStep === 1 ? onBack : prevStep}
                 className="flex items-center px-6 py-3 rounded-full border-2 border-gray-300 text-gray-800 hover:border-gray-600 hover:bg-gray-50 font-semibold transition-all"
@@ -1921,7 +1943,7 @@ setFormSubmitted(true);
               {currentStep < totalSteps ? (
                 <button
                   onClick={nextStep}
-                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
+                  className="flex items-center px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95"
                 >
                   Suivant
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -1929,7 +1951,7 @@ setFormSubmitted(true);
               ) : (
                 <button
                   onClick={submitForm}
-                  className="px-8 py-4 rounded-full font-semibold text-lg bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95 flex items-center"
+                  className="flex items-center px-6 py-3 rounded-full font-semibold bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-soft hover:shadow-float transition-all duration-300 hover:scale-105 active:scale-95"
                 >
                   Envoyer
                   <Check className="w-5 h-5 ml-2" />
@@ -1946,7 +1968,7 @@ setFormSubmitted(true);
 if (isSubmittingForm) {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1963,7 +1985,7 @@ if (isSubmittingForm) {
 if (formSubmitted) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -1990,7 +2012,7 @@ if (formSubmitted) {
 if (paymentSuccess && tripData.travelers === 1) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2245,7 +2267,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2353,7 +2375,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2566,7 +2588,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'start' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2625,7 +2647,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'with-code' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2685,7 +2707,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'no-code' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2744,7 +2766,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'solo-setup' && (
         <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2928,7 +2950,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'solo-payment' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -2979,6 +3001,13 @@ if (paymentSuccess && tripData.travelers === 1) {
                   
                   if (!emailInput?.value) {
                     alert('Veuillez entrer votre email');
+                    return;
+                  }
+
+                  // Validation email
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  if (!emailRegex.test(emailInput.value)) {
+                    alert('Veuillez entrer une adresse email valide');
                     return;
                   }
 
@@ -3067,7 +3096,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'gift-choice' && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -3116,7 +3145,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'dashboard' && groupStatus && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -3287,7 +3316,7 @@ if (paymentSuccess && tripData.travelers === 1) {
 
       {currentView === 'personalized-welcome' && participantInfo && (
         <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundImage: 'url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
