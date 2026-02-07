@@ -19,7 +19,7 @@ const IS_DEMO_MODE = false; // Changez à true pour activer le mode démo
 const CRITERIA = [
   { id: 'budget', label: 'Budget', icon: '💰' },
   { id: 'dates', label: 'Dates / Durée', icon: '📅' },
-  { id: 'environment', label: 'Environnement', icon: '🏖️' },
+  { id: 'environment', label: 'Cadre', icon: '🏖️' },
   { id: 'climate', label: 'Climat', icon: '☀️' },
   { id: 'activities', label: 'Activités souhaitées', icon: '🎯' },
   { id: 'rhythm', label: 'Rythme du voyage', icon: '⚡' },
@@ -870,7 +870,7 @@ const handleModifyForm = async () => {
 
     if (step === 1) {
       return (
-        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: '#f7f7f7' }}>
+        <div className="min-h-screen relative overflow-auto py-12 px-4" style={{ backgroundColor: '#f7f7f7' }}>
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
@@ -1113,7 +1113,7 @@ const handleModifyForm = async () => {
     }
 
     return (
-      <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ 
+      <div className="min-h-screen relative overflow-auto py-8 px-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -1287,6 +1287,37 @@ const handleModifyForm = async () => {
     console.log('📝 FormData initialisé:', formData);
 
     const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
+
+    // Gestion de l'historique du navigateur pour les étapes du formulaire
+    useEffect(() => {
+      // Sauvegarder l'étape actuelle dans l'historique
+      const state = { view: 'form', step: currentStep };
+      window.history.pushState(state, '', '');
+
+      const handlePopState = (event: PopStateEvent) => {
+        if (event.state?.view === 'form' && event.state?.step) {
+          // Retourner à l'étape précédente
+          if (event.state.step > 1) {
+            setCurrentStep(event.state.step);
+          } else {
+            // Si on est à l'étape 1, retourner à la page précédente
+            onBack();
+          }
+        } else if (currentStep > 1) {
+          // Si pas d'état et qu'on n'est pas à l'étape 1, revenir à l'étape précédente
+          setCurrentStep(prev => Math.max(1, prev - 1));
+        } else {
+          // Sinon retourner à la page précédente
+          onBack();
+        }
+      };
+
+      window.addEventListener('popstate', handlePopState);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }, [currentStep, onBack]);
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
@@ -1568,7 +1599,7 @@ setFormSubmitted(true);
     };
 
     return (
-      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
+      <div className="min-h-screen relative overflow-auto py-12 px-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -2166,30 +2197,30 @@ if (paymentSuccess && tripData.travelers === 1) {
         </div>
 
         {/* Contenu principal */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4 md:p-8">
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-3 md:p-8">
           <div className="max-w-6xl w-full">
             {/* Hero Section avec logo */}
-            <div className="text-center mb-12 md:mb-16">
+            <div className="text-center mb-6 md:mb-16">
               <img 
                 src="https://hihaaa.com/wp-content/uploads/2026/01/Plan-de-travail-1Passworld-logo-noir.png"
                 alt="Passworld"
-                className="mx-auto mb-6"
-                style={{ maxWidth: '280px', width: 'auto', height: 'auto' }}
+                className="mx-auto mb-4 md:mb-6"
+                style={{ maxWidth: '220px', width: 'auto', height: 'auto' }}
               />
-              <p className="text-base md:text-xl text-gray-600 font-light">
+              <p className="text-sm md:text-xl text-gray-600 font-light">
                 Votre prochaine aventure vous attend
               </p>
             </div>
 
             {/* Cards Grid */}
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               {/* Card 1: Commencer mon voyage (anciennement Card 2) */}
               <button
                 onClick={() => setCurrentView('start')}
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
                 {/* Image de fond - hauteur réduite */}
-                <div className="relative h-48 md:h-56 overflow-hidden">
+                <div className="relative h-36 md:h-56 overflow-hidden">
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
@@ -2215,11 +2246,11 @@ if (paymentSuccess && tripData.travelers === 1) {
                 </div>
 
                 {/* Contenu texte */}
-                <div className="p-5 text-left">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                <div className="p-3 md:p-5 text-left">
+                  <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                     Démarrer l'expérience
                   </h2>
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                  <p className="text-gray-600 leading-relaxed text-xs md:text-sm">
                     Je découvre la destination qui me correspond
                   </p>
                 </div>
@@ -2231,7 +2262,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
               >
                 {/* Image de fond - hauteur réduite */}
-                <div className="relative h-48 md:h-56 overflow-hidden">
+                <div className="relative h-36 md:h-56 overflow-hidden">
                   <div 
                     className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 group-hover:scale-110 transition-transform duration-700"
                     style={{
@@ -2257,12 +2288,12 @@ if (paymentSuccess && tripData.travelers === 1) {
                 </div>
 
                 {/* Contenu texte */}
-                <div className="p-5 text-left">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                <div className="p-3 md:p-5 text-left">
+                  <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                     Offrir l'expérience
                   </h2>
                   
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                  <p className="text-gray-600 leading-relaxed text-xs md:text-sm">
                     Le cadeau parfait pour une expérience unique
                   </p>
                   {/* Choix du montant */}
@@ -2274,7 +2305,7 @@ if (paymentSuccess && tripData.travelers === 1) {
             {/* Card 3: Dashboard */}
             <button
               onClick={() => setCurrentView('with-code')}
-              className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+              className="w-full bg-white/80 backdrop-blur-sm rounded-3xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -2814,7 +2845,7 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'solo-setup' && (
-        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
+        <div className="min-h-screen relative overflow-auto py-12 px-4" style={{ 
         backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
