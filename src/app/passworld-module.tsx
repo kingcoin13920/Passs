@@ -528,8 +528,6 @@ const handleModifyForm = async () => {
   const SoloCriteriaOrder = ({ onComplete }: { onComplete: (criteriaOrder: string[], travelData: any) => void }) => {
     const [criteria, setCriteria] = useState(CRITERIA);
     const [draggedItem, setDraggedItem] = useState<number | null>(null);
-    const [touchStartY, setTouchStartY] = useState<number | null>(null);
-    const [touchStartIndex, setTouchStartIndex] = useState<number | null>(null);
 
     const handleDragStart = (index: number) => {
       setDraggedItem(index);
@@ -552,44 +550,19 @@ const handleModifyForm = async () => {
       setDraggedItem(null);
     };
 
-    // Gestion tactile pour mobile
-    const handleTouchStart = (e: React.TouchEvent, index: number) => {
-      setTouchStartY(e.touches[0].clientY);
-      setTouchStartIndex(index);
-      setDraggedItem(index);
+    // Fonctions pour déplacer avec les flèches
+    const moveUp = (index: number) => {
+      if (index === 0) return;
+      const newCriteria = [...criteria];
+      [newCriteria[index - 1], newCriteria[index]] = [newCriteria[index], newCriteria[index - 1]];
+      setCriteria(newCriteria);
     };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-      if (touchStartY === null || touchStartIndex === null) return;
-      
-      const currentY = e.touches[0].clientY;
-      const element = e.currentTarget as HTMLElement;
-      const rect = element.getBoundingClientRect();
-      const itemHeight = rect.height;
-      
-      const deltaY = currentY - touchStartY;
-      const itemsMoved = Math.round(deltaY / itemHeight);
-      
-      if (itemsMoved !== 0) {
-        const newIndex = Math.max(0, Math.min(criteria.length - 1, touchStartIndex + itemsMoved));
-        
-        if (newIndex !== touchStartIndex) {
-          const newCriteria = [...criteria];
-          const draggedCriterion = newCriteria[touchStartIndex];
-          newCriteria.splice(touchStartIndex, 1);
-          newCriteria.splice(newIndex, 0, draggedCriterion);
-          
-          setCriteria(newCriteria);
-          setTouchStartIndex(newIndex);
-          setTouchStartY(currentY);
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      setTouchStartY(null);
-      setTouchStartIndex(null);
-      setDraggedItem(null);
+    const moveDown = (index: number) => {
+      if (index === criteria.length - 1) return;
+      const newCriteria = [...criteria];
+      [newCriteria[index], newCriteria[index + 1]] = [newCriteria[index + 1], newCriteria[index]];
+      setCriteria(newCriteria);
     };
 
     const handleSubmit = () => {
@@ -628,20 +601,38 @@ const handleModifyForm = async () => {
               onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
-              onTouchStart={(e) => handleTouchStart(e, index)}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
+              className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between transition-all hover:shadow-lg ${
                 draggedItem === index ? 'opacity-50 scale-95' : 'opacity-100'
               } border-gray-300 hover:border-gray-400`}
             >
               <div className="flex items-center gap-4 flex-1">
-                <GripVertical className="w-5 h-5 text-slate-400" />
+                <GripVertical className="w-5 h-5 text-slate-400 hidden md:block" />
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{criterion.icon}</span>
                   <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
                 </div>
               </div>
+              
+              {/* Flèches pour mobile */}
+              <div className="flex gap-2 md:hidden">
+                <button
+                  type="button"
+                  onClick={() => moveUp(index)}
+                  disabled={index === 0}
+                  className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
+                >
+                  <ArrowLeft className="w-4 h-4 rotate-90" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveDown(index)}
+                  disabled={index === criteria.length - 1}
+                  className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
+                >
+                  <ArrowLeft className="w-4 h-4 -rotate-90" />
+                </button>
+              </div>
+              
               <div className="bg-gray-800 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-lg shadow-md">
                 {index + 1}
               </div>
@@ -703,6 +694,8 @@ const handleModifyForm = async () => {
     // État pour les données communes à tous les participants
     const [commonData, setCommonData] = useState({
       enfants: '',
+      nbEnfants: '',
+      agesEnfants: '',
       villeDepart: '',
       dateDepart: '',
       duree: ''
@@ -751,48 +744,19 @@ const handleModifyForm = async () => {
       setDraggedItem(null);
     };
 
-    // NOUVEAU: Gestion tactile pour mobile
-    const [touchStartY, setTouchStartY] = useState<number | null>(null);
-    const [touchStartIndex, setTouchStartIndex] = useState<number | null>(null);
-
-    const handleTouchStart = (e: React.TouchEvent, index: number) => {
-      setTouchStartY(e.touches[0].clientY);
-      setTouchStartIndex(index);
-      setDraggedItem(index);
+    // Fonctions pour déplacer avec les flèches
+    const moveUp = (index: number) => {
+      if (index === 0) return;
+      const newCriteria = [...criteria];
+      [newCriteria[index - 1], newCriteria[index]] = [newCriteria[index], newCriteria[index - 1]];
+      setCriteria(newCriteria);
     };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-      if (touchStartY === null || touchStartIndex === null) return;
-      
-      const currentY = e.touches[0].clientY;
-      const element = e.currentTarget as HTMLElement;
-      const rect = element.getBoundingClientRect();
-      const itemHeight = rect.height;
-      
-      // Calculer le déplacement en nombre d'éléments
-      const deltaY = currentY - touchStartY;
-      const itemsMoved = Math.round(deltaY / itemHeight);
-      
-      if (itemsMoved !== 0) {
-        const newIndex = Math.max(0, Math.min(criteria.length - 1, touchStartIndex + itemsMoved));
-        
-        if (newIndex !== touchStartIndex) {
-          const newCriteria = [...criteria];
-          const draggedCriterion = newCriteria[touchStartIndex];
-          newCriteria.splice(touchStartIndex, 1);
-          newCriteria.splice(newIndex, 0, draggedCriterion);
-          
-          setCriteria(newCriteria);
-          setTouchStartIndex(newIndex);
-          setTouchStartY(currentY);
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      setTouchStartY(null);
-      setTouchStartIndex(null);
-      setDraggedItem(null);
+    const moveDown = (index: number) => {
+      if (index === criteria.length - 1) return;
+      const newCriteria = [...criteria];
+      [newCriteria[index], newCriteria[index + 1]] = [newCriteria[index + 1], newCriteria[index]];
+      setCriteria(newCriteria);
     };
 
     const addParticipant = () => {
@@ -862,7 +826,7 @@ const handleModifyForm = async () => {
                     </label>
                     <select
                       value={commonData.enfants}
-                      onChange={(e) => setCommonData({...commonData, enfants: e.target.value})}
+                      onChange={(e) => setCommonData({...commonData, enfants: e.target.value, nbEnfants: '', agesEnfants: ''})}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                     >
@@ -872,7 +836,42 @@ const handleModifyForm = async () => {
                     </select>
                   </div>
 
-                  <div>
+                  {commonData.enfants === 'oui' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                          Nombre d'enfants *
+                        </label>
+                        <select
+                          value={commonData.nbEnfants || ''}
+                          onChange={(e) => setCommonData({...commonData, nbEnfants: e.target.value})}
+                          required
+                          className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                        >
+                          <option value="">Sélectionner</option>
+                          <option value="1">1 enfant</option>
+                          <option value="2">2 enfants</option>
+                          <option value="3">3 enfants</option>
+                          <option value="4+">4 enfants ou plus</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                          Âge(s) des enfants *
+                        </label>
+                        <input
+                          type="text"
+                          value={commonData.agesEnfants || ''}
+                          onChange={(e) => setCommonData({...commonData, agesEnfants: e.target.value})}
+                          required
+                          placeholder="Ex: 3 ans, 7 ans"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className={commonData.enfants === 'oui' ? '' : 'md:col-start-2'}>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Ville de départ *
                     </label>
@@ -894,6 +893,7 @@ const handleModifyForm = async () => {
                       type="date"
                       value={commonData.dateDepart}
                       onChange={(e) => setCommonData({...commonData, dateDepart: e.target.value})}
+                      min={new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                     />
@@ -943,20 +943,38 @@ const handleModifyForm = async () => {
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    onTouchStart={(e) => handleTouchStart(e, index)}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
                     className={`bg-white border-2 rounded-4xl p-5 flex items-center justify-between cursor-move transition-all hover:shadow-lg ${
                       draggedItem === index 
                         ? 'border-gray-700 shadow-2xl scale-105 bg-gray-50' 
                         : 'border-slate-200 hover:border-gray-400'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <GripVertical className="w-6 h-6 text-slate-400" />
+                    <div className="flex items-center gap-4 flex-1">
+                      <GripVertical className="w-6 h-6 text-slate-400 hidden md:block" />
                       <span className="text-3xl">{criterion.icon}</span>
                       <span className="font-semibold text-slate-900 text-lg">{criterion.label}</span>
                     </div>
+                    
+                    {/* Flèches pour mobile */}
+                    <div className="flex gap-2 md:hidden mr-3">
+                      <button
+                        type="button"
+                        onClick={() => moveUp(index)}
+                        disabled={index === 0}
+                        className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
+                      >
+                        <ArrowLeft className="w-4 h-4 rotate-90" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveDown(index)}
+                        disabled={index === criteria.length - 1}
+                        className="p-2 bg-gray-100 rounded-full disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200"
+                      >
+                        <ArrowLeft className="w-4 h-4 -rotate-90" />
+                      </button>
+                    </div>
+                    
                     <div className="bg-gradient-to-br from-gray-500 to-gray-700 text-white px-4 py-2 rounded-3xl text-sm font-bold shadow-lg">
                       #{index + 1}
                     </div>
@@ -1024,7 +1042,12 @@ const handleModifyForm = async () => {
     }
 
     return (
-      <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+      <div className="min-h-screen relative overflow-hidden py-8 px-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
@@ -1170,7 +1193,7 @@ const handleModifyForm = async () => {
       nom: initialData?.nom || '',
       dateNaissance: initialData?.existingFormData?.dateNaissance || '',
       email: initialData?.email || '',
-      budget: initialData?.existingFormData?.budget || '',
+      // budget: initialData?.existingFormData?.budget || '', // Retiré car géré lors de la création
       distance: initialData?.existingFormData?.distance || '',
       motivations: initialData?.existingFormData?.motivations || [],
       motivationsDetail: initialData?.existingFormData?.motivationsDetail || '',
@@ -1225,8 +1248,7 @@ const handleModifyForm = async () => {
           if (!formData.email) { missingFields.push('Email'); errorFields.add('email'); }
           break;
         
-        case 2: // Budget, Distance
-          if (!formData.budget) { missingFields.push('Budget'); errorFields.add('budget'); }
+        case 2: // Distance uniquement
           if (!formData.distance) { missingFields.push('Préférence de distance'); errorFields.add('distance'); }
           break;
         
@@ -1385,7 +1407,7 @@ console.log('📤 Données:', {
 
 // Liste des champs qui existent dans Airtable
 const allowedFields = [
-  'budget',
+  // 'budget', // Retiré car déjà renseigné lors de la création du voyage
   'distance',
   'climat',
   'environnements',
@@ -1475,7 +1497,12 @@ setFormSubmitted(true);
     };
 
     return (
-      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+      <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="max-w-4xl mx-auto">
           {/* Progress bar premium */}
           <div className="mb-8 animate-fade-in">
@@ -1534,6 +1561,7 @@ setFormSubmitted(true);
                       type="date"
                       value={formData.dateNaissance}
                       onChange={(e) => updateField('dateNaissance', e.target.value)}
+                      max={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                   </div>
@@ -1560,47 +1588,48 @@ setFormSubmitted(true);
               </div>
             )}
 
-            {/* Step 2: Plan de vol */}
+            {/* Step 2: Préférence de distance */}
             {currentStep === 2 && (
               <div>
                 <div className="text-center mb-8">
-                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">💰 Budget et préférences</h2>
+                  <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">🌍 Préférence de distance</h2>
+                  <p className="text-gray-500 mt-2">Jusqu'où êtes-vous prêt à voyager ?</p>
                 </div>
 
                 <div className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {tripData.travelers === 1 ? "Quel est votre budget ?" : "Quel est votre budget par personne ?*"}</label>
-                      <select
-                        value={formData.budget}
-                        onChange={(e) => updateField('budget', e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">Sélectionner</option>
-                        <option value="<500">{"< 500€"}</option>
-                        <option value="500-1000">500-1000€</option>
-                        <option value="1000-2000">1000-2000€</option>
-                        <option value="2000-3000">2000-3000€</option>
-                        <option value="3000+">3000€+</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-2">Préférence de distance *</label>
-                      <select
-                        value={formData.distance}
-                        onChange={(e) => updateField('distance', e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      >
-                        <option value="">Sélectionner</option>
-                        <option value="proche">Proche (Europe)</option>
-                        <option value="moyen">Moyen (Afrique, Moyen-Orient)</option>
-                        <option value="loin">Loin (Amériques, Asie, Océanie)</option>
-                        <option value="peu-importe">Peu importe</option>
-                      </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">Préférence de distance *</label>
+                    <div className="grid gap-3">
+                      {[
+                        { value: 'proche', label: 'Proche', desc: 'Europe' },
+                        { value: 'moyen', label: 'Moyen', desc: 'Afrique, Moyen-Orient' },
+                        { value: 'loin', label: 'Loin', desc: 'Amériques, Asie, Océanie' },
+                        { value: 'peu-importe', label: 'Peu importe', desc: 'Ouvert à toutes les destinations' }
+                      ].map((option) => (
+                        <label 
+                          key={option.value} 
+                          className={`flex items-center justify-between p-4 border-2 rounded-2xl cursor-pointer transition-all ${
+                            formData.distance === option.value 
+                              ? 'border-gray-800 bg-gray-50' 
+                              : 'border-gray-200 hover:border-gray-400'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="distance"
+                              value={option.value}
+                              checked={formData.distance === option.value}
+                              onChange={(e) => updateField('distance', e.target.value)}
+                              className="w-5 h-5"
+                            />
+                            <div>
+                              <div className="font-semibold text-gray-900">{option.label}</div>
+                              <div className="text-sm text-gray-500">{option.desc}</div>
+                            </div>
+                          </div>
+                        </label>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1916,7 +1945,12 @@ setFormSubmitted(true);
 // Pages de chargement et confirmation
 if (isSubmittingForm) {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#f7f7f7" }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
       <div className="text-center">
         <Loader2 className="w-16 h-16 text-gray-700 animate-spin mx-auto mb-4" />
         <p className="text-xl text-gray-700 font-semibold">Envoi du formulaire en cours...</p>
@@ -1928,7 +1962,12 @@ if (isSubmittingForm) {
 
 if (formSubmitted) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
       <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <Check className="w-10 h-10 text-green-600" />
@@ -1950,7 +1989,12 @@ if (formSubmitted) {
 
 if (paymentSuccess && tripData.travelers === 1) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
       <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8 text-center">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <Check className="w-10 h-10 text-green-600" />
@@ -2200,7 +2244,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       
       {/* Vue d'accueil pour les codes cadeaux */}
       {currentView === 'gift-welcome' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('router')}
@@ -2303,7 +2352,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       
       {/* Vue extension de carte cadeau - Choix du nombre */}
       {currentView === 'gift-extend' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
             <button
               onClick={() => setCurrentView('gift-welcome')}
@@ -2511,7 +2565,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'start' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('router')}
@@ -2565,7 +2624,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'with-code' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2620,7 +2684,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'no-code' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('start')}
@@ -2674,7 +2743,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'solo-setup' && (
-        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden py-12 px-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
@@ -2717,12 +2791,47 @@ if (paymentSuccess && tripData.travelers === 1) {
                     <select
                       id="solo-children"
                       required
+                      onChange={(e) => {
+                        const childrenFields = document.getElementById('solo-children-fields');
+                        if (childrenFields) {
+                          childrenFields.style.display = e.target.value === 'oui' ? 'contents' : 'none';
+                        }
+                      }}
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                     >
                       <option value="">Sélectionner</option>
                       <option value="oui">Oui</option>
                       <option value="non">Non</option>
                     </select>
+                  </div>
+
+                  <div id="solo-children-fields" style={{ display: 'none', contents: 'contents' }}>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
+                        Nombre d'enfants *
+                      </label>
+                      <select
+                        id="solo-nb-children"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                      >
+                        <option value="">Sélectionner</option>
+                        <option value="1">1 enfant</option>
+                        <option value="2">2 enfants</option>
+                        <option value="3">3 enfants</option>
+                        <option value="4+">4 enfants ou plus</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
+                        Âge(s) des enfants *
+                      </label>
+                      <input
+                        type="text"
+                        id="solo-ages-children"
+                        placeholder="Ex: 3 ans, 7 ans"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -2745,6 +2854,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                     <input
                       type="date"
                       id="solo-date"
+                      min={new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
                     />
@@ -2813,7 +2923,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'solo-payment' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-md w-full bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setCurrentView('solo-setup')}
@@ -2947,7 +3062,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'gift-choice' && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -2991,7 +3111,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'dashboard' && groupStatus && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -3157,7 +3282,12 @@ if (paymentSuccess && tripData.travelers === 1) {
       )}
 
       {currentView === 'personalized-welcome' && participantInfo && (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ backgroundColor: "#f7f7f7" }}>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4" style={{ 
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url(https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=1920&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
           <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8">
             <div className="text-center mb-8">
               <div className="bg-gray-100 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
