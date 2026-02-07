@@ -206,24 +206,20 @@ const StripeAPI = {
     return emailRegex.test(email);
   };
 
-  // Gestion de l'historique du navigateur
+  // Gestion de l'historique du navigateur avec URLs
   useEffect(() => {
-    // Ne pas gérer l'historique si on est dans le formulaire (FormView le gère lui-même)
-    if (currentView === 'form') {
-      return;
+    // Lire l'URL au chargement
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam && viewParam !== currentView) {
+      setCurrentView(viewParam);
     }
 
-    // Ajouter l'état actuel à l'historique
-    window.history.pushState({ view: currentView }, '', '');
-
     // Gérer le bouton retour du navigateur
-    const handlePopState = (event: PopStateEvent) => {
-      if (event.state?.view) {
-        setCurrentView(event.state.view);
-      } else {
-        // Si on revient en arrière et qu'il n'y a pas d'état, retourner au router
-        setCurrentView('router');
-      }
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view') || 'router';
+      setCurrentView(viewParam);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -231,6 +227,23 @@ const StripeAPI = {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
+  }, []);
+
+  // Mettre à jour l'URL quand la vue change
+  useEffect(() => {
+    // Ne pas mettre à jour l'URL si on est dans le formulaire (géré séparément)
+    if (currentView === 'form') {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    if (currentView === 'router') {
+      // Supprimer le paramètre view pour la page d'accueil
+      url.searchParams.delete('view');
+    } else {
+      url.searchParams.set('view', currentView);
+    }
+    window.history.pushState({}, '', url.toString());
   }, [currentView]);
   
   // Tracking
@@ -1257,7 +1270,20 @@ const handleModifyForm = async () => {
     };
     skipFormatStep?: boolean;
   }) => {
-    const [currentStep, setCurrentStep] = useState(1);
+    // Initialiser currentStep depuis l'URL si présent
+    const getInitialStep = () => {
+      const params = new URLSearchParams(window.location.search);
+      const stepParam = params.get('step');
+      if (stepParam) {
+        const step = parseInt(stepParam, 10);
+        if (step >= 1 && step <= 8) {
+          return step;
+        }
+      }
+      return 1;
+    };
+
+    const [currentStep, setCurrentStep] = useState(getInitialStep());
     
     // LOG pour debug
     console.log('🎨 FormView - initialData:', initialData);
@@ -1293,26 +1319,30 @@ const handleModifyForm = async () => {
 
     const totalSteps = 8; // Infos, Budget, Motivations, Type, Planning, Env, Climat, Activités (Rythme supprimé)
 
-    // Gestion de l'historique du navigateur pour les étapes du formulaire
+    // Gestion de l'historique du navigateur pour les étapes du formulaire avec URLs
     useEffect(() => {
-      // Sauvegarder l'étape actuelle dans l'historique
-      const state = { view: 'form', step: currentStep };
-      window.history.pushState(state, '', '');
+      // Mettre à jour l'URL avec l'étape actuelle
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', 'form');
+      url.searchParams.set('step', currentStep.toString());
+      window.history.pushState({}, '', url.toString());
 
-      const handlePopState = (event: PopStateEvent) => {
-        if (event.state?.view === 'form' && event.state?.step) {
-          // Retourner à l'étape précédente
-          if (event.state.step > 1) {
-            setCurrentStep(event.state.step);
+      const handlePopState = () => {
+        const params = new URLSearchParams(window.location.search);
+        const stepParam = params.get('step');
+        const viewParam = params.get('view');
+        
+        if (viewParam !== 'form') {
+          // Si on n'est plus dans form, retourner
+          onBack();
+        } else if (stepParam) {
+          const step = parseInt(stepParam, 10);
+          if (step >= 1 && step <= totalSteps) {
+            setCurrentStep(step);
           } else {
-            // Si on est à l'étape 1, retourner à la page précédente
             onBack();
           }
-        } else if (currentStep > 1) {
-          // Si pas d'état et qu'on n'est pas à l'étape 1, revenir à l'étape précédente
-          setCurrentStep(prev => Math.max(1, prev - 1));
         } else {
-          // Sinon retourner à la page précédente
           onBack();
         }
       };
@@ -1322,7 +1352,7 @@ const handleModifyForm = async () => {
       return () => {
         window.removeEventListener('popstate', handlePopState);
       };
-    }, [currentStep, onBack]);
+    }, [currentStep, onBack, totalSteps]);
 
     const updateField = (field: string, value: any) => {
       setFormData({ ...formData, [field]: value });
