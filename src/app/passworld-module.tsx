@@ -3126,7 +3126,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                         type: 'solo',
                         nbParticipants: 1,
                         amount: 0, // Déjà payé via carte cadeau
-                        paymentStatus: 'completed',
+                        paymentStatus: 'paid-gift',
                         criteriaOrder,
                         budget: travelData.budget,
                         hasChildren: travelData.hasChildren,
@@ -3149,7 +3149,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                         prenom: recipientName.split(' ')[0] || 'Voyageur',
                         nom: recipientName.split(' ').slice(1).join(' ') || '',
                         email: buyerEmail || 'noemail@passworld.com',
-                        paymentStatus: 'completed'
+                        paymentStatus: 'paid-gift'
                       });
                       
                       console.log('✅ Participant créé:', participantData);
@@ -3320,7 +3320,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   type: 'group',
                   nbParticipants: groupData.participants.length,
                   amount: 0, // Déjà payé via carte cadeau
-                  paymentStatus: 'completed',
+                  paymentStatus: 'paid-gift',
                   criteriaOrder: groupData.criteria.map(c => c.id),
                   budget: groupData.commonData?.budget,
                   hasChildren: groupData.commonData?.enfants === 'oui',
@@ -3342,7 +3342,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                     prenom: participant.prenom,
                     nom: participant.nom,
                     email: participant.email,
-                    paymentStatus: 'completed'
+                    paymentStatus: 'paid-gift'
                   });
                 }
                 
