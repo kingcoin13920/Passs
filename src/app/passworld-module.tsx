@@ -826,6 +826,7 @@ const handleModifyForm = async () => {
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
+    const [localLoading, setLocalLoading] = useState(false); // État de chargement local
     
     // Initialiser avec le bon nombre de participants selon travelers
     // Minimum 2 participants pour un groupe
@@ -935,6 +936,9 @@ const handleModifyForm = async () => {
         alert('Veuillez entrer des adresses email valides pour tous les participants');
         return;
       }
+      
+      // Activer le loading AVANT d'appeler onComplete
+      setLocalLoading(true);
       
       console.log('Group setup complete:', { 
         criteria: criteria.map(c => c.id), 
@@ -1227,7 +1231,7 @@ const handleModifyForm = async () => {
         backgroundAttachment: 'fixed'
       }}>
         {/* Overlay de chargement */}
-        {loading && (
+        {localLoading && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-3xl p-8 max-w-md mx-4 text-center">
               <div className="mb-6">
@@ -1249,8 +1253,8 @@ const handleModifyForm = async () => {
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setStep(1)}
-              className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
-              disabled={loading}
+              className="flex items-center text-gray-500 hover:text-gray-900 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={localLoading}
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -1350,10 +1354,10 @@ const handleModifyForm = async () => {
 
             <button
               onClick={handlePayment}
-              disabled={loading}
+              disabled={localLoading}
               className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 flex items-center justify-center"
             >
-              {loading ? 'Chargement...' : (
+              {localLoading ? 'Chargement...' : (
                 <>
                   {isGiftCard ? 'Créer le voyage' : `Payer ${currentPrice.toFixed(2).replace('.', ',')}€`}
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -3142,7 +3146,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       
                       // Créer le voyage
                       const tripId = `TRIP-${Date.now()}`;
-                      const participantCode = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                      const participantCode = generateCode(); // Format XXX-XXX-XXX
                       
                       console.log('🎁 Création du trip:', tripId);
                       
@@ -3360,7 +3364,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                 // Créer tous les participants avec le record ID du trip et stocker les codes
                 const participantsWithCodes = [];
                 for (const participant of groupData.participants) {
-                  const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                  // Utiliser le même format de code que les cartes cadeaux (XXX-XXX-XXX)
+                  const code = generateCode();
                   await airtableClient.createParticipant({
                     tripId: tripRecord.id, // Utiliser le record ID, pas le Trip ID custom
                     code,
