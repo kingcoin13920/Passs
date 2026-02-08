@@ -3407,6 +3407,11 @@ if (paymentSuccess && tripData.travelers === 1) {
                     }
                     
                     console.log('✅ Participants créés avec codes:', participantsWithCodes);
+                    console.log('🔍 Nombre de participants:', participantsWithCodes.length);
+                    console.log('🔍 Détail des participants:');
+                    participantsWithCodes.forEach((p, i) => {
+                      console.log(`  [${i + 1}] ${p.prenom} ${p.nom} (${p.email}) - Code: ${p.code}`);
+                    });
                     
                     // Marquer la carte cadeau comme utilisée
                     if (tripData.inputCode) {
