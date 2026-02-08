@@ -581,23 +581,31 @@ const handleModifyForm = async () => {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-      <div className="relative inline-block">
+      <div className="relative inline-block ml-1">
         <button
           type="button"
           onMouseEnter={() => setIsVisible(true)}
           onMouseLeave={() => setIsVisible(false)}
           onClick={() => setIsVisible(!isVisible)}
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors"
         >
           ?
         </button>
         {isVisible && (
-          <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-normal w-64">
-            {text}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-              <div className="border-4 border-transparent border-t-gray-800"></div>
+          <>
+            {/* Overlay pour fermer sur mobile */}
+            <div 
+              className="fixed inset-0 z-40 md:hidden" 
+              onClick={() => setIsVisible(false)}
+            />
+            {/* Tooltip */}
+            <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg shadow-xl w-screen max-w-[280px] md:max-w-xs mx-2">
+              {text}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                <div className="border-4 border-transparent border-t-gray-800"></div>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     );
