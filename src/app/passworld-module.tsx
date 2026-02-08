@@ -27,12 +27,8 @@ const CRITERIA = [
   { id: 'motivations', label: 'Motivations', icon: '✨' }
 ];
 
-const PRICES = {
-  1: 29,
-  2: 49,
-  3: 79,
-  4: 129
-};
+const PRICE = 24.99; // Prix unique pour tous
+
 
 interface TripData {
   travelers?: number;
@@ -192,7 +188,7 @@ const StripeAPI = {
   const PassworldModule = () => {
   const [participantInfo, setParticipantInfo] = useState(null);
   const [currentView, setCurrentView] = useState('router');
-  const [selectedPrice, setSelectedPrice] = useState(29);
+  const [selectedPrice, setSelectedPrice] = useState(PRICE);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseEmail, setPurchaseEmail] = useState('');
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
@@ -329,7 +325,7 @@ useEffect(() => {
         tripId,
         type: data.type,
         nbParticipants: 1,
-        amount: PRICES[1],
+        amount: PRICE,
         paymentStatus: 'pending'
       });
 
@@ -858,26 +854,8 @@ const handleModifyForm = async () => {
       duree: ''
     });
 
-    // Calculer le prix en fonction du nombre réel de participants
-    const calculatePrice = (nbParticipants) => {
-      // Calculer d'abord le prix normal
-      let normalPrice;
-      if (nbParticipants === 1) normalPrice = PRICES[1];
-      else if (nbParticipants === 2) normalPrice = PRICES[2];
-      else if (nbParticipants >= 3 && nbParticipants <= 4) normalPrice = PRICES[3];
-      else if (nbParticipants >= 5 && nbParticipants <= 8) normalPrice = PRICES[4];
-      else normalPrice = PRICES[4]; // Max 8 personnes
-      
-      // Si c'est une extension de carte cadeau, soustraire 29€ (valeur du cadeau)
-      if (isGiftCard) {
-        return Math.max(0, normalPrice - 29);
-      }
-      
-      // Sinon, retourner le prix normal
-      return normalPrice;
-    };
-
-    const currentPrice = calculatePrice(participants.length);
+    // Prix unique pour tous les voyages
+    const currentPrice = PRICE;
     const maxParticipants = 8;
 
     const handleDragStart = (index: number) => {
@@ -2512,80 +2490,67 @@ if (paymentSuccess && tripData.travelers === 1) {
                 <strong>{tripData.buyerName}</strong> vous a offert une carte cadeau Passworld !
               </p>
               <p className="text-gray-500">
-                Découvrez votre destination surprise personnalisée
+                Choisissez votre type de voyage
               </p>
             </div>
 
             {/* Options */}
             <div className="space-y-4 mb-8">
               {/* Option 1: Solo */}
-              <div className="border-2 border-gray-300 rounded-4xl p-6 hover:border-gray-400 transition-colors cursor-pointer bg-gradient-to-r from-gray-50 to-gray-50">
+              <div className="border-2 border-gray-300 rounded-4xl p-6 hover:border-gray-500 transition-all cursor-pointer bg-white hover:shadow-lg">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      🚀 Utiliser pour moi seul
+                      🚀 Voyage solo
                     </h3>
                     <p className="text-gray-500 mb-4">
-                      Profitez de votre voyage surprise en solo
+                      Partez seul(e) à l'aventure
                     </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold text-gray-700">Gratuit</span>
-                      <span className="text-sm text-gray-500">(déjà payé)</span>
+                    <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
+                      ✓ Inclus dans votre cadeau
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => {
-                    // Utilisation solo - aller au tri des critères
-                    setTripData({ ...tripData, travelers: 1 });
-                    setCurrentView('group-setup');
+                    setTripData({ ...tripData, travelers: 1, isGiftCard: true });
+                    setCurrentView('solo-setup');
                   }}
-                  className="w-full bg-gray-800 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg"
+                  className="w-full bg-gray-800 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-900 transition-colors shadow-lg"
                 >
-                  Commencer mon questionnaire
+                  Choisir le voyage solo
                 </button>
               </div>
 
               {/* Option 2: Groupe */}
-              <div className="border-2 border-gray-300 rounded-4xl p-6 hover:border-gray-400 transition-colors cursor-pointer bg-gradient-to-r from-gray-50 to-gray-50">
+              <div className="border-2 border-gray-300 rounded-4xl p-6 hover:border-gray-500 transition-all cursor-pointer bg-white hover:shadow-lg">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      👥 Étendre à plusieurs personnes
+                      👥 Voyage de groupe
                     </h3>
                     <p className="text-gray-500 mb-4">
-                      Transformez ce cadeau en voyage de groupe
+                      Partez à plusieurs (2 à 8 personnes)
                     </p>
-                    <div className="space-y-2 text-sm text-gray-500">
-                      <div className="flex justify-between">
-                        <span>• Duo (2 personnes)</span>
-                        <span className="font-semibold">+20€</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>• Trio/Quatuor (3-4 personnes)</span>
-                        <span className="font-semibold">+50€</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>• Groupe (5-8 personnes)</span>
-                        <span className="font-semibold">+100€</span>
-                      </div>
+                    <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
+                      ✓ Inclus dans votre cadeau
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => {
-                    // Extension groupe - choix du nombre
-                    setCurrentView('gift-extend');
+                    setTripData({ ...tripData, isGiftCard: true });
+                    setCurrentView('group-setup');
                   }}
-                  className="w-full bg-gray-700 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg"
+                  className="w-full bg-gray-800 text-white py-4 rounded-3xl font-semibold text-lg hover:bg-gray-900 transition-colors shadow-lg"
                 >
-                  Choisir le nombre de personnes
+                  Choisir le voyage de groupe
                 </button>
               </div>
             </div>
 
-            <div className="text-center text-sm text-gray-500">
-              <p>💡 Vous pouvez choisir l'option qui vous convient le mieux</p>
+            <div className="text-center text-sm text-gray-500 bg-gray-50 rounded-2xl p-4">
+              <p>💡 Le même prix s'applique pour le voyage solo ou en groupe (jusqu'à 8 personnes)</p>
             </div>
           </div>
         </div>
@@ -2724,7 +2689,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   <Gift className="w-8 h-8 text-gray-700" />
                 </div>
                 <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Offrir l'expérience</h2>
-                <p className="text-gray-600">Offrez une carte cadeau Passworld à 29€</p>
+                <p className="text-gray-600">Offrez une carte cadeau Passworld à 24,99€</p>
               </div>
 
               <div className="space-y-6">
@@ -2788,7 +2753,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   onClick={() => {
                     // Récupérer les données du formulaire
                     const inputs = document.querySelectorAll('input');
-                    redirectToStripe('gift', 29, {
+                    redirectToStripe('gift', PRICE, {
                       recipientName: (inputs[0] as HTMLInputElement)?.value || '',
                       buyerName: (inputs[1] as HTMLInputElement)?.value || '',
                       buyerEmail: (inputs[2] as HTMLInputElement)?.value || ''
@@ -2796,7 +2761,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   }}
                   className="w-full bg-gray-900 text-white py-4 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
                 >
-                 Payer {selectedPrice}€
+                 Payer {PRICE.toFixed(2).replace('.', ',')}€
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               </div>
@@ -3207,7 +3172,7 @@ if (paymentSuccess && tripData.travelers === 1) {
               <div className="bg-gray-50 p-4 rounded-2xl">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Voyage solo</span>
-                  <span className="font-bold text-gray-900">29€</span>
+                  <span className="font-bold text-gray-900">{PRICE.toFixed(2).replace('.', ',')}€</span>
                 </div>
                 <p className="text-sm text-gray-500">
                   Un code unique vous sera envoyé par email après le paiement
@@ -3231,7 +3196,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                   }
 
                   // Récupérer les données depuis tripData qui ont été enregistrées dans solo-setup
-                  redirectToStripe('solo', 29, {
+                  redirectToStripe('solo', PRICE, {
                     email: emailInput.value,
                     budget: tripData.budget || '',
                     hasChildren: tripData.hasChildren || false,
@@ -3243,7 +3208,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 }}
                 className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center"
               >
-                Payer 29€
+                Payer {PRICE.toFixed(2).replace('.', ',')}€
                 <ArrowRight className="w-5 h-5 ml-2" />
               </button>
             </div>
