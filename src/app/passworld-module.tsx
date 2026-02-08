@@ -3121,7 +3121,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       
                       console.log('🎁 Création du trip:', tripId);
                       
-                      await airtableClient.createTrip({
+                      const tripRecord = await airtableClient.createTrip({
                         tripId,
                         type: 'solo',
                         nbParticipants: 1,
@@ -3135,16 +3135,16 @@ if (paymentSuccess && tripData.travelers === 1) {
                         duration: travelData.duration
                       });
                       
-                      console.log('✅ Trip créé');
+                      console.log('✅ Trip créé, record ID:', tripRecord.id);
                       
-                      // Créer le participant
+                      // Créer le participant avec le record ID du trip
                       const recipientName = tripData.recipientName || '';
                       const buyerEmail = tripData.buyerEmail || '';
                       
                       console.log('🎁 Création participant:', { recipientName, buyerEmail });
                       
                       const participantData = await airtableClient.createParticipant({
-                        tripId,
+                        tripId: tripRecord.id, // Utiliser le record ID, pas le Trip ID custom
                         code: participantCode,
                         prenom: recipientName.split(' ')[0] || 'Voyageur',
                         nom: recipientName.split(' ').slice(1).join(' ') || '',
@@ -3315,7 +3315,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 const tripId = `TRIP-${Date.now()}`;
                 
                 // Créer le voyage
-                await airtableClient.createTrip({
+                const tripRecord = await airtableClient.createTrip({
                   tripId,
                   type: 'group',
                   nbParticipants: groupData.participants.length,
@@ -3331,13 +3331,13 @@ if (paymentSuccess && tripData.travelers === 1) {
                   duration: groupData.commonData?.duree
                 });
                 
-                console.log('✅ Trip créé');
+                console.log('✅ Trip créé, record ID:', tripRecord.id);
                 
-                // Créer tous les participants
+                // Créer tous les participants avec le record ID du trip
                 for (const participant of groupData.participants) {
                   const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
                   await airtableClient.createParticipant({
-                    tripId,
+                    tripId: tripRecord.id, // Utiliser le record ID, pas le Trip ID custom
                     code,
                     prenom: participant.prenom,
                     nom: participant.nom,
