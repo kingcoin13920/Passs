@@ -3415,7 +3415,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                     }
                     
                     // Envoyer les codes par email avec les codes inclus
-                    await fetch('/api/emails/send-participant-codes', {
+                    const emailResponse = await fetch('/api/emails/send-participant-codes', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -3424,7 +3424,14 @@ if (paymentSuccess && tripData.travelers === 1) {
                       })
                     });
                     
-                    console.log('✅ Emails envoyés');
+                    const emailResult = await emailResponse.json();
+                    console.log('📊 Résultat envoi emails:', emailResult);
+                    
+                    if (emailResult.failed > 0) {
+                      console.warn(`⚠️ ${emailResult.failed} emails n'ont pas pu être envoyés`);
+                    }
+                    
+                    console.log(`✅ ${emailResult.sent || 0} emails envoyés sur ${participantsWithCodes.length}`);
                     
                     // Aller vers la page de succès
                     setCurrentView('group-success');
