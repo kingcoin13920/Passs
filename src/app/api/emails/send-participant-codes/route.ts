@@ -35,11 +35,11 @@ export async function POST(request: Request) {
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f0f4f8; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 100%;">
           
-          <!-- Header avec fond dégradé -->
+          <!-- Header avec fond uni (compatible Yahoo) -->
           <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+            <td style="background-color: #667eea; padding: 40px 30px; text-align: center;">
               <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
                 ✈️ Votre voyage surprise vous attend !
               </h1>
@@ -62,30 +62,40 @@ export async function POST(request: Request) {
               </p>
               
               <!-- Code Box -->
-              <div style="background-color: #edf2f7; border-left: 4px solid #667eea; padding: 20px; margin: 0 0 30px 0; border-radius: 8px;">
-                <p style="color: #2d3748; font-size: 14px; margin: 0 0 8px 0; font-weight: bold;">
-                  Votre code d'accès :
-                </p>
-                <p style="color: #667eea; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">
-                  ${code}
-                </p>
-              </div>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 30px 0;">
+                <tr>
+                  <td style="background-color: #edf2f7; border-left: 4px solid #667eea; padding: 20px; border-radius: 8px;">
+                    <p style="color: #2d3748; font-size: 14px; margin: 0 0 8px 0; font-weight: bold;">
+                      Votre code d'accès :
+                    </p>
+                    <p style="color: #667eea; font-size: 32px; margin: 0; font-weight: bold; letter-spacing: 4px; font-family: 'Courier New', monospace;">
+                      ${code}
+                    </p>
+                  </td>
+                </tr>
+              </table>
               
-              <!-- CTA Button -->
+              <!-- CTA Button (couleur solide) -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
                     <a href="https://passs-two.vercel.app?action=code&c=${code}" 
-                       style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff !important; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);">
+                       style="display: inline-block; background-color: #667eea; color: #ffffff !important; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold;">
                       🚀 Accéder à mon questionnaire
                     </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="color: #2d3748; font-size: 14px; line-height: 1.6; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-                💡 <strong>Astuce :</strong> Complétez le questionnaire en toute honnêteté pour que votre destination soit vraiment adaptée à vos envies !
-              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <tr>
+                  <td>
+                    <p style="color: #2d3748; font-size: 14px; line-height: 1.6; margin: 0;">
+                      💡 <strong>Astuce :</strong> Complétez le questionnaire en toute honnêteté pour que votre destination soit vraiment adaptée à vos envies !
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           
