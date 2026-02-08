@@ -304,7 +304,7 @@ useEffect(() => {
 
   const createGiftCard = async (formData: any, code: string) => {
     try {
-      return await AirtableAPI.createGiftCard({
+      return await airtableClient.createGiftCard({
         code,
         buyerName: formData.buyerName,
         buyerEmail: formData.buyerEmail,
@@ -321,7 +321,7 @@ useEffect(() => {
       const tripId = `TRIP-${Date.now()}`;
       
       // Créer le voyage
-      await AirtableAPI.createTrip({
+      await airtableClient.createTrip({
         tripId,
         type: data.type,
         nbParticipants: 1,
@@ -330,7 +330,7 @@ useEffect(() => {
       });
 
       // Créer le participant
-      await AirtableAPI.createParticipant({
+      await airtableClient.createParticipant({
         tripId,
         code: data.code,
         prenom: '',
@@ -351,7 +351,7 @@ useEffect(() => {
       const tripId = `TRIP-${Date.now()}`;
       
       // Créer le voyage
-      await AirtableAPI.createTrip({
+      await airtableClient.createTrip({
         tripId,
         type: 'group',
         nbParticipants: data.participants.length,
@@ -364,7 +364,7 @@ useEffect(() => {
       const participantCodes = [];
       for (const participant of data.participants) {
         const code = generateCode();
-        await AirtableAPI.createParticipant({
+        await airtableClient.createParticipant({
           tripId,
           code,
           prenom: participant.prenom,
@@ -3112,7 +3112,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       const tripId = `TRIP-${Date.now()}`;
                       const participantCode = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
                       
-                      await AirtableAPI.createTrip({
+                      await airtableClient.createTrip({
                         tripId,
                         type: 'solo',
                         nbParticipants: 1,
@@ -3127,7 +3127,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       });
                       
                       // Créer le participant avec l'email de la carte cadeau
-                      const participantData = await AirtableAPI.createParticipant({
+                      const participantData = await airtableClient.createParticipant({
                         tripId,
                         code: participantCode,
                         prenom: tripData.recipientName?.split(' ')[0] || '',
@@ -3138,7 +3138,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       
                       // Marquer la carte cadeau comme utilisée
                       if (tripData.inputCode) {
-                        await AirtableAPI.updateGiftCardStatus(tripData.inputCode, 'used');
+                        await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
                       }
                       
                       // Aller directement au formulaire avec les données du participant
@@ -3289,7 +3289,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 const tripId = `TRIP-${Date.now()}`;
                 
                 // Créer le voyage
-                await AirtableAPI.createTrip({
+                await airtableClient.createTrip({
                   tripId,
                   type: 'group',
                   nbParticipants: groupData.participants.length,
@@ -3308,7 +3308,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 // Créer tous les participants
                 for (const participant of groupData.participants) {
                   const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-                  await AirtableAPI.createParticipant({
+                  await airtableClient.createParticipant({
                     tripId,
                     code,
                     prenom: participant.prenom,
@@ -3320,7 +3320,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                 
                 // Marquer la carte cadeau comme utilisée
                 if (tripData.inputCode) {
-                  await AirtableAPI.updateGiftCardStatus(tripData.inputCode, 'used');
+                  await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
                 }
                 
                 // Envoyer les codes par email
