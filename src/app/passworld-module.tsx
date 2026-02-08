@@ -2945,7 +2945,7 @@ if (paymentSuccess && tripData.travelers === 1) {
               {/* Option Solo */}
               <button
                 onClick={() => {
-                  setTripData({ travelers: 1, nbParticipants: 1 });
+                  setTripData({ ...tripData, travelers: 1, nbParticipants: 1 });
                   setCurrentView('solo-setup');
                 }}
                 className="p-8 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all hover:shadow-lg"
@@ -2958,7 +2958,7 @@ if (paymentSuccess && tripData.travelers === 1) {
               {/* Option Groupe */}
               <button
                 onClick={() => {
-                  setTripData({ nbParticipants: 2 }); // Défaut 2 personnes, modifiable ensuite
+                  setTripData({ ...tripData, nbParticipants: 2 }); // Défaut 2 personnes, modifiable ensuite
                   setCurrentView('group-setup');
                 }}
                 className="p-8 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all hover:shadow-lg"
@@ -2982,7 +2982,14 @@ if (paymentSuccess && tripData.travelers === 1) {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
               <button
-                onClick={() => setCurrentView('no-code')}
+                onClick={() => {
+                  // Retourner au bon endroit selon le contexte
+                  if (tripData.isGiftCard) {
+                    setCurrentView('gift-welcome');
+                  } else {
+                    setCurrentView('no-code');
+                  }
+                }}
                 className="flex items-center text-slate-600 hover:text-slate-900 mb-8 transition-colors group"
               >
                 <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
