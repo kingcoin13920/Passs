@@ -2905,46 +2905,38 @@ if (paymentSuccess && tripData.travelers === 1) {
             </button>
 
             <div className="text-center mb-8">
-              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Combien êtes-vous ?</h2>
-              <p className="text-gray-500">Sélectionnez le nombre de voyageurs</p>
-              <p className="text-sm text-gray-600 mt-2 bg-green-50 inline-block px-4 py-2 rounded-full">
-                Prix unique : {PRICE.toFixed(2).replace('.', ',')}€ pour tous
-              </p>
+              <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Type de voyage</h2>
+              <p className="text-gray-500">Choisissez votre formule</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              {[
-                { value: 1, label: 'Solo' },
-                { value: 2, label: 'Duo (2 pers.)' },
-                { value: 3, label: '3-4 personnes' },
-                { value: 4, label: '5-8 personnes' }
-              ].map((option) => (
-                <button
-  key={option.value}
-  onClick={() => {
-    // Déterminer le nombre exact de participants
-    let nbParticipants = 1;
-    if (option.value === 2) nbParticipants = 2;
-    if (option.value === 3) nbParticipants = 4;  // 3-4 personnes = 4 champs
-    if (option.value === 4) nbParticipants = 8;  // 5-8 personnes = 8 champs
-    
-    setTripData({ 
-      travelers: nbParticipants,  // Passer le nombre réel de participants
-      nbParticipants: nbParticipants 
-    });
-    
-    if (option.value === 1) {
-      setCurrentView('solo-setup');
-    } else {
-      setCurrentView('group-setup');
-    }
-  }}
-                  className="p-6 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all"
-                >
-                  <div className="text-xl font-bold text-gray-900 mb-2">{option.label}</div>
-                  <div className="text-green-700 font-semibold text-lg">{PRICE.toFixed(2).replace('.', ',')}€</div>
-                </button>
-              ))}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Option Solo */}
+              <button
+                onClick={() => {
+                  setTripData({ travelers: 1, nbParticipants: 1 });
+                  setCurrentView('solo-setup');
+                }}
+                className="p-8 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all hover:shadow-lg"
+              >
+                <div className="text-5xl mb-4">🚀</div>
+                <div className="text-2xl font-bold text-gray-900 mb-2">Solo</div>
+                <div className="text-gray-600 mb-4">Partez seul(e) à l'aventure</div>
+                <div className="text-gray-900 font-bold text-xl">{PRICE.toFixed(2).replace('.', ',')}€</div>
+              </button>
+
+              {/* Option Groupe */}
+              <button
+                onClick={() => {
+                  setTripData({ nbParticipants: 2 }); // Défaut 2 personnes, modifiable ensuite
+                  setCurrentView('group-setup');
+                }}
+                className="p-8 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all hover:shadow-lg"
+              >
+                <div className="text-5xl mb-4">👥</div>
+                <div className="text-2xl font-bold text-gray-900 mb-2">Groupe</div>
+                <div className="text-gray-600 mb-4">Partez à plusieurs (2 à 8 pers.)</div>
+                <div className="text-gray-900 font-bold text-xl">{PRICE.toFixed(2).replace('.', ',')}€</div>
+              </button>
             </div>
           </div>
         </div>
