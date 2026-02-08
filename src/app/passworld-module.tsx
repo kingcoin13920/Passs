@@ -586,8 +586,7 @@ const handleModifyForm = async () => {
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            e.stopPropagation();
-            setIsVisible(!isVisible);
+            setIsVisible(true);
           }}
           className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
         >
@@ -598,10 +597,7 @@ const handleModifyForm = async () => {
           <div 
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsVisible(false);
-            }}
+            onClick={() => setIsVisible(false)}
           >
             <div 
               className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full mx-4 p-4"
@@ -610,21 +606,17 @@ const handleModifyForm = async () => {
               <div className="flex items-start justify-between mb-2">
                 <span className="text-sm font-semibold">ℹ️ Information</span>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsVisible(false);
-                  }}
-                  className="text-white hover:text-gray-300 text-xl leading-none"
+                  type="button"
+                  onClick={() => setIsVisible(false)}
+                  className="text-white hover:text-gray-300 text-xl leading-none -mt-1"
                 >
                   ×
                 </button>
               </div>
               <p className="text-sm leading-relaxed">{text}</p>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsVisible(false);
-                }}
+                type="button"
+                onClick={() => setIsVisible(false)}
                 className="mt-4 w-full bg-white text-gray-800 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors"
               >
                 J'ai compris
