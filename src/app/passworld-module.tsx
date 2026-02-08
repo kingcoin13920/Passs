@@ -1301,21 +1301,15 @@ const handleModifyForm = async () => {
               <div className="flex justify-between items-center mb-3">
                 <div>
                   <span className="text-gray-600 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
-                  <span className="text-sm text-gray-500">
-                    {participants.length === 1 && 'Solo'}
-                    {participants.length === 2 && 'Duo'}
-                    {participants.length >= 3 && participants.length <= 4 && 'Groupe 3-4'}
-                    {participants.length >= 5 && participants.length <= 8 && 'Groupe 5-8'}
-                  </span>
                 </div>
-                <span className="font-bold text-3xl text-gray-900">{currentPrice}€</span>
+                <span className="font-bold text-3xl text-gray-900">{currentPrice.toFixed(2).replace('.', ',')}€</span>
               </div>
               <p className="text-sm text-gray-500">
                 Vous recevrez un email avec votre code unique
               </p>
               {participants.length > 1 && (
                 <p className="text-sm text-gray-700 mt-2">
-                  💡 Soit {(currentPrice / participants.length).toFixed(2)}€ par personne
+                  💡 Soit {(currentPrice / participants.length).toFixed(2).replace('.', ',')}€ par personne
                 </p>
               )}
             </div>
@@ -3102,13 +3096,71 @@ if (paymentSuccess && tripData.travelers === 1) {
               </div>
 
               <SoloCriteriaOrder 
-                onComplete={(criteriaOrder, travelData) => {
+                onComplete={async (criteriaOrder, travelData) => {
                   setTripData({
                     ...tripData,
                     criteriaOrder,
                     ...travelData
                   });
-                  setCurrentView('solo-payment');
+                  
+                  // Si c'est une carte cadeau, créer directement le trip et aller au formulaire
+                  if (tripData.isGiftCard) {
+                    try {
+                      setLoading(true);
+                      
+                      // Créer le voyage
+                      const tripId = `TRIP-${Date.now()}`;
+                      const participantCode = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                      
+                      await AirtableAPI.createTrip({
+                        tripId,
+                        type: 'solo',
+                        nbParticipants: 1,
+                        amount: 0, // Déjà payé via carte cadeau
+                        paymentStatus: 'completed',
+                        criteriaOrder,
+                        budget: travelData.budget,
+                        hasChildren: travelData.hasChildren,
+                        departureCity: travelData.departureCity,
+                        departureDate: travelData.departureDate,
+                        duration: travelData.duration
+                      });
+                      
+                      // Créer le participant avec l'email de la carte cadeau
+                      const participantData = await AirtableAPI.createParticipant({
+                        tripId,
+                        code: participantCode,
+                        prenom: tripData.recipientName?.split(' ')[0] || '',
+                        nom: tripData.recipientName?.split(' ').slice(1).join(' ') || '',
+                        email: tripData.buyerEmail || '',
+                        paymentStatus: 'completed'
+                      });
+                      
+                      // Marquer la carte cadeau comme utilisée
+                      if (tripData.inputCode) {
+                        await AirtableAPI.updateGiftCardStatus(tripData.inputCode, 'used');
+                      }
+                      
+                      // Aller directement au formulaire avec les données du participant
+                      setTripData({
+                        ...tripData,
+                        participantRecordId: participantData.id,
+                        prenom: tripData.recipientName?.split(' ')[0] || '',
+                        nom: tripData.recipientName?.split(' ').slice(1).join(' ') || '',
+                        email: tripData.buyerEmail || ''
+                      });
+                      
+                      setLoading(false);
+                      setCurrentView('form');
+                    } catch (error) {
+                      console.error('Erreur:', error);
+                      alert('Erreur lors de la création du voyage');
+                      setLoading(false);
+                    }
+                  } else {
+                    // Flow normal: aller au paiement
+                    setCurrentView('solo-payment');
+                  }
                 }}
               />
 
@@ -3230,40 +3282,76 @@ if (paymentSuccess && tripData.travelers === 1) {
           onComplete={async (groupData) => {
             setLoading(true);
             try {
-              // CAS 1: Code cadeau SOLO gratuit (1 participant, pas de paiement)
-              if (tripData.isGiftCard && groupData.participants.length === 1 && !tripData.giftExtensionPrice) {
-                console.log('🎁 Code cadeau solo - Pas de paiement, aller au formulaire');
+              // Si c'est une carte cadeau, créer le trip directement sans paiement
+              if (tripData.isGiftCard) {
+                console.log('🎁 Code cadeau - Création du voyage de groupe');
                 
-                // Stocker les données pour le formulaire
-                setTripData({
-                  ...tripData,
-                  prenom: groupData.participants[0].prenom,
-                  nom: groupData.participants[0].nom,
-                  email: groupData.participants[0].email,
+                const tripId = `TRIP-${Date.now()}`;
+                
+                // Créer le voyage
+                await AirtableAPI.createTrip({
+                  tripId,
+                  type: 'group',
+                  nbParticipants: groupData.participants.length,
+                  amount: 0, // Déjà payé via carte cadeau
+                  paymentStatus: 'completed',
                   criteriaOrder: groupData.criteria.map(c => c.id),
+                  budget: groupData.commonData?.budget,
+                  hasChildren: groupData.commonData?.enfants === 'oui',
+                  nbEnfants: groupData.commonData?.nbEnfants,
+                  agesEnfants: groupData.commonData?.agesEnfants,
+                  departureCity: groupData.commonData?.villeDepart,
+                  departureDate: groupData.commonData?.dateDepart,
+                  duration: groupData.commonData?.duree
                 });
                 
-                // Aller au formulaire
-                setCurrentView('form');
+                // Créer tous les participants
+                for (const participant of groupData.participants) {
+                  const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                  await AirtableAPI.createParticipant({
+                    tripId,
+                    code,
+                    prenom: participant.prenom,
+                    nom: participant.nom,
+                    email: participant.email,
+                    paymentStatus: 'completed'
+                  });
+                }
+                
+                // Marquer la carte cadeau comme utilisée
+                if (tripData.inputCode) {
+                  await AirtableAPI.updateGiftCardStatus(tripData.inputCode, 'used');
+                }
+                
+                // Envoyer les codes par email
+                await fetch('/api/emails/send-participant-codes', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    tripId,
+                    participants: groupData.participants
+                  })
+                });
+                
                 setLoading(false);
+                alert('✅ Voyage créé ! Les codes ont été envoyés par email à tous les participants.');
+                setCurrentView('router');
                 return;
               }
               
-              // CAS 2: Extension de carte cadeau ou groupe normal (paiement requis)
-              const isGiftExtension = tripData.isGiftCard && tripData.giftExtensionPrice;
-              const finalPrice = isGiftExtension ? tripData.giftExtensionPrice : groupData.price;
-              
-              console.log('🎁 Extension carte cadeau ou groupe:', isGiftExtension, 'Prix:', finalPrice);
-              
-              // Envoyer directement à Stripe avec les metadata
-              await redirectToStripe('group', finalPrice, { 
+              // Flow normal avec paiement
+              await redirectToStripe('group', groupData.price, { 
                 type: 'group',
                 nbParticipants: groupData.participants.length,
                 participants: JSON.stringify(groupData.participants),
                 criteriaOrder: JSON.stringify(groupData.criteria.map(c => c.id)),
-                isGiftExtension: isGiftExtension,
-                giftCode: tripData.inputCode || null,
-                giftCardId: tripData.giftCardId || null
+                budget: groupData.commonData?.budget,
+                hasChildren: groupData.commonData?.enfants === 'oui',
+                nbEnfants: groupData.commonData?.nbEnfants,
+                agesEnfants: groupData.commonData?.agesEnfants,
+                departureCity: groupData.commonData?.villeDepart,
+                departureDate: groupData.commonData?.dateDepart,
+                duration: groupData.commonData?.duree
               });
             } catch (error) {
               alert('Erreur : ' + error.message);
