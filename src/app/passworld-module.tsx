@@ -675,7 +675,7 @@ const handleModifyForm = async () => {
   };
 
   // Composant pour gérer l'ordre des critères en mode solo
-  const SoloCriteriaOrder = ({ onComplete }: { onComplete: (criteriaOrder: string[], travelData: any) => void }) => {
+  const SoloCriteriaOrder = ({ onComplete, isGiftCard = false }: { onComplete: (criteriaOrder: string[], travelData: any) => void, isGiftCard?: boolean }) => {
     const [criteria, setCriteria] = useState(CRITERIA);
     const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
@@ -796,7 +796,7 @@ const handleModifyForm = async () => {
           onClick={handleSubmit}
           className="w-full bg-gray-800 text-white py-4 px-8 rounded-3xl font-semibold text-lg hover:bg-gray-900 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
-          Continuer vers le paiement
+          {isGiftCard ? 'Créer mon voyage' : 'Continuer vers le paiement'}
           <ArrowRight className="w-6 h-6" />
         </button>
       </>
@@ -1304,12 +1304,19 @@ const handleModifyForm = async () => {
                 <div>
                   <span className="text-gray-600 font-medium block">Total pour {participants.length} participant{participants.length > 1 ? 's' : ''}</span>
                 </div>
-                <span className="font-bold text-3xl text-gray-900">{currentPrice.toFixed(2).replace('.', ',')}€</span>
+                {!isGiftCard && (
+                  <span className="font-bold text-3xl text-gray-900">{currentPrice.toFixed(2).replace('.', ',')}€</span>
+                )}
+                {isGiftCard && (
+                  <span className="font-bold text-2xl text-green-600">✓ Payé</span>
+                )}
               </div>
               <p className="text-sm text-gray-500">
-                Vous recevrez un email avec votre code unique
+                {isGiftCard 
+                  ? 'Les codes seront envoyés par email à tous les participants' 
+                  : 'Vous recevrez un email avec votre code unique'}
               </p>
-              {participants.length > 1 && (
+              {!isGiftCard && participants.length > 1 && (
                 <p className="text-sm text-gray-700 mt-2">
                   💡 Soit {(currentPrice / participants.length).toFixed(2).replace('.', ',')}€ par personne
                 </p>
@@ -1323,7 +1330,7 @@ const handleModifyForm = async () => {
             >
               {loading ? 'Chargement...' : (
                 <>
-                  Payer {currentPrice}€
+                  {isGiftCard ? 'Créer le voyage' : `Payer ${currentPrice.toFixed(2).replace('.', ',')}€`}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </>
               )}
@@ -3092,7 +3099,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                 </p>
               </div>
 
-              <SoloCriteriaOrder 
+              <SoloCriteriaOrder
+                isGiftCard={tripData.isGiftCard || false}
                 onComplete={async (criteriaOrder, travelData) => {
                   setTripData({
                     ...tripData,
