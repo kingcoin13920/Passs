@@ -580,50 +580,100 @@ const handleModifyForm = async () => {
   const Tooltip = ({ text }: { text: string }) => {
     const [isVisible, setIsVisible] = useState(false);
 
+    // Effet pour gérer la fermeture avec Escape
+    useEffect(() => {
+      if (!isVisible) return;
+      
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsVisible(false);
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }, [isVisible]);
+
+    const closeTooltip = () => {
+      setIsVisible(false);
+    };
+
+    const openTooltip = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsVisible(true);
+    };
+
+    if (!isVisible) {
+      return (
+        <button
+          type="button"
+          onClick={openTooltip}
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
+        >
+          ?
+        </button>
+      );
+    }
+
     return (
       <>
         <button
           type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            setIsVisible(true);
-          }}
+          onClick={openTooltip}
           className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
         >
           ?
         </button>
         
-        {isVisible && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ 
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 9999
+          }}
+          onMouseDown={closeTooltip}
+          onTouchStart={closeTooltip}
+        >
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-            onClick={() => setIsVisible(false)}
+            className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full mx-4 p-4"
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           >
-            <div 
-              className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full mx-4 p-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <span className="text-sm font-semibold">ℹ️ Information</span>
-                <button
-                  type="button"
-                  onClick={() => setIsVisible(false)}
-                  className="text-white hover:text-gray-300 text-xl leading-none -mt-1"
-                >
-                  ×
-                </button>
-              </div>
-              <p className="text-sm leading-relaxed">{text}</p>
+            <div className="flex items-start justify-between mb-2">
+              <span className="text-sm font-semibold">ℹ️ Information</span>
               <button
                 type="button"
-                onClick={() => setIsVisible(false)}
-                className="mt-4 w-full bg-white text-gray-800 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors"
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  closeTooltip();
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                  closeTooltip();
+                }}
+                className="text-white hover:text-gray-300 text-xl leading-none -mt-1 px-2"
               >
-                J'ai compris
+                ×
               </button>
             </div>
+            <p className="text-sm leading-relaxed">{text}</p>
+            <button
+              type="button"
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                closeTooltip();
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+                closeTooltip();
+              }}
+              className="mt-4 w-full bg-white text-gray-800 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors"
+            >
+              J'ai compris
+            </button>
           </div>
-        )}
+        </div>
       </>
     );
   };
