@@ -576,38 +576,44 @@ const handleModifyForm = async () => {
   }
 };
 
-  // Composant Tooltip simple
+  // Composant Tooltip simple - version mobile friendly
   const Tooltip = ({ text }: { text: string }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-      <div className="relative inline-block ml-1">
+      <span className="relative inline-block ml-1">
         <button
           type="button"
-          onMouseEnter={() => setIsVisible(true)}
-          onMouseLeave={() => setIsVisible(false)}
-          onClick={() => setIsVisible(!isVisible)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsVisible(!isVisible);
+          }}
           className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors"
         >
           ?
         </button>
         {isVisible && (
-          <>
-            {/* Overlay pour fermer sur mobile */}
-            <div 
-              className="fixed inset-0 z-40 md:hidden" 
-              onClick={() => setIsVisible(false)}
-            />
-            {/* Tooltip */}
-            <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs md:text-sm rounded-lg shadow-xl w-screen max-w-[280px] md:max-w-xs mx-2">
-              {text}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                <div className="border-4 border-transparent border-t-gray-800"></div>
-              </div>
-            </div>
-          </>
+          <span 
+            className="absolute left-0 top-full mt-2 z-50 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg shadow-xl whitespace-normal"
+            style={{ 
+              width: '280px',
+              maxWidth: 'calc(100vw - 40px)',
+              left: '50%',
+              transform: 'translateX(-50%)'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsVisible(false);
+            }}
+          >
+            {text}
+            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-0">
+              <span className="border-4 border-transparent border-b-gray-800 block"></span>
+            </span>
+          </span>
         )}
-      </div>
+      </span>
     );
   };
 
