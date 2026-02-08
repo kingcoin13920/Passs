@@ -51,6 +51,13 @@ class AirtableClient {
   amount: number;
   paymentStatus: string;
   criteriaOrder?: string[];
+  budget?: string;
+  hasChildren?: boolean;
+  nbEnfants?: string;
+  agesEnfants?: string;
+  departureCity?: string;
+  departureDate?: string;
+  duration?: string;
 }) {
   const record = {
     fields: {
@@ -61,6 +68,13 @@ class AirtableClient {
       'Status': 'pending',
       'Payment Status': data.paymentStatus,
       'Criteria Order': data.criteriaOrder ? JSON.stringify(data.criteriaOrder) : '',
+      'Budget': data.budget || '',
+      'Enfants': data.hasChildren ? 'Oui' : 'Non',
+      'Nombre enfants': data.nbEnfants || '',
+      'Ages enfants': data.agesEnfants || '',
+      'Ville depart': data.departureCity || '',
+      'Date depart': data.departureDate || '',
+      'Duree': data.duration || '',
     },
   };
 
@@ -160,7 +174,7 @@ async createParticipant(data: {
   async getParticipantWithTripInfo(code: string) {
     try {
       // 1. Trouver le participant
-      const formula = encodeURIComponent(`{code} = '${code}'`);
+      const formula = encodeURIComponent(`{Code} = '${code}'`);
       console.log('🔍🔍🔍 FORMULE:', formula);
       console.log('🔍🔍🔍 CODE RECHERCHÉ:', code);
       const participantResult = await this.request(
@@ -206,11 +220,31 @@ async createParticipant(data: {
           nom: p.fields['Nom'] || ''
         }));
       
+      // 4. Récupérer les infos du voyage avec la destination
+      let tripInfo = null;
+      try {
+        const tripResult = await this.request('GET', `/${TABLES.VOYAGES}/${tripRecordId}`);
+        tripInfo = {
+          destination: tripResult.fields['Destination'] || '',
+          description: tripResult.fields['Description'] || '',
+          imageUrl: tripResult.fields['Image URL'] || '',
+          mainImage: tripResult.fields['Main Image'] ? tripResult.fields['Main Image'][0]?.url : '',
+          gallery: tripResult.fields['Gallery'] ? tripResult.fields['Gallery'].map((img: any) => img.url) : [],
+          pdfUrl: tripResult.fields['PDF URL'] || '',
+          departureDate: tripResult.fields['Date depart'] || '',
+          duration: tripResult.fields['Duree'] || '',
+          nbParticipants: tripResult.fields['Nb Participants'] || 1,
+        };
+      } catch (error) {
+        console.error('Error fetching trip info:', error);
+      }
+      
       return {
         valid: true,
         participant: currentParticipant,
         otherParticipants: otherParticipants,
-        tripRecordId: tripRecordId
+        tripRecordId: tripRecordId,
+        tripInfo: tripInfo
       };
       
     } catch (error) {
