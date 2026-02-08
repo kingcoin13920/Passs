@@ -174,7 +174,7 @@ async createParticipant(data: {
   async getParticipantWithTripInfo(code: string) {
     try {
       // 1. Trouver le participant
-      const formula = encodeURIComponent(`{Code} = '${code}'`);
+      const formula = encodeURIComponent(`{code} = '${code}'`);
       console.log('🔍🔍🔍 FORMULE:', formula);
       console.log('🔍🔍🔍 CODE RECHERCHÉ:', code);
       const participantResult = await this.request(
