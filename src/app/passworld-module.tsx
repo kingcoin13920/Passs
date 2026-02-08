@@ -576,12 +576,12 @@ const handleModifyForm = async () => {
   }
 };
 
-  // Composant Tooltip simple - version mobile friendly
+  // Composant Tooltip simple - affichage centré type modale
   const Tooltip = ({ text }: { text: string }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-      <span className="relative inline-block ml-1">
+      <>
         <button
           type="button"
           onClick={(e) => {
@@ -589,31 +589,50 @@ const handleModifyForm = async () => {
             e.stopPropagation();
             setIsVisible(!isVisible);
           }}
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors"
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-700 text-xs font-bold hover:bg-gray-400 transition-colors ml-1"
         >
           ?
         </button>
+        
         {isVisible && (
-          <span 
-            className="absolute left-0 top-full mt-2 z-50 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg shadow-xl whitespace-normal"
-            style={{ 
-              width: '280px',
-              maxWidth: 'calc(100vw - 40px)',
-              left: '50%',
-              transform: 'translateX(-50%)'
-            }}
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
             onClick={(e) => {
               e.stopPropagation();
               setIsVisible(false);
             }}
           >
-            {text}
-            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-0">
-              <span className="border-4 border-transparent border-b-gray-800 block"></span>
-            </span>
-          </span>
+            <div 
+              className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full mx-4 p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <span className="text-sm font-semibold">ℹ️ Information</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsVisible(false);
+                  }}
+                  className="text-white hover:text-gray-300 text-xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-sm leading-relaxed">{text}</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsVisible(false);
+                }}
+                className="mt-4 w-full bg-white text-gray-800 py-2 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors"
+              >
+                J'ai compris
+              </button>
+            </div>
+          </div>
         )}
-      </span>
+      </>
     );
   };
 
