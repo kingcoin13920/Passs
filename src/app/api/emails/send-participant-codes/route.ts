@@ -9,6 +9,23 @@ export async function POST(request: Request) {
     const { participants, tripId } = await request.json();
     
     console.log('📧 Envoi des emails pour', participants.length, 'participants');
+    console.log('📋 Liste des participants reçus:');
+    
+    const emailCounts = {};
+    participants.forEach((p: any, i: number) => {
+      const email = p.email;
+      emailCounts[email] = (emailCounts[email] || 0) + 1;
+      console.log(`  [${i + 1}] ${p.prenom} ${p.nom} (${p.email}) - Code: ${p.code || 'MANQUANT'}`);
+    });
+    
+    // Détecter les doublons
+    const duplicates = Object.entries(emailCounts).filter(([email, count]) => count > 1);
+    if (duplicates.length > 0) {
+      console.warn('⚠️ ATTENTION: Emails en double détectés:');
+      duplicates.forEach(([email, count]) => {
+        console.warn(`  - ${email}: utilisé ${count} fois`);
+      });
+    }
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
@@ -134,12 +151,19 @@ export async function POST(request: Request) {
         results.push({ success: true, email, messageId: result.data?.id });
       } catch (error) {
         console.error(`❌ Erreur email ${i + 1}/${participants.length} à ${email}:`, error);
+        console.error(`❌ Détails complets:`, {
+          participant: { prenom, nom, email, code },
+          errorMessage: error.message,
+          errorStack: error.stack,
+          errorDetails: error
+        });
         results.push({ success: false, email, error: error.message });
       }
       
-      // Pause de 200ms entre chaque email pour éviter le rate-limiting
+      // Pause de 500ms entre chaque email pour éviter le rate-limiting
       if (i < participants.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        console.log(`⏱️ Pause de 500ms avant l'email suivant...`);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
     
