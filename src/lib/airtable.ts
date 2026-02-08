@@ -359,6 +359,7 @@ async createParticipant(data: {
 
 export const airtableClient = new AirtableClient();
 
+// Exports pour l'API Airtable - Version mise à jour avec toutes les méthodes
 export const AirtableAPI = {
   createTrip: (data: any) => airtableClient.createTrip(data),
   createParticipant: (data: any) => airtableClient.createParticipant(data),
