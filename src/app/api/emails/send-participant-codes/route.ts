@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     console.log('📧 Envoi des emails pour', participants.length, 'participants');
     console.log('📋 Liste des participants reçus:');
     
-    const emailCounts = {};
+    const emailCounts: Record<string, number> = {};
     participants.forEach((p: any, i: number) => {
       const email = p.email;
       emailCounts[email] = (emailCounts[email] || 0) + 1;
@@ -19,10 +19,10 @@ export async function POST(request: Request) {
     });
     
     // Détecter les doublons
-    const duplicates = Object.entries(emailCounts).filter(([email, count]) => count > 1);
+    const duplicates = Object.entries(emailCounts).filter(([email, count]: [string, number]) => count > 1);
     if (duplicates.length > 0) {
       console.warn('⚠️ ATTENTION: Emails en double détectés:');
-      duplicates.forEach(([email, count]) => {
+      duplicates.forEach(([email, count]: [string, number]) => {
         console.warn(`  - ${email}: utilisé ${count} fois`);
       });
     }
