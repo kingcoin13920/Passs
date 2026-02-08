@@ -2907,14 +2907,17 @@ if (paymentSuccess && tripData.travelers === 1) {
             <div className="text-center mb-8">
               <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-2">Combien êtes-vous ?</h2>
               <p className="text-gray-500">Sélectionnez le nombre de voyageurs</p>
+              <p className="text-sm text-gray-600 mt-2 bg-green-50 inline-block px-4 py-2 rounded-full">
+                Prix unique : {PRICE.toFixed(2).replace('.', ',')}€ pour tous
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
               {[
-                { value: 1, label: 'Solo', price: 29 },
-                { value: 2, label: 'Duo', price: 49 },
-                { value: 3, label: '3-4 personnes', price: 79 },
-                { value: 4, label: '5-8 personnes', price: 129 }
+                { value: 1, label: 'Solo' },
+                { value: 2, label: 'Duo (2 pers.)' },
+                { value: 3, label: '3-4 personnes' },
+                { value: 4, label: '5-8 personnes' }
               ].map((option) => (
                 <button
   key={option.value}
@@ -2938,8 +2941,8 @@ if (paymentSuccess && tripData.travelers === 1) {
   }}
                   className="p-6 rounded-3xl border-2 border-gray-200 hover:border-gray-700 hover:bg-gray-50 transition-all"
                 >
-                  <div className="text-xl font-bold text-gray-900 mb-1">{option.label}</div>
-                  <div className="text-gray-700 font-semibold">{option.price}€</div>
+                  <div className="text-xl font-bold text-gray-900 mb-2">{option.label}</div>
+                  <div className="text-green-700 font-semibold text-lg">{PRICE.toFixed(2).replace('.', ',')}€</div>
                 </button>
               ))}
             </div>
