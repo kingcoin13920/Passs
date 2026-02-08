@@ -448,12 +448,16 @@ const verifyCode = async (code: string) => {
         return;
       }
       
-      // Vérifier si la carte cadeau a déjà été utilisée
+      // Vérifier si la carte cadeau a été utilisée ET si le voyage a été créé
       if (giftResult.status === 'used') {
-        alert(`Ce code cadeau a déjà été utilisé.\n\nSi vous avez effectué un voyage de groupe, vous avez dû recevoir un nouveau code par email.\n\nSi vous avez effectué un voyage solo, votre formulaire a déjà été envoyé et est en cours de traitement.`);
+        // Si c'est "used", c'est un voyage de groupe déjà créé avec codes envoyés
+        alert(`Ce code cadeau a déjà été utilisé pour créer un voyage de groupe.\n\nVous avez dû recevoir un nouveau code par email pour remplir votre formulaire.`);
         setLoading(false);
         return;
       }
+      
+      // Pour un voyage solo, on peut revenir tant que le formulaire n'est pas envoyé
+      // Le code n'est marqué "used" qu'à l'envoi du formulaire
       
       // Stocker les infos de la carte cadeau
       setTripData({ 
@@ -3154,11 +3158,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                       
                       console.log('✅ Participant créé:', participantData);
                       
-                      // Marquer la carte cadeau comme utilisée
-                      if (tripData.inputCode) {
-                        console.log('🎁 Marquage carte cadeau utilisée:', tripData.inputCode);
-                        await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
-                      }
+                      // NE PAS marquer la carte cadeau utilisée maintenant
+                      // Elle sera marquée "used" à l'envoi du formulaire
                       
                       // Aller directement au formulaire avec les données du participant
                       setTripData({
@@ -3167,7 +3168,9 @@ if (paymentSuccess && tripData.travelers === 1) {
                         code: participantCode,
                         prenom: recipientName.split(' ')[0] || 'Voyageur',
                         nom: recipientName.split(' ').slice(1).join(' ') || '',
-                        email: buyerEmail || ''
+                        email: buyerEmail || '',
+                        // Garder inputCode pour le marquer "used" à l'envoi
+                        giftCardCode: tripData.inputCode
                       });
                       
                       console.log('✅ Redirection vers formulaire');
