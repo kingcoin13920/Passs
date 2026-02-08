@@ -822,6 +822,7 @@ const handleModifyForm = async () => {
     giftExtensionPrice?: number | null;
     recipientName?: string | null;
   }) => {
+    console.log('🎁 GroupSetupView - isGiftCard:', isGiftCard);
     const [step, setStep] = useState(1);
     const [criteria, setCriteria] = useState([...CRITERIA]);
     const [draggedItem, setDraggedItem] = useState(null);
@@ -1225,11 +1226,31 @@ const handleModifyForm = async () => {
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       }}>
+        {/* Overlay de chargement */}
+        {loading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-3xl p-8 max-w-md mx-4 text-center">
+              <div className="mb-6">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-gray-900 mx-auto"></div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {isGiftCard ? 'Création du voyage...' : 'Préparation du paiement...'}
+              </h3>
+              <p className="text-gray-600">
+                {isGiftCard 
+                  ? 'Nous créons votre voyage et envoyons les codes par email à tous les participants. Cela peut prendre quelques secondes...' 
+                  : 'Redirection vers la page de paiement...'}
+              </p>
+            </div>
+          </div>
+        )}
+        
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-4xl shadow-xl p-8">
             <button
               onClick={() => setStep(1)}
               className="flex items-center text-gray-500 hover:text-gray-900 mb-6"
+              disabled={loading}
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Retour
@@ -3336,7 +3357,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                 
                 console.log('✅ Trip créé, record ID:', tripRecord.id);
                 
-                // Créer tous les participants avec le record ID du trip
+                // Créer tous les participants avec le record ID du trip et stocker les codes
+                const participantsWithCodes = [];
                 for (const participant of groupData.participants) {
                   const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
                   await airtableClient.createParticipant({
@@ -3347,9 +3369,18 @@ if (paymentSuccess && tripData.travelers === 1) {
                     email: participant.email,
                     paymentStatus: 'paid-gift'
                   });
+                  
+                  // Ajouter le code au participant pour l'email
+                  participantsWithCodes.push({
+                    ...participant,
+                    code
+                  });
+                  
+                  // Petite pause pour éviter les codes identiques
+                  await new Promise(resolve => setTimeout(resolve, 10));
                 }
                 
-                console.log('✅ Participants créés');
+                console.log('✅ Participants créés avec codes:', participantsWithCodes);
                 
                 // Marquer la carte cadeau comme utilisée
                 if (tripData.inputCode) {
@@ -3357,21 +3388,21 @@ if (paymentSuccess && tripData.travelers === 1) {
                   await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
                 }
                 
-                // Envoyer les codes par email
+                // Envoyer les codes par email avec les codes inclus
                 await fetch('/api/emails/send-participant-codes', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     tripId,
-                    participants: groupData.participants
+                    participants: participantsWithCodes // Envoyer avec les codes
                   })
                 });
                 
                 console.log('✅ Emails envoyés');
                 
                 setLoading(false);
-                alert('✅ Voyage créé ! Les codes ont été envoyés par email à tous les participants.');
-                setCurrentView('router');
+                // Au lieu de alert + router, aller vers une page de succès
+                setCurrentView('group-success');
                 return;
               }
               
@@ -3398,6 +3429,53 @@ if (paymentSuccess && tripData.travelers === 1) {
             }
           }}
         />
+      )}
+
+      {currentView === 'group-success' && (
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
+          backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}>
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+            <div className="mb-6">
+              <div className="bg-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            
+            <h2 className="font-['Poppins'] text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Voyage créé ! 🎉
+            </h2>
+            
+            <p className="text-xl text-gray-600 mb-8">
+              Les codes ont été envoyés par email à tous les participants.
+              <br />
+              Chacun recevra son code personnel pour remplir son formulaire.
+            </p>
+            
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-8">
+              <p className="text-gray-700">
+                <strong>📧 Vérifiez vos boîtes mail</strong>
+                <br />
+                Si vous ne recevez pas l'email dans quelques minutes, pensez à vérifier vos spams.
+              </p>
+            </div>
+            
+            <button
+              onClick={() => {
+                setTripData({});
+                setCurrentView('router');
+              }}
+              className="w-full bg-gray-800 text-white py-4 rounded-2xl font-semibold hover:bg-gray-900 transition-colors"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
+        </div>
       )}
 
       {currentView === 'gift-choice' && (
