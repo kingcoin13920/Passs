@@ -823,9 +823,11 @@ const handleModifyForm = async () => {
     const [draggedItem, setDraggedItem] = useState(null);
     
     // Initialiser avec le bon nombre de participants selon travelers
+    // Minimum 2 participants pour un groupe
     // Si c'est un code cadeau, pré-remplir le premier participant avec recipientName
     const getInitialParticipants = () => {
-      const parts = Array.from({ length: travelers || 1 }, (_, index) => {
+      const minParticipants = Math.max(travelers || 2, 2); // Minimum 2 pour groupe
+      const parts = Array.from({ length: minParticipants }, (_, index) => {
         if (index === 0 && isGiftCard && recipientName) {
           // Premier participant = destinataire du cadeau
           const names = recipientName.split(' ');
@@ -841,7 +843,7 @@ const handleModifyForm = async () => {
     };
     
     const [participants, setParticipants] = useState(getInitialParticipants());
-    const [selectedGroupSize, setSelectedGroupSize] = useState(travelers || 1);
+    const [selectedGroupSize, setSelectedGroupSize] = useState(Math.max(travelers || 2, 2));
 
     // État pour les données communes à tous les participants
     const [commonData, setCommonData] = useState({
@@ -856,7 +858,7 @@ const handleModifyForm = async () => {
 
     // Prix unique pour tous les voyages
     const currentPrice = PRICE;
-    const maxParticipants = 8;
+    const maxParticipants = 20;
 
     const handleDragStart = (index: number) => {
       setDraggedItem(index);
@@ -2524,7 +2526,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       👥 Voyage de groupe
                     </h3>
                     <p className="text-gray-500 mb-4">
-                      Partez à plusieurs (2 à 8 personnes)
+                      Partez à plusieurs
                     </p>
                     <div className="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
                       ✓ Inclus dans votre cadeau
@@ -2914,8 +2916,7 @@ if (paymentSuccess && tripData.travelers === 1) {
               >
                 <div className="text-5xl mb-4">🚀</div>
                 <div className="text-2xl font-bold text-gray-900 mb-2">Solo</div>
-                <div className="text-gray-600 mb-4">Partez seul(e) à l'aventure</div>
-                <div className="text-gray-900 font-bold text-xl">{PRICE.toFixed(2).replace('.', ',')}€</div>
+                <div className="text-gray-600">Partez seul(e) à l'aventure</div>
               </button>
 
               {/* Option Groupe */}
@@ -2928,8 +2929,7 @@ if (paymentSuccess && tripData.travelers === 1) {
               >
                 <div className="text-5xl mb-4">👥</div>
                 <div className="text-2xl font-bold text-gray-900 mb-2">Groupe</div>
-                <div className="text-gray-600 mb-4">Partez à plusieurs (2 à 8 pers.)</div>
-                <div className="text-gray-900 font-bold text-xl">{PRICE.toFixed(2).replace('.', ',')}€</div>
+                <div className="text-gray-600">Partez à plusieurs</div>
               </button>
             </div>
           </div>
@@ -2954,16 +2954,16 @@ if (paymentSuccess && tripData.travelers === 1) {
               </button>
 
               {/* Informations du voyage */}
-              <div className="mb-10 p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
+              <div className="mb-10 p-4 md:p-6 bg-gray-50 rounded-4xl border-2 border-gray-300">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 flex items-center">
                   📋 Informations du voyage
                 </h3>
-                <p className="text-gray-500 mb-6 text-sm">Renseignez les informations de votre voyage</p>
+                <p className="text-gray-500 mb-4 md:mb-6 text-xs md:text-sm">Renseignez les informations de votre voyage</p>
                 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Budget estimé *
+                    <label className="flex items-center text-sm font-medium text-gray-600 mb-2">
+                      Budget estimé (par personne) *
                       <Tooltip text="Indiquez votre budget par personne pour ce voyage. Cela nous aide à trouver la destination parfaite pour vous." />
                     </label>
                     <select
@@ -2989,7 +2989,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                       onChange={(e) => {
                         const childrenFields = document.getElementById('solo-children-fields');
                         if (childrenFields) {
-                          childrenFields.style.display = e.target.value === 'oui' ? 'grid' : 'none';
+                          childrenFields.style.display = e.target.value === 'oui' ? 'block' : 'none';
                         }
                       }}
                       className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
@@ -2999,40 +2999,37 @@ if (paymentSuccess && tripData.travelers === 1) {
                       <option value="non">Non</option>
                     </select>
                   </div>
-                </div>
 
-                {/* Champs conditionnels enfants */}
-                <div id="solo-children-fields" style={{ display: 'none' }} className="grid md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Nombre d'enfants *
-                    </label>
-                    <select
-                      id="solo-nb-children"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                    >
-                      <option value="">Sélectionner</option>
-                      <option value="1">1 enfant</option>
-                      <option value="2">2 enfants</option>
-                      <option value="3">3 enfants</option>
-                      <option value="4+">4 enfants ou plus</option>
-                    </select>
+                  {/* Champs conditionnels enfants */}
+                  <div id="solo-children-fields" style={{ display: 'none' }} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
+                        Nombre d'enfants *
+                      </label>
+                      <select
+                        id="solo-nb-children"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                      >
+                        <option value="">Sélectionner</option>
+                        <option value="1">1 enfant</option>
+                        <option value="2">2 enfants</option>
+                        <option value="3">3 enfants</option>
+                        <option value="4+">4 enfants ou plus</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-2">
+                        Âge(s) des enfants *
+                      </label>
+                      <input
+                        type="text"
+                        id="solo-ages-children"
+                        placeholder="Ex: 3 ans, 7 ans"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                      />
+                    </div>
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-600 mb-2">
-                      Âge(s) des enfants *
-                    </label>
-                    <input
-                      type="text"
-                      id="solo-ages-children"
-                      placeholder="Ex: 3 ans, 7 ans"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-                    />
-                  </div>
-                </div>
 
-                {/* Reprise de la grille normale */}
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Ville de départ *
@@ -3059,7 +3056,7 @@ if (paymentSuccess && tripData.travelers === 1) {
                     />
                   </div>
 
-                  <div className="md:col-span-2">
+                  <div>
                     <label className="block text-sm font-medium text-gray-600 mb-2">
                       Durée du voyage *
                     </label>
@@ -3107,10 +3104,14 @@ if (paymentSuccess && tripData.travelers === 1) {
                   if (tripData.isGiftCard) {
                     try {
                       setLoading(true);
+                      console.log('🎁 SOLO - Carte cadeau détectée');
+                      console.log('🎁 tripData:', tripData);
                       
                       // Créer le voyage
                       const tripId = `TRIP-${Date.now()}`;
                       const participantCode = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                      
+                      console.log('🎁 Création du trip:', tripId);
                       
                       await airtableClient.createTrip({
                         tripId,
@@ -3126,18 +3127,28 @@ if (paymentSuccess && tripData.travelers === 1) {
                         duration: travelData.duration
                       });
                       
-                      // Créer le participant avec l'email de la carte cadeau
+                      console.log('✅ Trip créé');
+                      
+                      // Créer le participant
+                      const recipientName = tripData.recipientName || '';
+                      const buyerEmail = tripData.buyerEmail || '';
+                      
+                      console.log('🎁 Création participant:', { recipientName, buyerEmail });
+                      
                       const participantData = await airtableClient.createParticipant({
                         tripId,
                         code: participantCode,
-                        prenom: tripData.recipientName?.split(' ')[0] || '',
-                        nom: tripData.recipientName?.split(' ').slice(1).join(' ') || '',
-                        email: tripData.buyerEmail || '',
+                        prenom: recipientName.split(' ')[0] || 'Voyageur',
+                        nom: recipientName.split(' ').slice(1).join(' ') || '',
+                        email: buyerEmail || 'noemail@passworld.com',
                         paymentStatus: 'completed'
                       });
                       
+                      console.log('✅ Participant créé:', participantData);
+                      
                       // Marquer la carte cadeau comme utilisée
                       if (tripData.inputCode) {
+                        console.log('🎁 Marquage carte cadeau utilisée:', tripData.inputCode);
                         await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
                       }
                       
@@ -3145,16 +3156,18 @@ if (paymentSuccess && tripData.travelers === 1) {
                       setTripData({
                         ...tripData,
                         participantRecordId: participantData.id,
-                        prenom: tripData.recipientName?.split(' ')[0] || '',
-                        nom: tripData.recipientName?.split(' ').slice(1).join(' ') || '',
-                        email: tripData.buyerEmail || ''
+                        code: participantCode,
+                        prenom: recipientName.split(' ')[0] || 'Voyageur',
+                        nom: recipientName.split(' ').slice(1).join(' ') || '',
+                        email: buyerEmail || ''
                       });
                       
+                      console.log('✅ Redirection vers formulaire');
                       setLoading(false);
                       setCurrentView('form');
                     } catch (error) {
-                      console.error('Erreur:', error);
-                      alert('Erreur lors de la création du voyage');
+                      console.error('❌ Erreur complète:', error);
+                      alert('Erreur lors de la création du voyage: ' + (error.message || error));
                       setLoading(false);
                     }
                   } else {
@@ -3282,6 +3295,11 @@ if (paymentSuccess && tripData.travelers === 1) {
           onComplete={async (groupData) => {
             setLoading(true);
             try {
+              console.log('🎁 GROUPE - onComplete appelé');
+              console.log('🎁 tripData:', tripData);
+              console.log('🎁 tripData.isGiftCard:', tripData.isGiftCard);
+              console.log('🎁 groupData:', groupData);
+              
               // Si c'est une carte cadeau, créer le trip directement sans paiement
               if (tripData.isGiftCard) {
                 console.log('🎁 Code cadeau - Création du voyage de groupe');
@@ -3305,6 +3323,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                   duration: groupData.commonData?.duree
                 });
                 
+                console.log('✅ Trip créé');
+                
                 // Créer tous les participants
                 for (const participant of groupData.participants) {
                   const code = `CODE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
@@ -3318,8 +3338,11 @@ if (paymentSuccess && tripData.travelers === 1) {
                   });
                 }
                 
+                console.log('✅ Participants créés');
+                
                 // Marquer la carte cadeau comme utilisée
                 if (tripData.inputCode) {
+                  console.log('🎁 Marquage carte cadeau:', tripData.inputCode);
                   await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
                 }
                 
@@ -3333,11 +3356,15 @@ if (paymentSuccess && tripData.travelers === 1) {
                   })
                 });
                 
+                console.log('✅ Emails envoyés');
+                
                 setLoading(false);
                 alert('✅ Voyage créé ! Les codes ont été envoyés par email à tous les participants.');
                 setCurrentView('router');
                 return;
               }
+              
+              console.log('💳 Pas de carte cadeau, redirection Stripe');
               
               // Flow normal avec paiement
               await redirectToStripe('group', groupData.price, { 
@@ -3354,7 +3381,8 @@ if (paymentSuccess && tripData.travelers === 1) {
                 duration: groupData.commonData?.duree
               });
             } catch (error) {
-              alert('Erreur : ' + error.message);
+              console.error('❌ Erreur groupe:', error);
+              alert('Erreur : ' + (error.message || error));
               setLoading(false);
             }
           }}
