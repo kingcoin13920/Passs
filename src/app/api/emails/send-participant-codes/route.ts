@@ -17,11 +17,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Envoyer un email à chaque participant
-    const emailPromises = participants.map(async (participant: any) => {
+    // Envoyer les emails SÉQUENTIELLEMENT (un par un) pour éviter le rate-limiting
+    const results = [];
+    
+    for (let i = 0; i < participants.length; i++) {
+      const participant = participants[i];
       const { prenom, nom, email, code } = participant;
       
-      console.log(`📨 Envoi email à ${prenom} ${nom} (${email}) - Code: ${code}`);
+      console.log(`📨 [${i + 1}/${participants.length}] Envoi email à ${prenom} ${nom} (${email}) - Code: ${code}`);
 
       const emailHtml = `
 <!DOCTYPE html>
@@ -127,21 +130,23 @@ export async function POST(request: Request) {
           html: emailHtml,
         });
 
-        console.log(`✅ Email envoyé à ${email}:`, result);
-        return { success: true, email, messageId: result.data?.id };
+        console.log(`✅ Email ${i + 1}/${participants.length} envoyé à ${email}`);
+        results.push({ success: true, email, messageId: result.data?.id });
       } catch (error) {
-        console.error(`❌ Erreur envoi email à ${email}:`, error);
-        return { success: false, email, error: error.message };
+        console.error(`❌ Erreur email ${i + 1}/${participants.length} à ${email}:`, error);
+        results.push({ success: false, email, error: error.message });
       }
-    });
-
-    // Attendre que tous les emails soient envoyés
-    const results = await Promise.all(emailPromises);
+      
+      // Pause de 200ms entre chaque email pour éviter le rate-limiting
+      if (i < participants.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    }
     
     const successCount = results.filter(r => r.success).length;
     const failureCount = results.filter(r => !r.success).length;
 
-    console.log(`📊 Résultats: ${successCount} envoyés, ${failureCount} échoués`);
+    console.log(`📊 Résultats finaux: ${successCount} envoyés, ${failureCount} échoués sur ${participants.length} total`);
 
     return NextResponse.json({
       success: true,
