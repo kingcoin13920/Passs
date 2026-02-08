@@ -3336,78 +3336,99 @@ if (paymentSuccess && tripData.travelers === 1) {
               console.log('🎁 tripData.isGiftCard:', tripData.isGiftCard);
               console.log('🎁 groupData:', groupData);
               
-              // Si c'est une carte cadeau, créer le trip directement sans paiement
+              // Si c'est une carte cadeau, afficher le loading puis créer le trip
               if (tripData.isGiftCard) {
-                console.log('🎁 Code cadeau - Création du voyage de groupe');
+                console.log('🎁 Code cadeau - Affichage de la page de chargement');
                 
-                const tripId = `TRIP-${Date.now()}`;
-                
-                // Créer le voyage
-                const tripRecord = await airtableClient.createTrip({
-                  tripId,
-                  type: 'group',
-                  nbParticipants: groupData.participants.length,
-                  amount: 0, // Déjà payé via carte cadeau
-                  paymentStatus: 'paid-gift',
-                  criteriaOrder: groupData.criteria.map(c => c.id),
-                  budget: groupData.commonData?.budget,
-                  hasChildren: groupData.commonData?.enfants === 'oui',
-                  nbEnfants: groupData.commonData?.nbEnfants,
-                  agesEnfants: groupData.commonData?.agesEnfants,
-                  departureCity: groupData.commonData?.villeDepart,
-                  departureDate: groupData.commonData?.dateDepart,
-                  duration: groupData.commonData?.duree
+                // Stocker les données du groupe pour les utiliser après
+                setTripData({
+                  ...tripData,
+                  pendingGroupData: groupData
                 });
                 
-                console.log('✅ Trip créé, record ID:', tripRecord.id);
+                // Aller vers la vue de chargement IMMÉDIATEMENT
+                setCurrentView('group-loading');
                 
-                // Créer tous les participants avec le record ID du trip et stocker les codes
-                const participantsWithCodes = [];
-                for (const participant of groupData.participants) {
-                  // Utiliser le même format de code que les cartes cadeaux (XXX-XXX-XXX)
-                  const code = generateCode();
-                  await airtableClient.createParticipant({
-                    tripId: tripRecord.id, // Utiliser le record ID, pas le Trip ID custom
-                    code,
-                    prenom: participant.prenom,
-                    nom: participant.nom,
-                    email: participant.email,
-                    paymentStatus: 'paid-gift'
-                  });
-                  
-                  // Ajouter le code au participant pour l'email
-                  participantsWithCodes.push({
-                    ...participant,
-                    code
-                  });
-                  
-                  // Petite pause pour éviter les codes identiques
-                  await new Promise(resolve => setTimeout(resolve, 10));
-                }
+                // Créer le voyage après un micro-délai (pour que la vue se charge)
+                setTimeout(async () => {
+                  try {
+                    const tripId = `TRIP-${Date.now()}`;
+                    
+                    console.log('🎁 Début création du voyage');
+                    
+                    // Créer le voyage
+                    const tripRecord = await airtableClient.createTrip({
+                      tripId,
+                      type: 'group',
+                      nbParticipants: groupData.participants.length,
+                      amount: 0, // Déjà payé via carte cadeau
+                      paymentStatus: 'paid-gift',
+                      criteriaOrder: groupData.criteria.map(c => c.id),
+                      budget: groupData.commonData?.budget,
+                      hasChildren: groupData.commonData?.enfants === 'oui',
+                      nbEnfants: groupData.commonData?.nbEnfants,
+                      agesEnfants: groupData.commonData?.agesEnfants,
+                      departureCity: groupData.commonData?.villeDepart,
+                      departureDate: groupData.commonData?.dateDepart,
+                      duration: groupData.commonData?.duree
+                    });
+                    
+                    console.log('✅ Trip créé, record ID:', tripRecord.id);
+                    
+                    // Créer tous les participants avec le record ID du trip et stocker les codes
+                    const participantsWithCodes = [];
+                    for (const participant of groupData.participants) {
+                      // Utiliser le même format de code que les cartes cadeaux (XXX-XXX-XXX)
+                      const code = generateCode();
+                      await airtableClient.createParticipant({
+                        tripId: tripRecord.id, // Utiliser le record ID, pas le Trip ID custom
+                        code,
+                        prenom: participant.prenom,
+                        nom: participant.nom,
+                        email: participant.email,
+                        paymentStatus: 'paid-gift'
+                      });
+                      
+                      // Ajouter le code au participant pour l'email
+                      participantsWithCodes.push({
+                        ...participant,
+                        code
+                      });
+                      
+                      // Petite pause pour éviter les codes identiques
+                      await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+                    
+                    console.log('✅ Participants créés avec codes:', participantsWithCodes);
+                    
+                    // Marquer la carte cadeau comme utilisée
+                    if (tripData.inputCode) {
+                      console.log('🎁 Marquage carte cadeau:', tripData.inputCode);
+                      await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
+                    }
+                    
+                    // Envoyer les codes par email avec les codes inclus
+                    await fetch('/api/emails/send-participant-codes', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        tripId,
+                        participants: participantsWithCodes // Envoyer avec les codes
+                      })
+                    });
+                    
+                    console.log('✅ Emails envoyés');
+                    
+                    // Aller vers la page de succès
+                    setCurrentView('group-success');
+                  } catch (error) {
+                    console.error('❌ Erreur groupe:', error);
+                    alert('Erreur : ' + (error.message || error));
+                    setLoading(false);
+                    setCurrentView('group-setup');
+                  }
+                }, 100);
                 
-                console.log('✅ Participants créés avec codes:', participantsWithCodes);
-                
-                // Marquer la carte cadeau comme utilisée
-                if (tripData.inputCode) {
-                  console.log('🎁 Marquage carte cadeau:', tripData.inputCode);
-                  await airtableClient.updateGiftCardStatus(tripData.inputCode, 'used');
-                }
-                
-                // Envoyer les codes par email avec les codes inclus
-                await fetch('/api/emails/send-participant-codes', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    tripId,
-                    participants: participantsWithCodes // Envoyer avec les codes
-                  })
-                });
-                
-                console.log('✅ Emails envoyés');
-                
-                setLoading(false);
-                // Au lieu de alert + router, aller vers une page de succès
-                setCurrentView('group-success');
                 return;
               }
               
@@ -3434,6 +3455,39 @@ if (paymentSuccess && tripData.travelers === 1) {
             }
           }}
         />
+      )}
+
+      {currentView === 'group-loading' && (
+        <div className="min-h-screen relative overflow-auto flex items-center justify-center p-4" style={{ 
+          backgroundImage: 'url(https://images.unsplash.com/photo-1612278675615-7b093b07772d?q=80&w=1920)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}>
+          <div className="max-w-2xl w-full bg-white rounded-4xl shadow-xl p-8 text-center">
+            <div className="mb-6">
+              <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-gray-900 mx-auto"></div>
+            </div>
+            
+            <h2 className="font-['Poppins'] text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Création du voyage en cours...
+            </h2>
+            
+            <p className="text-lg text-gray-600 mb-6">
+              Nous créons votre voyage et envoyons les codes par email à tous les participants.
+            </p>
+            
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 mb-4">
+              <p className="text-sm text-gray-700">
+                ⏱️ Cela peut prendre quelques secondes, merci de patienter...
+              </p>
+            </div>
+            
+            <p className="text-sm text-gray-500">
+              Ne fermez pas cette page
+            </p>
+          </div>
+        </div>
       )}
 
       {currentView === 'group-success' && (
