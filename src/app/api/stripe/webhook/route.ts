@@ -192,11 +192,23 @@ async function handleSoloPayment(session: Stripe.Checkout.Session, metadata: any
     
     console.log('🎫 Code utilisé:', code);
     
-    // Récupérer les infos du client depuis Stripe
-    const customerEmail = session.customer_details?.email;
-    const customerName = session.customer_details?.name || '';
-    const [prenom, ...nomParts] = customerName.split(' ');
-    const nom = nomParts.join(' ');
+    // 🔥 IMPORTANT : Utiliser l'email du FORMULAIRE (dans metadata), pas l'email Stripe
+    const customerEmail = metadata.email;
+    
+    console.log('📧 Email du formulaire:', customerEmail);
+    
+    if (!customerEmail) {
+      console.error('❌ ERREUR: Pas d\'email dans les metadata!');
+      console.error('Metadata:', metadata);
+      throw new Error('Email manquant dans les metadata');
+    }
+    
+    // Pour le solo, on n'a pas de prénom/nom dans le formulaire
+    // On utilise des valeurs par défaut
+    const prenom = 'Voyageur';
+    const nom = '';
+
+    console.log('✅ Infos extraites:', { prenom, nom, email: customerEmail });
 
     // Créer le voyage
     const tripId = `TRIP-${Date.now()}`;
